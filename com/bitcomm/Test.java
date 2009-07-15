@@ -28,6 +28,13 @@ public class Test {
 		Shell shell=new Shell(d);
 		//AnalogMeterControl c = new AnalogMeterControl(shell,SWT.PUSH);
 		//Button a = new Button(shell,SWT.PUSH);
+		Composite tool = new Composite(shell,SWT.NONE);
+		tool.setLayoutData(new GridData(SWT.LEFT,SWT.TOP,true,false));
+		ToolBar toolbar = new ToolBar(tool,SWT.NONE);
+		ToolItem item = new ToolItem(toolbar,SWT.PUSH);
+		item.setText("test");
+		toolbar.pack();
+		
 		AnalogMeter m = new AnalogMeter(shell,SWT.BORDER);
 		AnalogMeter n = new AnalogMeter(shell,SWT.BORDER);
 		//AnalogMeter mm = new AnalogMeter(shell,SWT.BORDER);
@@ -41,12 +48,7 @@ public class Test {
 		m.setLayoutData(layoutData);
 		n.setLayoutData(layoutData);
 		shell.setLayout(layout);
-		Composite tool = new Composite(shell,SWT.NONE);
-		tool.setLayoutData(new GridData(SWT.LEFT,SWT.TOP,true,false));
-		ToolBar toolbar = new ToolBar(tool,SWT.NONE);
-		ToolItem item = new ToolItem(toolbar,SWT.PUSH);
-		item.setText("test");
-		toolbar.pack();
+		
 		shell.open();
 		shell.layout();
 		// TODO 自动生成方法存根
