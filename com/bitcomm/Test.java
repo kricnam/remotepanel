@@ -24,6 +24,7 @@ public class Test {
 	 */
 	public static void main(String[] args) {
 		// TODO 自动生成方法存根
+		
 		Display d = new Display();
 		Shell shell=new Shell(d);
 		//AnalogMeterControl c = new AnalogMeterControl(shell,SWT.PUSH);
