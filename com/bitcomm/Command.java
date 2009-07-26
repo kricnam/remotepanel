@@ -15,7 +15,8 @@ public class Command {
 		Alarm,
 		CurrentData,
 		HistoryData,
-		HistorySpectrumData
+		SpectrumDataRequest,
+		SpectrumDataConfirm
     }
 	Command()
 	{
@@ -35,9 +36,13 @@ public class Command {
 			CommandCode[0]='r';
 			CommandCode[1]='a';
 			break;
-		case HistorySpectrumData:
+		case SpectrumDataRequest:
 			CommandCode[0]='h';
 			CommandCode[1]='c';
+			break;
+		case SpectrumDataConfirm:
+			CommandCode[0]='h';
+			CommandCode[1]='C';
 			break;
 		default:
 			break;
