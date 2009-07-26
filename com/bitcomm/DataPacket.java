@@ -86,7 +86,7 @@ public class DataPacket {
 	int GetDataStart(byte []Data)
 	{
 		int i;
-		i =0;
+		i = 0;
 		while(Data[i]!= SOH && i < Data.length) i++;
 		if (Data[i]!=SOH) return -1;
 		if (Data[i] == SOH && Data[i+2]== STX)
