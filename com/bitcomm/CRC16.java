@@ -38,7 +38,7 @@ public class CRC16 {
 	};
 	
 	/* CRC-ITUT 計算 */
-	static char _calc_crc_itut(byte data, char crc)
+	static char crc16_byte(byte data, char crc)
 	{
 		char i,j;
 	    i=crc_table_itut[(crc ^ data) & 0x00ff] ;
@@ -52,14 +52,8 @@ public class CRC16 {
 		char crc=start;
 		
 		for(int i=0;i<len;i++) {
-			crc=_calc_crc_itut(data[i],crc);
+			crc=crc16_byte(data[i],crc);
 		}
 		return crc;
-	}
-	public static void main(String[] args)
-	{
-		byte []a={1,2,3,4,5};
-		char b = crc16((char)0xffff,a,a.length);
-		System.out.print((int)b);
 	}
 }
