@@ -6,5 +6,4 @@ public class DateTime {
 	byte day;
 	byte hour;
 	byte minute;
-
 }
