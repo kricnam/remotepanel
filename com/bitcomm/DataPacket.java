@@ -1,5 +1,7 @@
 package com.bitcomm;
 
+import java.util.Arrays;
+
 public class DataPacket {
 	static byte SOH=0x01;
 	static byte STX=0x02;
@@ -12,34 +14,56 @@ public class DataPacket {
 	byte MachineNumber;
 	int start;
 	int end;
-	byte Command[];
-	char crc16;
+	byte Content[];
 	boolean bValid;
 	DataPacket()
 	{
 		bValid = false;
 	}
 	
-	DataPacket(byte Machine){
+	DataPacket(byte Machine,byte[] Data){
 		MachineNumber = Machine;
-		byte tmp[]=new byte[2];
-		Command = new byte[9];
-		Command[0]= SOH;
-		Command[1]= Machine;
-		Command[2]= STX;
-		Command[3]='r';
-		Command[4]='a';
-		Command[5]=ETX;
-		Command[8]=EOT;
-		tmp[0]='r';
-		tmp[1]='a';
-		crc16=CRC16.crc16((char)0xFFFF, tmp,tmp.length );
-		Command[6] = (byte)(crc16 & 0x00ff);
-		Command[7] = (byte)(crc16 >> 8 & 0x00ff);
+		Content = Arrays.copyOf(Data, Data.length);
 		bValid = true;
 	}
 	
-	boolean IsValid(byte []Data, int start)
+	DataPacket(byte []Data){
+		bValid = false;
+		start = GetDataStart(Data);
+		if (start<0)	return;
+
+		if (Is_CRC_OK(Data,start))
+		{
+		   Content = Arrays.copyOfRange(Data, start, end);
+		}
+	}
+	
+	byte[] ByteStream()
+	{
+		byte []out;
+		if (bValid)
+		{
+			out = new byte[Content.length + 3 + 5];
+			out[0]=SOH;
+			out[1]=MachineNumber;
+			out[2]=STX;
+			int i;
+			for ( i=0;i<Content.length;i++)
+				out[i+3]=Content[i];
+			out[i+3]=ETX;
+			char crc = CRC16.crc16((char)0xFFFF,Content, Content.length);
+			out[i+4]= (byte)((crc >> 8) & 0x00ff);
+			out[i+5]= (byte)(crc & 0x00ff);
+			out[i+6]= EOT;
+		}
+		else
+		{
+			out = new byte[0];
+		}
+		return out;
+	}
+
+	boolean Is_CRC_OK(byte []Data, int start)
 	{
 		int i;
 		char crc =  (char)0xFFFF;
@@ -73,44 +97,4 @@ public class DataPacket {
 		return -1;
 	}
 	
-	
-	DataPacket(byte []Data){
-		int i;
-		i =0;
-		while(Data[i]!= SOH && i < Data.length) i++;
-		if (Data[i]!=SOH) 
-		{
-			bValid = false;
-			return;
-		}
-		MachineNumber = Data[++i];
-		if (Data[++i]!= STX)
-		{
-			bValid = false;
-			return;
-		}
-		
-		i++;
-		while(Data[i]!= ETX && i < Data.length) i++;
-		
-		byte tmp[]=new byte[2];
-		tmp[0]='r';
-		tmp[1]='a';
-		crc16=
-		
-		//new byte[9];
-		if (Data[0]== SOH &&
-			Data[2]== STX &&
-		    Data[3]== 'r' &&
-		    Data[4]== 'a' &&
-		    Data[5]== ETX &&
-		    Data[8]== EOT &&
-		    Data[6]== (byte)(crc16 & 0x00ff) &&
-		    Data[7]== (byte)(crc16 >> 8 & 0x00ff))
-			bValid = true;
-		else 
-			bValid = false;
-		MachineNumber = Data[1];
-		Command = Data.clone();
-	}
 }
