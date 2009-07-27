@@ -31,6 +31,8 @@ public class SpectrumData extends MeasureData{
 		dateGPS = new DateTime(Data,4026);
 		gps = new GPSData(Data,4032);
 		cFOMA = Data[4044];
-		
+		nHVVolt = (short)ToChar(Data,4045);
+		nThermoral = (short)ToChar(Data,4047);
+		nBattVoltage = (short)ToChar(Data,4049);		
 	}
 }
