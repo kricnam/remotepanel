@@ -83,7 +83,7 @@ public class DataPacket {
 		return false;
 	}
 	
-	int GetDataStart(byte []Data)
+	protected int GetDataStart(byte []Data)
 	{
 		int i;
 		i = 0;
@@ -96,5 +96,4 @@ public class DataPacket {
 		}
 		return -1;
 	}
-	
 }
