@@ -49,4 +49,9 @@ public class Command {
 			
 		}
 	}
+	
+	byte[] ByteStream()
+	{ 
+		return CommandCode;
+	}
 }
