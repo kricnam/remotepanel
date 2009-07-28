@@ -33,7 +33,9 @@ public class Test {
 		tool.setLayoutData(new GridData(SWT.LEFT,SWT.TOP,true,false));
 		ToolBar toolbar = new ToolBar(tool,SWT.NONE);
 		ToolItem item = new ToolItem(toolbar,SWT.PUSH);
+		ToolItem item1 = new ToolItem(toolbar,SWT.PUSH);
 		item.setText("test");
+		item1.setText("www");
 		toolbar.pack();
 		
 		AnalogMeter m = new AnalogMeter(shell,SWT.BORDER);
