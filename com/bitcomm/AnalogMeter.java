@@ -53,6 +53,7 @@ public class AnalogMeter extends Canvas {
 	public RGB rgbMark;
 
 	public FontData fontLable;
+	public RGB rgbBK;
 
 	public AnalogMeter(Composite parent, int style) {
 		super(parent, style);
@@ -67,6 +68,7 @@ public class AnalogMeter extends Canvas {
 		nMinScale = 0;
 		nMaxScale = 100;
 		nValue = 60;
+		rgbBK=new RGB(172,178,179);
 
 	}
 
@@ -213,8 +215,11 @@ public class AnalogMeter extends Canvas {
 		// TODO 自动生成方法存根
 		super.drawBackground(gc, x, y, width, height);
 
-		gc.drawLine(x, y, width, height);
+		//gc.drawLine(x, y, width, height);
+		Color bk = new Color(gc.getDevice(),rgbBK);
+		setBackground(bk);
 		drawScale(gc);
+		bk.dispose();
 	}
 
 	/*
