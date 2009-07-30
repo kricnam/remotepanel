@@ -27,37 +27,44 @@ public class Test {
 		
 		Display d = new Display();
 		Shell shell=new Shell(d);
-		//AnalogMeterControl c = new AnalogMeterControl(shell,SWT.PUSH);
-		//Button a = new Button(shell,SWT.PUSH);
+
+		shell.setLocation(0, 0);
+		shell.setText("控制台");
+		//shell.setMaximized(true);
+		//shell.setSize(1800, 600);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		shell.setLayout(layout);
+		
 		Composite tool = new Composite(shell,SWT.NONE);
-		tool.setLayoutData(new GridData(SWT.LEFT,SWT.TOP,true,false));
 		ToolBar toolbar = new ToolBar(tool,SWT.NONE);
 		ToolItem item = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem item1 = new ToolItem(toolbar,SWT.PUSH);
 		item.setText("test");
 		item1.setText("www");
+		//item1.setImage(ImageFactory.loadImage(toolbar.getDisplay(),imageFactory.ADD_OBJ));
+		tool.setLayoutData(new GridData(SWT.LEFT,SWT.TOP,true,false));
 		toolbar.pack();
 		
-		AnalogMeter m = new AnalogMeter(shell,SWT.BORDER);
-		AnalogMeter n = new AnalogMeter(shell,SWT.BORDER);
-		//AnalogMeter mm = new AnalogMeter(shell,SWT.BORDER);
-		//m.addPaintListener(listener);
-		//a.setText("dddd");
+
 		
-		//shell.setSize(100, 100);
-		GridLayout layout = new GridLayout();
-		layout.numColumns =3;
-		GridData layoutData = new GridData(GridData.FILL_BOTH);
+		Composite Meters = new Composite(shell,SWT.BORDER);
+		GridLayout meterLayout= new GridLayout();
+
+		Meters.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
+
+		AnalogMeter m = new AnalogMeter(Meters,SWT.NONE);
+		AnalogMeter n = new AnalogMeter(Meters,SWT.NONE);
+		
+		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
+		meterLayout.numColumns = 2;
+		Meters.setLayout(meterLayout);
+
 		m.setLayoutData(layoutData);
 		n.setLayoutData(layoutData);
-		shell.setLayout(layout);
-		
+
 		shell.open();
 		shell.layout();
-		// TODO 自动生成方法存根
-		
-		
-		
          while (!shell.isDisposed()){
         	 if (!d.readAndDispatch()) 
         	 {
@@ -66,8 +73,6 @@ public class Test {
         		 n.redraw();
         		 m.redraw();
         		 d.sleep();
-        	
-        	 
         	 }
          }
 	}
