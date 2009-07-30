@@ -58,14 +58,18 @@ public class Test {
 		
 		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
 		meterLayout.numColumns = 2;
-		Meters.setLayout(meterLayout);
+		//Meters.setLayout(meterLayout);
 
 		m.setLayoutData(layoutData);
 		n.setLayoutData(layoutData);
+		m.setSize(300, 200);
+		m.setLocation(0, 0);
+		n.setLocation(300, 0);
+		n.setSize(300, 200);
 
 		shell.open();
 		shell.layout();
-         while (!shell.isDisposed()){
+        while (!shell.isDisposed()){
         	 if (!d.readAndDispatch()) 
         	 {
         		 m.nValue = m.nValue-1;
