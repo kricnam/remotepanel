@@ -12,7 +12,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -174,7 +173,7 @@ public class AnalogMeter extends Canvas {
 	void drawDigiValue(GC gc) {
 		FontData fdata = new FontData("NI7SEG", 12, SWT.NORMAL);
 		RGB rgb1 = new RGB(222, 231, 214);
-		RGB rgb2 = new RGB(22, 22, 0);
+		RGB rgb2 = new RGB(22, 22, 22);
 
 		Color bkColor = new Color(gc.getDevice(), rgb1);
 		Color fgColor = new Color(gc.getDevice(), rgb2);
@@ -184,12 +183,12 @@ public class AnalogMeter extends Canvas {
 		gc.setFont(ft);
 		
 		Point p = gc.stringExtent("+888.8");
-		gc.fillRectangle(pointGaugeCenter.x - p.x / 2, pointGaugeCenter.y-40, p.x, p.y);
+		gc.fillRectangle(pointGaugeCenter.x - p.x / 2, pointGaugeCenter.y-nScaleRadius/2, p.x, p.y);
 		String str = String.valueOf(nValue);
 		Point pt = gc.stringExtent(str);
 
 		gc.drawString(str, pointGaugeCenter.x - p.x / 2 + (p.x - pt.x),
-				pointGaugeCenter.y - 40);
+				pointGaugeCenter.y - nScaleRadius/2);
 		bkColor.dispose();
 		fgColor.dispose();
 		ft.dispose();
@@ -223,25 +222,30 @@ public class AnalogMeter extends Canvas {
 	public void drawBackground(GC gc, int x, int y, int width, int height) {
 		// TODO 自动生成方法存根
 		super.drawBackground(gc, x, y, width, height);
-
-		// gc.drawLine(x, y, width, height);
-		rgbBK.blue = 255;
-		Color bk = new Color(gc.getDevice(), rgbBK);
-		setBackground(bk);
-		gc.fillGradientRectangle(10, 10, 100, 2, true);
-		gc.fillGradientRectangle(110, 14, -100, -2, true);
-		bk.dispose();
+		
+		RGB rgb0 = new RGB(20, 20, 20);
+		RGB rgb1 = new RGB(80, 80, 80);
+		RGB rgb2 = new RGB(200, 200, 200);
+		
+		Color bkColor = new Color(gc.getDevice(), rgb1);
+		Color bkColor0 = new Color(gc.getDevice(), rgb0);
+		Color fgColor = new Color(gc.getDevice(), rgb2);
+		
+		gc.setBackground(bkColor);
+		gc.setForeground(bkColor0);
+		
+		gc.fillGradientRectangle(x, y, width, height, true);
+		
+		gc.setBackground(bkColor);
+		gc.setForeground(fgColor);
+	
 		drawScale(gc);
-		gc
-				.drawString("uGy/h", pointGaugeCenter.x - 15,
+		gc.drawString("uGy/h", pointGaugeCenter.x - 15,
 						pointGaugeCenter.y + 30);
-
-		gc.drawRectangle(new Rectangle(2, 2, 10, 10));
-		RGB rgb = new RGB(255, 0, 0);
-		bk = new Color(gc.getDevice(), rgb);
-		gc.setBackground(bk);
-		gc.fillRectangle(10, 10, 10, 10);
-		bk.dispose();
+		
+		bkColor.dispose();
+		fgColor.dispose();
+		bkColor0.dispose();
 
 	}
 
