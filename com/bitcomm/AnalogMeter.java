@@ -223,9 +223,9 @@ public class AnalogMeter extends Canvas {
 		// TODO 自动生成方法存根
 		super.drawBackground(gc, x, y, width, height);
 		
-		RGB rgb0 = new RGB(20, 20, 20);
-		RGB rgb1 = new RGB(100, 100, 100);
-		RGB rgb2 = new RGB(200, 200, 200);
+		RGB rgb0 = new RGB(100, 100, 100);
+		RGB rgb1 = new RGB(180, 200, 200);
+		RGB rgb2 = new RGB(250, 250, 230);
 		
 		Color bkColor = new Color(gc.getDevice(), rgb1);
 		Color bkColor0 = new Color(gc.getDevice(), rgb0);
