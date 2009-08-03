@@ -62,10 +62,10 @@ public class Test {
 
 		m.setLayoutData(layoutData);
 		n.setLayoutData(layoutData);
-		m.setSize(300, 200);
+		m.setSize(400, 350);
 		m.setLocation(0, 0);
-		n.setLocation(300, 0);
-		n.setSize(300, 200);
+		n.setLocation(400, 0);
+		n.setSize(400, 350);
 
 		shell.open();
 		shell.layout();
