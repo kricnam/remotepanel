@@ -46,8 +46,6 @@ public class Test {
 		tool.setLayoutData(new GridData(SWT.LEFT,SWT.TOP,true,false));
 		toolbar.pack();
 		
-
-		
 		Composite Meters = new Composite(shell,SWT.BORDER);
 		GridLayout meterLayout= new GridLayout();
 
