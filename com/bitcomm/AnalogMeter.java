@@ -171,7 +171,7 @@ public class AnalogMeter extends Canvas {
 	}
 
 	void drawDigiValue(GC gc) {
-		FontData fdata = new FontData("NI7SEG", 12, SWT.NORMAL);
+		FontData fdata = new FontData("NI7SEG", 16, SWT.NORMAL);
 		RGB rgb1 = new RGB(222, 231, 214);
 		RGB rgb2 = new RGB(22, 22, 22);
 
