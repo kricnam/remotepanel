@@ -224,7 +224,7 @@ public class AnalogMeter extends Canvas {
 		super.drawBackground(gc, x, y, width, height);
 		
 		RGB rgb0 = new RGB(20, 20, 20);
-		RGB rgb1 = new RGB(80, 80, 80);
+		RGB rgb1 = new RGB(100, 100, 100);
 		RGB rgb2 = new RGB(200, 200, 200);
 		
 		Color bkColor = new Color(gc.getDevice(), rgb1);
