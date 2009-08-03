@@ -40,7 +40,7 @@ public class Test {
 		ToolBar toolbar = new ToolBar(tool,SWT.NONE);
 		ToolItem item = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem item1 = new ToolItem(toolbar,SWT.PUSH);
-		item.setText("test");
+		item.setText("设置");
 		item1.setText("www");
 		//item1.setImage(ImageFactory.loadImage(toolbar.getDisplay(),imageFactory.ADD_OBJ));
 		tool.setLayoutData(new GridData(SWT.LEFT,SWT.TOP,true,false));
