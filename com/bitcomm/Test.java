@@ -51,29 +51,34 @@ public class Test {
 
 		Meters.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 
-		AnalogMeter m = new AnalogMeter(Meters,SWT.NONE);
-		AnalogMeter n = new AnalogMeter(Meters,SWT.NONE);
+		//AnalogMeter m = new AnalogMeter(Meters,SWT.NONE);
+		//AnalogMeter n = new AnalogMeter(Meters,SWT.NONE);
+		ChartGraph g= new ChartGraph(Meters,SWT.NONE);
 		
 		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
 		meterLayout.numColumns = 2;
 		//Meters.setLayout(meterLayout);
 
-		m.setLayoutData(layoutData);
-		n.setLayoutData(layoutData);
-		m.setSize(400, 350);
-		m.setLocation(0, 0);
-		n.setLocation(400, 0);
-		n.setSize(400, 350);
+		//m.setLayoutData(layoutData);
+		//n.setLayoutData(layoutData);
+		//n.setLayoutData(layoutData);
+		//m.setSize(400, 350);
+		//m.setLocation(0, 0);
+		//n.setLocation(400, 0);
+		//n.setSize(400, 350);
+		g.setLocation(0,0);
+		g.setSize(600,400);
 
 		shell.open();
 		shell.layout();
         while (!shell.isDisposed()){
         	 if (!d.readAndDispatch()) 
         	 {
-        		 m.nValue = m.nValue-1;
+        		/* m.nValue = m.nValue-1;
         		 n.nValue -= 1;
         		 n.redraw();
         		 m.redraw();
+        		 */
         		 d.sleep();
         	 }
          }
