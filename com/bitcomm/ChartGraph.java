@@ -20,6 +20,8 @@ public class ChartGraph extends Canvas {
 	double YOffset;
 	double Xmin;
 	double Xmax;
+	int Margin;
+	
 	
 	
 	
@@ -34,12 +36,17 @@ public class ChartGraph extends Canvas {
 	}
 	void paintControl(PaintEvent e) {
 		GC gc = e.gc;
+		
 		Point size = getSize();
+		SetTransform(0,0,size.x,size.y);
+		Margin = Math.min((int)(size.x * 0.04),(int)(size.y * 0.04));
+		
 		Color white= getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		
 		setBackground(white);
 		drawBackground(gc, 0, 0, size.x, size.y);
 		
-		drawAxis(gc, 0, 0,size.x, size.y);
+		
 		drawData(gc, 0, 0,size.x, size.y);
 
 	}
@@ -49,16 +56,13 @@ public class ChartGraph extends Canvas {
 	@Override
 	public void drawBackground(GC gc, int x, int y, int width, int height) {
 		// TODO 自动生成方法存根
-		//super.drawBackground(gc, x, y, width, height);
-		
+		super.drawBackground(gc, x, y, width, height);
+		drawAxis(gc, x, y, width, height);
 		
 	}
-	public void drawAxis(GC gc, int x, int y, int width, int height) {
-		// TODO 自动生成方法存根
-		//super.drawBackground(gc, x, y, width, height);		
-		gc.drawRectangle(x+10, y+10, width-20, height-20);
-		gc.setLineStyle(SWT.LINE_DOT);
-		gc.drawLine(x+20, y+20, width-30, y+20);
+	
+	public void SetTransform(int x, int y, int width, int height)
+	{
 		int MaxCount=0;
 		nMaxData = 0;
 		for (int j=0;j < Data.length;j++)
@@ -76,13 +80,24 @@ public class ChartGraph extends Canvas {
 		
 		double nRange = nMaxData - nMinData;
 		
-		yRate = (nRange / 0.8) / height;
+		yRate = (nRange / 0.8) / (height-2*Margin);
 		if (nMinData < 0)
 			YOffset = (0-nMinData)/0.8;
 		else 
 			YOffset = 0;
 		
-		xRate = (double) width/MaxCount;
+		xRate = (double) (width-2*Margin)/MaxCount;
+
+	}
+	
+	public void drawAxis(GC gc, int x, int y, int width, int height) {
+		// TODO 自动生成方法存根
+		Color gray= getDisplay().getSystemColor(SWT.COLOR_GRAY);		
+		
+		gc.drawRectangle(x+Margin, y+Margin, width-2*Margin, height-2*Margin);
+		gc.setForeground(gray);
+		gc.setLineStyle(SWT.LINE_DOT);
+		
 	}
 	
 	public void drawData(GC gc, int x, int y, int width, int height) {
