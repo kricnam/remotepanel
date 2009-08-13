@@ -1,5 +1,7 @@
 package com.bitcomm;
 
+import java.text.DecimalFormat;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -8,6 +10,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+
 
 public class ChartGraph extends Canvas {
 
@@ -20,8 +23,12 @@ public class ChartGraph extends Canvas {
 	double Xmin;
 	double Xmax;
 	int Margin;
-	
-	
+	int MaxCount;
+	double nScaleMax;
+	double nScaleMin;
+	double xScaleRate;  // 
+	int nXMarkNum;
+	int nYMarkNum;
 	
 	
 	public ChartGraph(Composite parent, int style) {
@@ -34,6 +41,13 @@ public class ChartGraph extends Canvas {
 		});
 		nMaxData = 0;
 		nMinData = nMaxData;
+		nScaleMax = 0;
+		nScaleMin = nScaleMax;
+		YOffset = 0;
+		MaxCount = 0;
+		xScaleRate=1;
+		nXMarkNum = 0;
+		nYMarkNum = 0;
 	}
 	void paintControl(PaintEvent e) {
 		GC gc = e.gc;
@@ -67,7 +81,7 @@ public class ChartGraph extends Canvas {
 	public void AutoSetTransform(int x, int y, int width, int height)
 	{
 		Margin = Math.min((int)(width * 0.04),(int)(height * 0.04));
-		int MaxCount=0;
+		
 		nMaxData = 0;
 			for (int j=0;j < Data.length;j++)
 			{
@@ -82,28 +96,28 @@ public class ChartGraph extends Canvas {
 				for(int i=0 ; i< Data[j].length;i++)
 					nMinData = Math.min(nMinData , Data[j][i]);
 		
-		
-		double nRange = nMaxData - nMinData;
-		yRate = (nRange / 0.8) / (height-2*Margin);
-		if (nMinData < 0)
-			YOffset = (0-nMinData)/0.8;
-		else 
-			YOffset = 0;
-		
-		xRate = (double) (width-2*Margin)/MaxCount;
+		SetTransform(x,y,width,height);
 
 	}
 
 	public void SetTransform(int x, int y, int width, int height)
 	{
-		double nRange = nMaxData - nMinData;
-		int MaxCount=0;
-		for (int j=0;j < Data.length;j++)
-			MaxCount = Math.max(MaxCount, Data[j].length);
+		if (nScaleMax == nScaleMin)
+		{
+			nScaleMax = Math.ceil(nMaxData );
+			nScaleMin = Math.floor(nMinData);
+		}
 
-		yRate = (nRange / 0.8) / (height-2*Margin);
-		if (nMinData < 0)
-			YOffset = (0-nMinData)/0.8;
+		double nRange = nScaleMax - nScaleMin;
+		if (MaxCount==0)
+		{
+			for (int j=0;j < Data.length;j++)
+				MaxCount = Math.max(MaxCount, Data[j].length);
+		}
+
+		yRate = nRange  / (height-2*Margin);
+		if (nScaleMin < 0)
+			YOffset = -nScaleMin ;
 		else 
 			YOffset = 0;
 		
@@ -114,11 +128,31 @@ public class ChartGraph extends Canvas {
 	public void drawAxis(GC gc, int x, int y, int width, int height) {
 		// TODO 自动生成方法存根
 		Color gray= getDisplay().getSystemColor(SWT.COLOR_GRAY);		
-		
 		gc.drawRectangle(x+Margin, y+Margin, width-2*Margin, height-2*Margin);
 		gc.setForeground(gray);
 		gc.setLineStyle(SWT.LINE_DOT);
-		//gc.drawLine(x1, y1, x2, y2);
+		
+		double avg = (nScaleMax-nScaleMin)/10;
+		int ys;
+		
+		for (int i=0;i<11;i++)
+		{
+			ys = (int)Math.round((YOffset- nScaleMin-i*avg)/yRate)+Margin;
+			gc.drawLine((int)Margin,y+ys,x+width-Margin,y+ys);
+			
+			DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
+			String strValue  = df.format(nScaleMin+i*avg);
+			System.out.print('X');
+			System.out.println(strValue);
+			gc.drawString(strValue, Margin, ys,true);
+		}
+		avg = MaxCount / nXMarkNum;
+		for (int i=0;i<nXMarkNum;i++)
+		{
+			ys = (int)Math.round((i*avg)*xRate);
+			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
+			gc.drawString(String.valueOf(i*avg*xScaleRate),x+Margin+ys-20 , y+height-Margin,true);
+		}
 		
 	}
 	
@@ -126,7 +160,7 @@ public class ChartGraph extends Canvas {
 		int []p = new int[Data[0].length];
 		for (int i = 0; i < Data[0].length;i++)
 		{
-			p[i] = (int)Math.round((Data[0][i]+ YOffset)/ yRate)+Margin;
+			p[i] = (int)Math.round(( YOffset-Data[0][i])/ yRate)+Margin;
 		}
 		gc.setLineStyle(SWT.LINE_SOLID);
 		for (int i = 0; i < Data[0].length-1;i++)
