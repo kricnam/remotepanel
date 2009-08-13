@@ -55,7 +55,7 @@ public class Test {
 		//AnalogMeter n = new AnalogMeter(Meters,SWT.NONE);
 		ChartGraph g= new ChartGraph(Meters,SWT.NONE);
 		
-		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
+		//GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
 		meterLayout.numColumns = 2;
 		//Meters.setLayout(meterLayout);
 
@@ -67,7 +67,17 @@ public class Test {
 		//n.setLocation(400, 0);
 		//n.setSize(400, 350);
 		g.setLocation(0,0);
-		g.setSize(600,400);
+		g.setSize(800,400);
+		g.Data = new double[1][360];
+		for (int i=0;i<360 ;i++)
+		{
+			g.Data[0][i]= Math.sin(i*Math.PI/180);
+		}
+		g.Margin =20;
+		g.nMaxData = 1;
+		g.nMinData = -1;
+		g.nXMarkNum = 10;
+		g.nYMarkNum = 10;
 
 		shell.open();
 		shell.layout();
