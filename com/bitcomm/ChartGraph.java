@@ -142,8 +142,6 @@ public class ChartGraph extends Canvas {
 			
 			DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
 			String strValue  = df.format(nScaleMin+i*avg);
-			System.out.print('X');
-			System.out.println(strValue);
 			gc.drawString(strValue, Margin, ys,true);
 		}
 		avg = MaxCount / nXMarkNum;
