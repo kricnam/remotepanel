@@ -5,12 +5,12 @@ package com.bitcomm;
 
 import org.eclipse.swt.SWT;
 
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -26,11 +26,13 @@ public class AlokaPanel {
 	/**
 	 * @param args
 	 */
+	static Display d;
+	static Shell shell;
+	
 	public static void main(String[] args) {
 		// TODO 自动生成方法存根
-		
-		Display d = new Display();
-		Shell shell=new Shell(d);
+		d = new Display();
+		shell =new Shell(d);
 
 		//shell.setLocation(0, 0);
 		shell.setText("控制台");
@@ -46,10 +48,10 @@ public class AlokaPanel {
 		Composite Meters = new Composite(shell,SWT.BORDER);
 		
 		tool.setBounds(0, 0, 80, shell.getClientArea().height);
-	
-		
-		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.FLAT);
+
+		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.FLAT|SWT.BORDER);
 		//toolbar.setBackground(d.getSystemColor(SWT.COLOR_BLUE));
+		ToolItem item0 = new ToolItem(toolbar,SWT.CHECK);
 		ToolItem itemSetup = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemTrend = new ToolItem(toolbar,SWT.PUSH);
 		Image imgSetup = new Image(d,"com/bitcomm/resource/setup.png");
@@ -57,11 +59,39 @@ public class AlokaPanel {
 		itemSetup.setText("设置");
 		itemSetup.setImage(imgSetup);
 		imgSetup.dispose();
+		itemTrend.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				Shell s = new Shell(shell);
+				s.setLayout(new FillLayout());
+				Composite Meters = new Composite(s,SWT.BORDER);
+				ChartGraph g= new ChartGraph(Meters,SWT.NONE);
+				Meters.setLayout(new FillLayout());
+				Meters.setLocation(0,0);
+				Meters.setSize(800,400);
+				g.Data = new double[1][360];
+				for (int i=0;i<360 ;i++)
+				{
+					g.Data[0][i]= Math.sin(i*Math.PI/180);
+				}
+				g.Margin =20;
+				g.nMaxData = 2;
+				g.nMinData = -2;
+				g.nXMarkNum = 10;
+				g.nYMarkNum = 10;
+				Meters.pack();
+				s.open();
+				s.layout();
+			}
+			public void widgetDefaultSelected(SelectionEvent e){
+				System.out.println("fff");
+			}
+		});
+		
 		itemTrend.setText("趋势图");
 		itemTrend.setImage(imgNum);
 		imgNum.dispose();
 		toolbar.pack();
-				
+		
 		Meters.setBounds(tool.getSize().x, 0, shell.getClientArea().width - 80, shell.getClientArea().height);
 		
 		GridLayout meterLayout= new GridLayout();
@@ -98,7 +128,6 @@ public class AlokaPanel {
 		
 		shell.open();
 		shell.layout();
-		itemSetup.setSelection(false);
         while (!shell.isDisposed()){
         	 if (!d.readAndDispatch()) 
         	 {
