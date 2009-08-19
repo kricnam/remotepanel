@@ -128,7 +128,7 @@ public class ChartGraph extends Canvas {
 	public void drawAxis(GC gc, int x, int y, int width, int height) {
 		// TODO 自动生成方法存根
 		Color gray= getDisplay().getSystemColor(SWT.COLOR_GRAY);		
-		gc.drawRectangle(x+Margin, y+Margin, width-2*Margin, height-2*Margin);
+		
 		gc.setForeground(gray);
 		gc.setLineStyle(SWT.LINE_DOT);
 		
@@ -151,6 +151,10 @@ public class ChartGraph extends Canvas {
 			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
 			gc.drawString(String.valueOf(i*avg*xScaleRate),x+Margin+ys-20 , y+height-Margin,true);
 		}
+		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
+		gc.setForeground(black);
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.drawRectangle(x+Margin, y+Margin, width-2*Margin, height-2*Margin);
 		
 	}
 	
