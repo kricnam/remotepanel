@@ -242,6 +242,9 @@ public class AnalogMeter extends Canvas {
 		drawScale(gc);
 		gc.drawString("uGy/h", pointGaugeCenter.x - 15,
 						pointGaugeCenter.y + 30,true);
+		//gc.setLineWidth(5);
+		//gc.drawOval(pointGaugeCenter.x - nScaleRadius - 5, pointGaugeCenter.y - nScaleRadius -5,
+		//		2*nScaleRadius+10, 2*nScaleRadius + 10);
 		
 		bkColor.dispose();
 		fgColor.dispose();
