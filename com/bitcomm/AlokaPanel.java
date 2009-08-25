@@ -3,6 +3,12 @@
  */
 package com.bitcomm;
 
+import java.io.IOException;
+
+import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.preference.PreferenceManager;
+import org.eclipse.jface.preference.PreferenceNode;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
 
 import org.eclipse.swt.events.SelectionEvent;
@@ -59,6 +65,29 @@ public class AlokaPanel {
 		itemSetup.setText("设置");
 		itemSetup.setImage(imgSetup);
 		imgSetup.dispose();
+		
+		itemSetup.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				
+				PreferenceManager manager= new PreferenceManager();
+				PreferenceNode node1= new PreferenceNode("System","系统设置",null,SetupPage.class.getName());
+				manager.addToRoot(node1);
+				PreferenceDialog dlg = new PreferenceDialog(shell,manager);
+				PreferenceStore store = new PreferenceStore("config.ini");
+				try{
+					store.load();
+					dlg.setPreferenceStore(store);
+					dlg.open();
+					store.save();
+				}
+				catch(IOException ex){
+					ex.printStackTrace();
+				}
+			}
+			public void widgetDefaultSelected(SelectionEvent e){
+			}
+		});
+		
 		itemTrend.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
 				Shell s = new Shell(shell);
@@ -81,9 +110,9 @@ public class AlokaPanel {
 				Meters.pack();
 				s.open();
 				s.layout();
+				
 			}
 			public void widgetDefaultSelected(SelectionEvent e){
-				System.out.println("fff");
 			}
 		});
 		
