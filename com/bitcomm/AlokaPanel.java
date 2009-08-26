@@ -57,11 +57,19 @@ public class AlokaPanel {
 
 		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.FLAT|SWT.BORDER);
 		//toolbar.setBackground(d.getSystemColor(SWT.COLOR_BLUE));
-		ToolItem item0 = new ToolItem(toolbar,SWT.CHECK);
+		ToolItem item0 = new ToolItem(toolbar,SWT.FLAT);
 		ToolItem itemSetup = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemTrend = new ToolItem(toolbar,SWT.PUSH);
+		ToolItem itemReport = new ToolItem(toolbar,SWT.PUSH);
+		ToolItem itemSpectrum = new ToolItem(toolbar,SWT.PUSH);
+		ToolItem itemClose = new ToolItem(toolbar,SWT.PUSH);
+		
 		Image imgSetup = new Image(d,"com/bitcomm/resource/setup.png");
 		Image imgNum = new Image(d,"com/bitcomm/resource/numbers.png");
+		Image imgReport = new Image(d,"com/bitcomm/resource/report.png");
+		Image imgSpectrum = new Image(d,"com/bitcomm/resource/spectrum.png");
+		Image imgClose = new Image(d,"com/bitcomm/resource/power_on_blue.png");
+		
 		itemSetup.setText("设置");
 		itemSetup.setImage(imgSetup);
 		imgSetup.dispose();
@@ -119,6 +127,49 @@ public class AlokaPanel {
 		itemTrend.setText("趋势图");
 		itemTrend.setImage(imgNum);
 		imgNum.dispose();
+
+		itemReport.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				Shell s = new Shell(shell);
+				s.setLayout(new FillLayout());
+				s.open();
+				s.layout();
+			}
+			public void widgetDefaultSelected(SelectionEvent e){
+			}
+		});
+		
+		itemReport.setText("报表");
+		itemReport.setImage(imgReport);
+		imgReport.dispose();
+		
+		itemSpectrum.setText("频谱");
+		itemSpectrum.setImage(imgSpectrum);
+		imgSpectrum.dispose();
+
+		itemSpectrum.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				Shell s = new Shell(shell);
+				s.setLayout(new FillLayout());
+				s.open();
+				s.layout();
+			}
+			public void widgetDefaultSelected(SelectionEvent e){
+			}
+		});
+		
+		itemClose.setText("关闭");
+		itemClose.setImage(imgClose);
+		imgClose.dispose();
+		itemClose.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				d.dispose();
+			}
+			public void widgetDefaultSelected(SelectionEvent e){
+			}
+		});
+
+		
 		toolbar.pack();
 		
 		Meters.setBounds(tool.getSize().x, 0, shell.getClientArea().width - 80, shell.getClientArea().height);
