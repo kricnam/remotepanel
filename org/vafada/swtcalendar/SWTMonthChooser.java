@@ -52,8 +52,8 @@ public class SWTMonthChooser extends Composite {
     }
 
     private void initNames() {
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(locale);
-        String[] monthNames = dateFormatSymbols.getMonths();
+        //DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(locale);
+        //String[] monthNames = dateFormatSymbols.getMonths();    	String[] monthNames = {"1","2","3","4","5","6","7","8","9","10","11","12"};
 
         int month = comboBox.getSelectionIndex();
         if (comboBox.getItemCount() > 0) {
