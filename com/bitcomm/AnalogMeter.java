@@ -27,7 +27,7 @@ public class AnalogMeter extends Canvas {
 	 */
 	public int Height;
 
-	public int Wide;
+	public int Width;
 
 	public double nValue;
 
@@ -164,6 +164,8 @@ public class AnalogMeter extends Canvas {
 	void paintControl(PaintEvent e) {
 		GC gc = e.gc;
 		Point size = getSize();
+		Height = size.y;
+		Width = size.x;
 		drawBackground(gc, 0, 0, size.x, size.y);
 		drawDigiValue(gc);
 		drawPoint(gc);
@@ -215,6 +217,13 @@ public class AnalogMeter extends Canvas {
 				+ (int) (valueR * Math.cos(valueAngle)), pointGaugeCenter.y
 				+ (int) (valueR * Math.sin(valueAngle)));
 		gc.setLineWidth(1);
+		gc.setBackground(this.getDisplay().getSystemColor(SWT.COLOR_GREEN));
+		gc.fillRoundRectangle(10,Height-26, 20, 16, 3, 3);
+		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+		gc.drawRoundRectangle(10,Height-26, 20, 16, 3, 3);
+		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+		gc.setFont(this.getDisplay().getSystemFont());
+		gc.drawText("正常", 32, Height-26,true);
 
 	}
 
