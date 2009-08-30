@@ -270,5 +270,6 @@ public class AnalogMeter extends Canvas {
 	public void setSize(int width, int height) {
 		// TODO 自动生成方法存根
 		super.setSize(width, height);
+		System.out.println("111");
 	}
 }

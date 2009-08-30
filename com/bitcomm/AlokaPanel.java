@@ -37,10 +37,11 @@ public class AlokaPanel {
 	public static void main(String[] args) {
 		// TODO 自动生成方法存根
 		d = new Display();
-		shell =new Shell(d);
+		shell =new Shell(d,SWT.MIN);
 
 		//shell.setLocation(0, 0);
 		shell.setText("控制台");
+		
 		//shell.setMaximized(true);
 		shell.setSize(800, 600);
 		GridLayout layout = new GridLayout();
@@ -140,6 +141,7 @@ public class AlokaPanel {
 			public void widgetSelected(SelectionEvent e){
 				Shell s = new Shell(shell);
 				s.setLayout(new FillLayout());
+				SpectrumView spec = new SpectrumView(s,SWT.BORDER);
 				s.open();
 				s.layout();
 			}
@@ -168,52 +170,34 @@ public class AlokaPanel {
 		Meters.setLayout(meterLayout);
 		Meters.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 		
-		//AnalogMeter m = new AnalogMeter(Meters,SWT.NONE);
-		//AnalogMeter n = new AnalogMeter(Meters,SWT.NONE);
-		//ChartGraph g= new ChartGraph(Meters,SWT.NONE);
-		
 		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
+		PreferenceStore store = new PreferenceStore("./config.ini");
+		try{
+			store.load();
+		}
+		catch(IOException eio)
+		{
+			eio.printStackTrace();
+			return;
+		}
+		int Num = store.getInt("StationNum");
 		MeterView meter ;
-		for(int i =0 ;i < 4;i++)
+		for(int i =0 ;i < Num;i++)
 		{
 		  meter = new MeterView(Meters,SWT.NONE);
 		  meter.setLayoutData(layoutData);
 		  
 		  meter.setTitle(new String("站点")+String.valueOf(i+1));
+		  meter.meter.nValue+=5*i;
 		}
 		meterLayout.numColumns = (int)(Math.ceil(Math.sqrt(4)));
-		//m.setLayoutData(layoutData);
-		//n.setLayoutData(layoutData);
-		//n.setLayoutData(layoutData);
-		//m.setSize(400, 350);
-		//m.setLocation(0, 0);
 		Meters.pack();
-		//n.setLocation(400, 0);
-		//n.setSize(400, 350);
-		//g.setLocation(0,0);
-		//g.setSize(800,400);
-		//g.Data = new double[1][360];
-		//for (int i=0;i<360 ;i++)
-		//{
-			//g.Data[0][i]= Math.sin(i*Math.PI/180);
-		//}
-		//g.Margin =20;
-		//g.nMaxData = 1;
-		//g.nMinData = -1;
-//		g.nXMarkNum = 10;
-//		g.nYMarkNum = 10;
-
 		
 		shell.open();
 		shell.layout();
         while (!shell.isDisposed()){
         	 if (!d.readAndDispatch()) 
         	 {
-        		/* m.nValue = m.nValue-1;
-        		 n.nValue -= 1;
-        		 n.redraw();
-        		 m.redraw();
-        		 */
         		 d.sleep();
         	 }
          }
