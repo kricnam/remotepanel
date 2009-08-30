@@ -147,8 +147,9 @@ public class SWTDayChooser extends Composite
         calendar.setLenient(true);
         today = (Calendar) calendar.clone();
         int firstDayOfWeek = calendar.getFirstDayOfWeek();
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(locale);
-        String[] dayNames = dateFormatSymbols.getShortWeekdays();
+        //DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(locale);
+        //String[] dayNames = dateFormatSymbols.getShortWeekdays();
+        String[] dayNames = {"1","2","3","4","5","6","日"};
         int minLength = Integer.MAX_VALUE;
         for (int i = 0; i < dayNames.length; i++) {
             int len = dayNames[i].length();
@@ -176,7 +177,7 @@ public class SWTDayChooser extends Composite
         int d = firstDayOfWeek;
         for (int i = 0; i < dayTitles.length; i++) {
             Label label = dayTitles[i];
-            label.setText(dayNames[d]);
+            label.setText(dayNames[d-1]);
             label.setBackground(getBackground());
             if (d == Calendar.SUNDAY && (style & RED_SUNDAY) != 0 ||
                     d == Calendar.SATURDAY && (style & RED_SATURDAY) != 0) {
