@@ -21,9 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import org.vafada.swtcalendar.SWTCalendarEvent;
 import org.vafada.swtcalendar.SWTCalendarListener;
 import java.text.ParseException;
-
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 
 public class ReprotView extends Composite {
@@ -32,6 +30,7 @@ public class ReprotView extends Composite {
 	Composite comDaily;
 	Composite comMonth;
     final SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日");
+    final SimpleDateFormat monformatter= new SimpleDateFormat("yyyy年MM月");
 	Table dailyTab;
 	Table monthTab;
 	public ReprotView(Composite parent, int style) {
@@ -92,11 +91,13 @@ public class ReprotView extends Composite {
         butDate.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 final SWTCalendarDialog cal = new SWTCalendarDialog(folder.getShell().getDisplay());
+                
                 cal.addDateChangedListener(new SWTCalendarListener() {
                     public void dateChanged(SWTCalendarEvent calendarEvent) {
                         textDate.setText(formatter.format(calendarEvent.getCalendar().getTime()));
                     }
                 });
+                
                 if (textDate.getText() != null && textDate.getText().length() > 0) {
                     try {
                         Date d = formatter.parse(textDate.getText());
@@ -168,7 +169,7 @@ public class ReprotView extends Composite {
                 final SWTCalendarDialog cal = new SWTCalendarDialog(folder.getShell().getDisplay());
                 cal.addDateChangedListener(new SWTCalendarListener() {
                     public void dateChanged(SWTCalendarEvent calendarEvent) {
-                        textDate.setText(formatter.format(calendarEvent.getCalendar().getTime()));
+                        textDate.setText(monformatter.format(calendarEvent.getCalendar().getTime()));
                     }
                 });
                 if (textDate.getText() != null && textDate.getText().length() > 0) {
