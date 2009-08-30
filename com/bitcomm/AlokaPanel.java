@@ -10,7 +10,6 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
-
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -43,21 +42,24 @@ public class AlokaPanel {
 		//shell.setLocation(0, 0);
 		shell.setText("控制台");
 		//shell.setMaximized(true);
-		//shell.setSize(1000, 600);
-		//RowLayout layout = new RowLayout();
-		//layout.numColumns = 2;
-		//shell.setLayout(layout);
+		shell.setSize(800, 600);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		
+		shell.setLayout(layout);
 		
 		//layout.marginLeft = 10;
 		
-		Composite tool = new Composite(shell,SWT.NONE);
+		Composite tool = new Composite(shell,SWT.BORDER);
 		Composite Meters = new Composite(shell,SWT.BORDER);
 		
 		tool.setBounds(0, 0, 80, shell.getClientArea().height);
 
 		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.FLAT|SWT.BORDER);
-		//toolbar.setBackground(d.getSystemColor(SWT.COLOR_BLUE));
-		ToolItem item0 = new ToolItem(toolbar,SWT.FLAT);
+		d.beep();
+		//.setBackground(d.getSystemColor(SWT.COLOR_BLACK));
+		tool.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,true));
+		new ToolItem(toolbar,SWT.FLAT);
 		ToolItem itemSetup = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemTrend = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemReport = new ToolItem(toolbar,SWT.PUSH);
@@ -100,22 +102,7 @@ public class AlokaPanel {
 			public void widgetSelected(SelectionEvent e){
 				Shell s = new Shell(shell);
 				s.setLayout(new FillLayout());
-				Composite Meters = new Composite(s,SWT.BORDER);
-				ChartGraph g= new ChartGraph(Meters,SWT.NONE);
-				Meters.setLayout(new FillLayout());
-				Meters.setLocation(0,0);
-				Meters.setSize(800,400);
-				g.Data = new double[1][360];
-				for (int i=0;i<360 ;i++)
-				{
-					g.Data[0][i]= Math.sin(i*Math.PI/180);
-				}
-				g.Margin =20;
-				g.nMaxData = 2;
-				g.nMinData = -2;
-				g.nXMarkNum = 10;
-				g.nYMarkNum = 10;
-				Meters.pack();
+				new TrendView(s,SWT.BORDER);
 				s.open();
 				s.layout();
 				
@@ -131,8 +118,10 @@ public class AlokaPanel {
 		itemReport.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
 				Shell s = new Shell(shell);
+				ReprotView report = new ReprotView(s,SWT.BORDER);
 				s.setLayout(new FillLayout());
 				s.open();
+				
 				s.layout();
 			}
 			public void widgetDefaultSelected(SelectionEvent e){
@@ -172,33 +161,42 @@ public class AlokaPanel {
 		
 		toolbar.pack();
 		
-		Meters.setBounds(tool.getSize().x, 0, shell.getClientArea().width - 80, shell.getClientArea().height);
+		//Meters.setBounds(tool.getSize().x, 0, shell.getClientArea().width - 80, shell.getClientArea().height);
 		
 		GridLayout meterLayout= new GridLayout();
-		meterLayout.numColumns = 1;
+		//
 		Meters.setLayout(meterLayout);
+		Meters.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 		
-		AnalogMeter m = new AnalogMeter(Meters,SWT.NONE);
+		//AnalogMeter m = new AnalogMeter(Meters,SWT.NONE);
 		//AnalogMeter n = new AnalogMeter(Meters,SWT.NONE);
 		//ChartGraph g= new ChartGraph(Meters,SWT.NONE);
 		
 		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
-
-		m.setLayoutData(layoutData);
+		MeterView meter ;
+		for(int i =0 ;i < 4;i++)
+		{
+		  meter = new MeterView(Meters,SWT.NONE);
+		  meter.setLayoutData(layoutData);
+		  
+		  meter.setTitle(new String("站点")+String.valueOf(i+1));
+		}
+		meterLayout.numColumns = (int)(Math.ceil(Math.sqrt(4)));
+		//m.setLayoutData(layoutData);
 		//n.setLayoutData(layoutData);
 		//n.setLayoutData(layoutData);
-		m.setSize(400, 350);
-		m.setLocation(0, 0);
-		//Meters.pack();
+		//m.setSize(400, 350);
+		//m.setLocation(0, 0);
+		Meters.pack();
 		//n.setLocation(400, 0);
 		//n.setSize(400, 350);
 		//g.setLocation(0,0);
 		//g.setSize(800,400);
 		//g.Data = new double[1][360];
-		for (int i=0;i<360 ;i++)
-		{
+		//for (int i=0;i<360 ;i++)
+		//{
 			//g.Data[0][i]= Math.sin(i*Math.PI/180);
-		}
+		//}
 		//g.Margin =20;
 		//g.nMaxData = 1;
 		//g.nMinData = -1;
@@ -220,6 +218,6 @@ public class AlokaPanel {
         	 }
          }
 	}
-	}
+}
 
 
