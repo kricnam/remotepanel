@@ -30,6 +30,7 @@ public class ReprotView extends Composite {
 	CTabFolder folder;
 	Image img;
 	Composite comDaily;
+	Composite comMonth;
     final SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日");
 	Table dailyTab;
 	Table monthTab;
@@ -61,6 +62,8 @@ public class ReprotView extends Composite {
 		itemDaily.setControl(comDaily);
 		itemMonthly.setText("月表报");
 		itemMonthly.setImage(img);
+		createMonthlyTable();
+		itemMonthly.setControl(comMonth);
 		
 	}
 	
@@ -81,48 +84,29 @@ public class ReprotView extends Composite {
 		
 		optionBar.setLayout(optionLayout);
 		Button butDate = new Button(optionBar,SWT.NONE);
-		final Text textDate = new Text(optionBar,SWT.SINGLE);
+		final Text textDate = new Text(optionBar,SWT.BORDER);
 		Button butPrint = new Button(optionBar,SWT.NONE);
 		
 		butDate.setText("日期选择");
 		
         butDate.addListener(SWT.Selection, new Listener() {
-
             public void handleEvent(Event event) {
-
                 final SWTCalendarDialog cal = new SWTCalendarDialog(folder.getShell().getDisplay());
-
                 cal.addDateChangedListener(new SWTCalendarListener() {
-
                     public void dateChanged(SWTCalendarEvent calendarEvent) {
-
                         textDate.setText(formatter.format(calendarEvent.getCalendar().getTime()));
-
                     }
-
                 });
                 if (textDate.getText() != null && textDate.getText().length() > 0) {
-
                     try {
-
                         Date d = formatter.parse(textDate.getText());
-
                         cal.setDate(d);
-
                     } catch (ParseException pe) {
-
-
-
+                    	pe.printStackTrace();
                     }
-
                 }
-
                 cal.open();
-
-
-
             }
-
         });
 
 		
@@ -141,7 +125,7 @@ public class ReprotView extends Composite {
 		dailyTab.setHeaderVisible(true);
 		dailyTab.setLayoutData(gridData);
 		dailyTab.setLinesVisible(true);
-		String []tabHead = {"1","2","3","4"};
+		String []tabHead = {"时间","最大值","最小值","平均值","3σ"};
 		for (int i=0;i<tabHead.length;i++)
 		{
 			TableColumn tabCol = new TableColumn(dailyTab,SWT.NONE);
@@ -149,12 +133,86 @@ public class ReprotView extends Composite {
 		}
 		
 		TableItem item = new TableItem(dailyTab,SWT.NONE);
-		item.setText(new String[]{"a","b","c","d"});
+		item.setText(new String[]{"0","x","x","x","x"});
 		
 		for (int i=0;i<tabHead.length;i++)
 		{
 			dailyTab.getColumn(i).pack();
 		}
 	}
-	
+
+	private void createMonthlyTable()
+	{
+		comMonth = new Composite(folder,SWT.NONE);
+		GridLayout comLayout = new GridLayout();
+		comLayout.numColumns =1;
+		comMonth.setLayout(comLayout);
+		
+		Composite optionBar = new Composite(comMonth,SWT.NONE);
+		RowLayout optionLayout = new RowLayout();
+		optionLayout.marginLeft = 10;
+		
+		optionLayout.justify = true		;
+		optionLayout.fill = true;
+		
+		
+		optionBar.setLayout(optionLayout);
+		Button butDate = new Button(optionBar,SWT.NONE);
+		final Text textDate = new Text(optionBar,SWT.BORDER);
+		Button butPrint = new Button(optionBar,SWT.NONE);
+		
+		butDate.setText("选择月份");
+		
+        butDate.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                final SWTCalendarDialog cal = new SWTCalendarDialog(folder.getShell().getDisplay());
+                cal.addDateChangedListener(new SWTCalendarListener() {
+                    public void dateChanged(SWTCalendarEvent calendarEvent) {
+                        textDate.setText(formatter.format(calendarEvent.getCalendar().getTime()));
+                    }
+                });
+                if (textDate.getText() != null && textDate.getText().length() > 0) {
+                    try {
+                        Date d = formatter.parse(textDate.getText());
+                        cal.setDate(d);
+                    } catch (ParseException pe) {
+                    	pe.printStackTrace();
+                    }
+                }
+                cal.open();
+            }
+        });
+
+		
+		butPrint.setText("打印");
+		textDate.setTextLimit(20);
+		textDate.setLayoutData(new RowData(200,16));
+		
+		
+		GridData gridData= new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace  = true;
+		gridData.grabExcessVerticalSpace =  true;
+		gridData.verticalAlignment = SWT.FILL;
+		
+		monthTab = new Table(comMonth,SWT.FULL_SELECTION);
+		monthTab.setHeaderVisible(true);
+		monthTab.setLayoutData(gridData);
+		monthTab.setLinesVisible(true);
+		String []tabHead = {"日期","最大值","最小值","平均值","3σ"};
+		for (int i=0;i<tabHead.length;i++)
+		{
+			TableColumn tabCol = new TableColumn(monthTab,SWT.NONE);
+			tabCol.setText(tabHead[i]);
+		}
+		
+		TableItem item = new TableItem(monthTab,SWT.NONE);
+		item.setText(new String[]{"1","x","x","x","x"});
+		
+		for (int i=0;i<tabHead.length;i++)
+		{
+			monthTab.getColumn(i).pack();
+		}
+	}
+
 }
