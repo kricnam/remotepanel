@@ -34,10 +34,7 @@ public class TrendView extends Composite {
 	private void initialize() {
 		//setSize(new Point(300, 200));
 		GridLayout layout = new GridLayout();
-		//layout.marginRight = 0;
-		//layout.marginLeft = 60;
 		
-		//layout.type = SWT.VERTICAL;
 		setLayout(layout);
 		//setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,false));
 		
