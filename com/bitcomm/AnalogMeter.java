@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Canvas;
@@ -231,14 +232,17 @@ public class AnalogMeter extends Canvas {
 	public void drawBackground(GC gc, int x, int y, int width, int height) {
 		// TODO 自动生成方法存根
 		super.drawBackground(gc, x, y, width, height);
+		Image img = new Image(gc.getDevice(),"com/bitcomm/resource/logo.gif");
 		
-		RGB rgb0 = new RGB(100, 100, 100);
-		RGB rgb1 = new RGB(180, 200, 200);
-		RGB rgb2 = new RGB(250, 250, 230);
+		RGB rgb0 = new RGB(90, 175, 203);
+		RGB rgb1 = new RGB(176, 215, 230);
+		RGB rgb2 = new RGB(30, 30, 30);
+		RGB rgbLogo = new RGB(77,113,178);
 		
 		Color bkColor = new Color(gc.getDevice(), rgb1);
 		Color bkColor0 = new Color(gc.getDevice(), rgb0);
 		Color fgColor = new Color(gc.getDevice(), rgb2);
+		Color logoColor = new Color(gc.getDevice(),rgbLogo);
 		
 		gc.setBackground(bkColor);
 		gc.setForeground(bkColor0);
@@ -254,10 +258,14 @@ public class AnalogMeter extends Canvas {
 		//gc.setLineWidth(5);
 		//gc.drawOval(pointGaugeCenter.x - nScaleRadius - 5, pointGaugeCenter.y - nScaleRadius -5,
 		//		2*nScaleRadius+10, 2*nScaleRadius + 10);
+		gc.setForeground(logoColor);
+		//gc.drawString("ALOKA", width -70, height - 40,true);
+		gc.drawImage(img, width - img.getBounds().width, height - img.getBounds().height);
 		
 		bkColor.dispose();
 		fgColor.dispose();
 		bkColor0.dispose();
+		logoColor.dispose();
 
 	}
 
