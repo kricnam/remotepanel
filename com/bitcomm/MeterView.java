@@ -27,7 +27,9 @@ public class MeterView extends Composite {
 		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
 		meter = new AnalogMeter(group,SWT.BORDER);
 		meter.setLayoutData(layoutData);
-		
+		byte[] a=new byte[12];
+		a[0]=(byte)255;
+		meter.dateData = new DateTime(a,0);
 		
 	}
 	public void setTitle(String str)
