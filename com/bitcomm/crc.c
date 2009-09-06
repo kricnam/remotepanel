@@ -52,8 +52,8 @@ return crc;
 main()
 {
 unsigned short  crc;
-char ra_buf[73] ={1,2,3,4,5};
-crc = calc_crc16_itut(0xffff,&ra_buf[0],5);
-printf("%d %x\n",crc,crc);
+char ra_buf[73] ={0x01,0x01,2,'r','a',3};
+crc = calc_crc16_itut(0xffff,&ra_buf[3],2);
+printf("%d %x\n,%hhx,%hhx",crc,crc,'r','a');
 }
 
