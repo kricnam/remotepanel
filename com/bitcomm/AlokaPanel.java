@@ -3,6 +3,8 @@
  */
 package com.bitcomm;
 
+
+
 import java.io.IOException;
 
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -10,12 +12,18 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -38,23 +46,28 @@ public class AlokaPanel {
 		// TODO 自动生成方法存根
 		d = new Display();
 		shell =new Shell(d,SWT.MIN);
-
-		//shell.setLocation(0, 0);
-		shell.setText("控制台");
+		shell.setText(ConstData.strName);
+		Image imgShell = new Image(d,"com/bitcomm/resource/burn.png");
+		shell.setImage(imgShell);
+		shell.setMaximized(true);
 		
-		//shell.setMaximized(true);
-		shell.setSize(800, 600);
+		//shell.setSize(d.getClientArea().width, d.getClientArea().height);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		
 		shell.setLayout(layout);
 		
-		//layout.marginLeft = 10;
-		
-		Composite tool = new Composite(shell,SWT.BORDER);
+		Composite Logo = new Composite(shell,SWT.NONE);
+		Composite tool = new Composite(shell,SWT.NONE);
 		Composite Meters = new Composite(shell,SWT.BORDER);
+		GridData gridData = new GridData(SWT.FILL,SWT.FILL,true,false,2,1);
+		gridData.heightHint = 36;
+		Logo.setLayoutData(gridData);
+		LogoView logoView = new LogoView(Logo,SWT.NONE);
+		logoView.setLayout(new FillLayout());
+		Logo.setLayout(new FillLayout());
 		
-		tool.setBounds(0, 0, 80, shell.getClientArea().height);
+		//tool.setBounds(0, 0, 80, shell.getClientArea().height);
 
 		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.FLAT|SWT.BORDER);
 		d.beep();
@@ -73,7 +86,7 @@ public class AlokaPanel {
 		Image imgSpectrum = new Image(d,"com/bitcomm/resource/spectrum.png");
 		Image imgClose = new Image(d,"com/bitcomm/resource/power_on_blue.png");
 		
-		itemSetup.setText("设置");
+		itemSetup.setText(ConstData.strConfig);
 		itemSetup.setImage(imgSetup);
 		imgSetup.dispose();
 		
@@ -112,7 +125,7 @@ public class AlokaPanel {
 			}
 		});
 		
-		itemTrend.setText("趋势图");
+		itemTrend.setText(ConstData.strTrend);
 		itemTrend.setImage(imgNum);
 		imgNum.dispose();
 
@@ -129,11 +142,11 @@ public class AlokaPanel {
 			}
 		});
 		
-		itemReport.setText("报表");
+		itemReport.setText(ConstData.strReport);
 		itemReport.setImage(imgReport);
 		imgReport.dispose();
 		
-		itemSpectrum.setText("频谱");
+		itemSpectrum.setText(ConstData.strSpetru);
 		itemSpectrum.setImage(imgSpectrum);
 		imgSpectrum.dispose();
 
@@ -149,7 +162,7 @@ public class AlokaPanel {
 			}
 		});
 		
-		itemClose.setText("关闭");
+		itemClose.setText(ConstData.strClose);
 		itemClose.setImage(imgClose);
 		imgClose.dispose();
 		itemClose.addSelectionListener(new SelectionListener(){
@@ -159,7 +172,7 @@ public class AlokaPanel {
 			public void widgetDefaultSelected(SelectionEvent e){
 			}
 		});
-
+		
 		
 		toolbar.pack();
 		
@@ -187,18 +200,19 @@ public class AlokaPanel {
 		  meter = new MeterView(Meters,SWT.NONE);
 		  meter.setLayoutData(layoutData);
 		  
-		  meter.setTitle(new String("站点")+String.valueOf(i+1));
+		  meter.setTitle(ConstData.strStation+String.valueOf(i+1));
 		  meter.meter.nValue+=5*i;
 		}
-		meterLayout.numColumns = (int)(Math.ceil(Math.sqrt(4)));
+		meterLayout.numColumns = (int)(Math.ceil(Math.sqrt(Num)));
 		Meters.pack();
-		
 		shell.open();
 		shell.layout();
+		
         while (!shell.isDisposed()){
         	 if (!d.readAndDispatch()) 
         	 {
         		 d.sleep();
+        		 Logo.redraw();
         	 }
          }
 	}
