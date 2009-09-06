@@ -1,7 +1,10 @@
 package com.bitcomm;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -20,18 +23,19 @@ public class LogoView extends Canvas {
 		});
 	}
 	void paintControl(PaintEvent e) {
-		GC gc = e.gc;
-		
-		
-		Image imgLogo = new Image(gc.getDevice(),"com/bitcomm/resource/logo.png");
 		GC g = e.gc;
+		Point p=getSize();
+		FontData fdata = new FontData("Times", 20, SWT.NORMAL);
+		Image imgLogo = new Image(g.getDevice(),"com/bitcomm/resource/logo.png");
 		
-		g.drawImage(imgLogo,e.width-imgLogo.getBounds().width-100,0);
-		g.drawText("ALOKA Console", 0, 0);
+		g.drawImage(imgLogo,p.x-imgLogo.getBounds().width-10,0);
+		Font font = new Font(g.getDevice(),fdata);
+		g.setFont(font);
+		
+		Point pt=g.stringExtent(ConstData.strTitle);
+		g.drawText(ConstData.strTitle,p.x/2 - pt.x/2 , 0);
 		imgLogo.dispose();
-
-		
-
+		font.dispose();
 	}
 	
 }
