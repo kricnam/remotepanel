@@ -94,7 +94,7 @@ public class AlokaPanel {
 			public void widgetSelected(SelectionEvent e){
 				
 				PreferenceManager manager= new PreferenceManager();
-				PreferenceNode node1= new PreferenceNode("System","系统设置",null,SetupPage.class.getName());
+				PreferenceNode node1= new PreferenceNode("System",ConstData.strSysSetup,null,SetupPage.class.getName());
 				manager.addToRoot(node1);
 				PreferenceDialog dlg = new PreferenceDialog(shell,manager);
 				PreferenceStore store = new PreferenceStore("config.ini");
@@ -199,7 +199,7 @@ public class AlokaPanel {
 		{
 		  meter = new MeterView(Meters,SWT.NONE);
 		  meter.setLayoutData(layoutData);
-		  
+		  if (i==0) meter.Enable(true);
 		  meter.setTitle(ConstData.strStation+String.valueOf(i+1));
 		  meter.meter.nValue+=5*i;
 		}
@@ -212,7 +212,7 @@ public class AlokaPanel {
         	 if (!d.readAndDispatch()) 
         	 {
         		 d.sleep();
-        		 Logo.redraw();
+        		 
         	 }
          }
 	}
