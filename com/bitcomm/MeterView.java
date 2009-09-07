@@ -28,7 +28,8 @@ public class MeterView extends Composite {
 		meter = new AnalogMeter(group,SWT.BORDER);
 		meter.setLayoutData(layoutData);
 		byte[] a=new byte[12];
-		a[0]=(byte)255;
+		a[0]=(byte)25;
+		a[3]=(byte)12;
 		meter.dateData = new DateTime(a,0);
 		
 	}
