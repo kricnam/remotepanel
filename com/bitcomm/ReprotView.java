@@ -29,8 +29,8 @@ public class ReprotView extends Composite {
 	Image img;
 	Composite comDaily;
 	Composite comMonth;
-    final SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日");
-    final SimpleDateFormat monformatter= new SimpleDateFormat("yyyy年MM月");
+    final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    final SimpleDateFormat monformatter= new SimpleDateFormat("yyyy-MM");
 	Table dailyTab;
 	Table monthTab;
 	public ReprotView(Composite parent, int style) {
@@ -55,11 +55,11 @@ public class ReprotView extends Composite {
 		
 		CTabItem itemDaily = new CTabItem(folder,SWT.NONE);
 		CTabItem itemMonthly = new CTabItem(folder,SWT.NONE);
-		itemDaily.setText("日报表");
+		itemDaily.setText(ConstData.strDailyReprot);
 		itemDaily.setImage(img);
 		createDailyTable();
 		itemDaily.setControl(comDaily);
-		itemMonthly.setText("月表报");
+		itemMonthly.setText(ConstData.strMonthReport);
 		itemMonthly.setImage(img);
 		createMonthlyTable();
 		itemMonthly.setControl(comMonth);
@@ -86,7 +86,7 @@ public class ReprotView extends Composite {
 		final Text textDate = new Text(optionBar,SWT.BORDER);
 		Button butPrint = new Button(optionBar,SWT.NONE);
 		
-		butDate.setText("日期选择");
+		butDate.setText(ConstData.strDate);
 		
         butDate.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
@@ -111,7 +111,7 @@ public class ReprotView extends Composite {
         });
 
 		
-		butPrint.setText("打印");
+		butPrint.setText(ConstData.strPrint);
 		textDate.setTextLimit(20);
 		textDate.setLayoutData(new RowData(200,16));
 		
@@ -126,7 +126,8 @@ public class ReprotView extends Composite {
 		dailyTab.setHeaderVisible(true);
 		dailyTab.setLayoutData(gridData);
 		dailyTab.setLinesVisible(true);
-		String []tabHead = {"时间","最大值","最小值","平均值","3σ"};
+		String []tabHead = {ConstData.strTime,ConstData.strMax,ConstData.strMin,
+				ConstData.strAvg,ConstData.str3Sigma};
 		for (int i=0;i<tabHead.length;i++)
 		{
 			TableColumn tabCol = new TableColumn(dailyTab,SWT.NONE);
@@ -162,7 +163,7 @@ public class ReprotView extends Composite {
 		final Text textDate = new Text(optionBar,SWT.BORDER);
 		Button butPrint = new Button(optionBar,SWT.NONE);
 		
-		butDate.setText("选择月份");
+		butDate.setText(ConstData.strDate);
 		
         butDate.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
@@ -185,7 +186,7 @@ public class ReprotView extends Composite {
         });
 
 		
-		butPrint.setText("打印");
+		butPrint.setText(ConstData.strPrint);
 		textDate.setTextLimit(20);
 		textDate.setLayoutData(new RowData(200,16));
 		
@@ -200,7 +201,8 @@ public class ReprotView extends Composite {
 		monthTab.setHeaderVisible(true);
 		monthTab.setLayoutData(gridData);
 		monthTab.setLinesVisible(true);
-		String []tabHead = {"日期","最大值","最小值","平均值","3σ"};
+		String []tabHead = {ConstData.strDate,ConstData.strMax,ConstData.strMin,
+				ConstData.strAvg,ConstData.str3Sigma};
 		for (int i=0;i<tabHead.length;i++)
 		{
 			TableColumn tabCol = new TableColumn(monthTab,SWT.NONE);

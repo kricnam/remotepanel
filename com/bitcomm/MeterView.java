@@ -27,15 +27,17 @@ public class MeterView extends Composite {
 		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
 		meter = new AnalogMeter(group,SWT.BORDER);
 		meter.setLayoutData(layoutData);
-		byte[] a=new byte[12];
-		a[0]=(byte)25;
-		a[3]=(byte)12;
-		meter.dateData = new DateTime(a,0);
-		
 	}
+	
 	public void setTitle(String str)
 	{
 		group.setText(str);
 	}
+
+	public void Enable(boolean b)
+	{
+		meter.Enable = b;
+	}
+
 
 }

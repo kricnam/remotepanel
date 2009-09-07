@@ -21,7 +21,7 @@ import org.vafada.swtcalendar.SWTCalendarEvent;
 import org.vafada.swtcalendar.SWTCalendarListener;
 
 public class SpectrumView extends Composite {
-	final SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日");
+	final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	Composite optionBar;
 	ChartGraph3D graph3d;
 	Display display;
@@ -68,8 +68,8 @@ public class SpectrumView extends Composite {
 		//butTime.setText("起始时间");
 		//butDate1.setText("结束日期");
 		//butTime1.setText("结束时间");
-		butPrint.setText("打印");
-		butSetup.setText("选择数据文件");
+		butPrint.setText(ConstData.strPrint);
+		butSetup.setText(ConstData.strDate);
 		//textDate.setLayoutData(new RowData(100,16));
 //		textDate1.setLayoutData(new RowData(100,16));
 //		textTime.setLayoutData(new RowData(50,16));

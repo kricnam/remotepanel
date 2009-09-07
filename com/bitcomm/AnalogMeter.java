@@ -30,6 +30,7 @@ public class AnalogMeter extends Canvas {
 	 * @param parent
 	 * @param style
 	 */
+	boolean EnableAnalog;
 	boolean Enable;
 	public int Height;
 
@@ -84,6 +85,7 @@ public class AnalogMeter extends Canvas {
         });	
 
 		Enable = false;
+		EnableAnalog = false;
 		nGaugeStartDegree = 120;
 		nGaugeEndDegree = 420;
 
@@ -129,7 +131,7 @@ public class AnalogMeter extends Canvas {
 
 		N = (nMaxScale - nMinScale) / nMajorMark;
 		
-		if (!Enable) return;
+		if (!EnableAnalog) return;
 		
 		for (n = 0; n < nMinormark + 1; n = n + 1) {
 			angle = ((nGaugeStartDegree + n * avg) / 180) * Math.PI;
@@ -206,7 +208,7 @@ public class AnalogMeter extends Canvas {
 	}
 
 	void drawDigiValue(GC gc) {
-		FontData fdata = new FontData("NI7SEG", 26, SWT.NORMAL);
+		FontData fdata = new FontData("NI7SEG", pointGaugeCenter.x/8, SWT.NORMAL);
 		RGB rgb1 = new RGB(222, 231, 214);
 		RGB rgb2 = new RGB(22, 22, 22);
 
@@ -217,24 +219,37 @@ public class AnalogMeter extends Canvas {
 		
 		gc.setFont(ft);
 		
-		Point p = gc.stringExtent("+888.8");
+		Point p = gc.stringExtent("+888888888.8");
 		//gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
 		//gc.drawRectangle(pointGaugeCenter.x - p.x / 2, pointGaugeCenter.y-nScaleRadius/2, p.x, p.y);
+		
+		
+		gc.setForeground(bkColor);
+		gc.drawRectangle(pointGaugeCenter.x - p.x / 2 -3, pointGaugeCenter.y-nScaleRadius/2-3 , p.x+8, p.y+8);
 		gc.setForeground(fgColor);
-		gc.fillRectangle(pointGaugeCenter.x - p.x / 2, pointGaugeCenter.y-nScaleRadius/2, p.x, p.y);
+		gc.fillRoundRectangle(pointGaugeCenter.x - p.x / 2 , pointGaugeCenter.y-nScaleRadius/2 , p.x+3, p.y+3,2,2);
 		String str = String.valueOf(nValue);
 		Point pt = gc.stringExtent(str);
 
-		gc.drawString(str, pointGaugeCenter.x - p.x / 2 + (p.x - pt.x),
-				pointGaugeCenter.y - nScaleRadius/2);
+		if (Enable)
+		{
+			gc.drawString(str, pointGaugeCenter.x - p.x / 2 + (p.x - pt.x),
+					pointGaugeCenter.y - nScaleRadius/2,true);
 
-		gc.drawText(dateData.toStringDate(),pointGaugeCenter.x - p.x/2 + (p.x - pt.x)- 80,
-				pointGaugeCenter.y - nScaleRadius/2 + 32);
+		}
+		else
+		{
+			gc.drawString(".", pointGaugeCenter.x - p.x / 2 + (p.x - pt.x),
+					pointGaugeCenter.y - nScaleRadius/2);
+
+		}
 		ft.dispose();
 		gc.setFont(gc.getDevice().getSystemFont());
+		gc.drawString(dateData.toStringDate(),10,10,true);
+
 		gc.drawString("uGy/h", pointGaugeCenter.x - p.x / 2 + p.x + 10,
 				pointGaugeCenter.y - nScaleRadius/2,true);
-
+		
 		bkColor.dispose();
 		fgColor.dispose();
 		
@@ -278,10 +293,26 @@ public class AnalogMeter extends Canvas {
 		super.drawBackground(gc, x, y, width, height);
 		
 		
-		RGB rgb0 = new RGB(90, 175, 203);
-		RGB rgb1 = new RGB(176, 215, 230);
-		RGB rgb2 = new RGB(30, 30, 30);
-		RGB rgbLogo = new RGB(77,113,178);
+		RGB rgb0;
+		RGB rgb1;
+		RGB rgb2;
+		RGB rgbLogo;
+		
+		if (Enable)
+		{
+			rgb0 = new RGB(90, 175, 203);
+			rgb1 = new RGB(176, 215, 230);
+			rgb2 = new RGB(30, 30, 30);
+			rgbLogo = new RGB(77,113,178);
+		}
+		else
+		{
+			rgb0 = new RGB(100, 100, 100);
+			rgb1 = new RGB(200, 200, 200);
+			rgb2 = new RGB(30, 30, 30);
+			rgbLogo = new RGB(77,113,178);
+
+		}
 		
 		Color bkColor = new Color(gc.getDevice(), rgb1);
 		Color bkColor0 = new Color(gc.getDevice(), rgb0);

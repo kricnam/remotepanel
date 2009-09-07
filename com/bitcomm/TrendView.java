@@ -60,21 +60,19 @@ public class TrendView extends Composite {
 
 		Button butDate1 = new Button(optionBar,SWT.PUSH);
 		final Text textDate1 = new Text(optionBar,SWT.BORDER);
-		Button butTime1 = new Button(optionBar,SWT.PUSH);
-		final Text textTime1 = new Text(optionBar,SWT.BORDER);
-
+		
 		Button butPrint = new Button(optionBar,SWT.PUSH);
 		
-		butDate.setText("起始日期");
-		butTime.setText("起始时间");
-		butDate1.setText("结束日期");
-		butTime1.setText("结束时间");
-		butPrint.setText("打印");
-		butSetup.setText("设置");
+		butDate.setText(ConstData.strStartDate);
+		butTime.setText(ConstData.strStartTime);
+		butDate1.setText(ConstData.strEndDate);
+		
+		butPrint.setText(ConstData.strPrint);
+		butSetup.setText("");
 		textDate.setLayoutData(new RowData(100,16));
 		textDate1.setLayoutData(new RowData(100,16));
 		textTime.setLayoutData(new RowData(50,16));
-		textTime1.setLayoutData(new RowData(50,16));
+
 		textDate.setEditable(false);
 		
 

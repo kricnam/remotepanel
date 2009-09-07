@@ -31,11 +31,11 @@ public class SetupPage extends PreferencePage {
 		Composite comp= new Composite(parent,SWT.NONE);
 		comp.setLayout(new GridLayout(2,false));
 		IPreferenceStore  prefStore = getPreferenceStore();
-		new Label(comp,SWT.LEFT).setText("站点数量");
+		new Label(comp,SWT.LEFT).setText(ConstData.strStationNum);
 		StationNum = new Text(comp,SWT.BORDER);
 		StationNum.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		StationNum.setText(prefStore.getString("StationNum"));
-		new Label(comp,SWT.LEFT).setText("服务器URL");
+		new Label(comp,SWT.LEFT).setText(ConstData.strURL);
 		urlAddress = new Text(comp,SWT.BORDER);
 		urlAddress.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		urlAddress.setText(prefStore.getString("ServerURL"));
@@ -47,7 +47,7 @@ public class SetupPage extends PreferencePage {
 		
 		IPreferenceStore store = getPreferenceStore();
 		StationNum.setText("4");//(store.getDefaultString("StationNum"));
-		urlAddress.setText("http://localhost");//store.getDefaultString("ServerURL"));
+		urlAddress.setText("localhost");//store.getDefaultString("ServerURL"));
 		
 		
 	}
