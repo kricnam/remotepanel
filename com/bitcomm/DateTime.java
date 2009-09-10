@@ -34,5 +34,16 @@ public class DateTime extends MeasureData{
 		else
 			return new String("--------");
 	}
-	
+
+	public String toStringTime()
+	{
+		if (bValid)
+		{
+			NumberFormat formater = new DecimalFormat("00");
+			return formater.format(hour)+":"+formater.format(minute);  
+ 		}
+		else
+			return new String("--:--");
+	}
+
 }

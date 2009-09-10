@@ -50,30 +50,35 @@ public class AlokaPanel {
 		Image imgShell = new Image(d,"com/bitcomm/resource/burn.png");
 		shell.setImage(imgShell);
 		shell.setMaximized(true);
-		
+				
 		//shell.setSize(d.getClientArea().width, d.getClientArea().height);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 		
 		shell.setLayout(layout);
 		
-		Composite Logo = new Composite(shell,SWT.NONE);
 		Composite tool = new Composite(shell,SWT.NONE);
+		Composite Logo = new Composite(shell,SWT.NONE);
+		
 		Composite Meters = new Composite(shell,SWT.BORDER);
-		GridData gridData = new GridData(SWT.FILL,SWT.FILL,true,false,2,1);
+		GridData gridData = new GridData(SWT.FILL,SWT.FILL,true,false);
 		gridData.heightHint = 36;
 		Logo.setLayoutData(gridData);
+		tool.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,false,1,2));
+		
 		LogoView logoView = new LogoView(Logo,SWT.NONE);
 		logoView.setLayout(new FillLayout());
 		Logo.setLayout(new FillLayout());
 		
+		
 		//tool.setBounds(0, 0, 80, shell.getClientArea().height);
 
-		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.FLAT|SWT.BORDER);
+		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.PUSH|SWT.BORDER);
 		d.beep();
 		//.setBackground(d.getSystemColor(SWT.COLOR_BLACK));
-		tool.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,true));
-		new ToolItem(toolbar,SWT.FLAT);
+		//tool.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,true));
+		//new ToolItem(toolbar,SWT.FLAT);
+		
 		ToolItem itemSetup = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemTrend = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemReport = new ToolItem(toolbar,SWT.PUSH);

@@ -8,9 +8,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
-public class MeterView extends Composite {
+public class MeterView extends Composite  {
 	Group group;
 	AnalogMeter meter;
+	HiLowData data;
 
 	public MeterView(Composite parent, int style) {
 		super(parent, style);

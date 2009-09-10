@@ -24,5 +24,6 @@ public class ConstData {
 	static String strSysSetup = "System Config";
 	static String strStationNum = "Measure Point Number";
 	static String strURL = "Server Name/IP";
+	static String strNormal = "Normal";
 	
 }
