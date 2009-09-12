@@ -200,14 +200,12 @@ public class AlokaPanel {
 		}
 		int Num = store.getInt("StationNum");
 		MeterView meter ;
-		for(int i =0 ;i < Num;i++)
-		{
 		  meter = new MeterView(Meters,SWT.NONE);
 		  meter.setLayoutData(layoutData);
-		  if (i==0) meter.Enable(true);
-		  meter.setTitle(ConstData.strStation+String.valueOf(i+1));
-		  meter.meter.nValue+=5*i;
-		}
+		  meter.Enable(true);
+		  meter.setTitle(ConstData.strStation+String.valueOf(1));
+		  
+		
 		meterLayout.numColumns = (int)(Math.ceil(Math.sqrt(Num)));
 		Meters.pack();
 		shell.open();
@@ -220,6 +218,7 @@ public class AlokaPanel {
         		 
         	 }
          }
+        meter.dataSource.Stop = true;
 	}
 }
 

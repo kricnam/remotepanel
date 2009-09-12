@@ -29,7 +29,7 @@ public class DateTime extends MeasureData{
 		if (bValid)
 		{
 			NumberFormat formater = new DecimalFormat("00");
-			return formater.format(year)+"-"+formater.format(month)+"-"+formater.format(day);  
+			return formater.format(year%100)+"-"+formater.format(month)+"-"+formater.format(day);  
  		}
 		else
 			return new String("--------");

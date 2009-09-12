@@ -22,6 +22,10 @@ public class GPSData extends MeasureData {
 		nSatlite = Data[start+10];
 		nGeoSys = Data[start+11];
 	}
+	String ToString()
+	{
+		return String.valueOf((int)laDegree)+" "+String.valueOf((int)laMinute);
+	}
 
 
 }

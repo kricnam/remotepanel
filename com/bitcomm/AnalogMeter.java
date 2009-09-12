@@ -88,13 +88,11 @@ public class AnalogMeter extends Canvas {
 		EnableAnalog = false;
 		nGaugeStartDegree = 120;
 		nGaugeEndDegree = 420;
-
 		nMinScale = 0;
 		nMaxScale = 180;
-		nValue = 60.5;
-		dateData = new DateTime();
+
 		rgbBK = new RGB(172, 178, 179);
-		strUnit = "nGy/h";
+		
 
 	}
 
@@ -239,7 +237,11 @@ public class AnalogMeter extends Canvas {
 			gc.drawString(str, pointGaugeCenter.x - p.x / 2 + (p.x - pt.x),
 					pointGaugeCenter.y - nScaleRadius/2+1,true);
 			gc.setFont(ft1);
-			String strTime = dateData.toStringDate()+"    "+dateData.toStringTime(); 
+			String strTime;
+			if (dateData==null)
+				strTime="---------    --:--";
+			else
+			 	strTime = dateData.toStringDate()+"    "+dateData.toStringTime(); 
 			Point pTime = gc.stringExtent(strTime);
 			gc.drawString(strTime ,pointGaugeCenter.x - pTime.x/2,
 					pointGaugeCenter.y - nScaleRadius/2 + p.y + 8 + pt.y/5 ,true);
@@ -255,8 +257,8 @@ public class AnalogMeter extends Canvas {
 		ft.dispose();
 		gc.setFont(gc.getDevice().getSystemFont());
 		
-
-		gc.drawString("uGy/h", pointGaugeCenter.x - p.x / 2 + p.x + 10,
+		if (strUnit!=null)
+			gc.drawString(strUnit, pointGaugeCenter.x - p.x / 2 + p.x + 10,
 				pointGaugeCenter.y - nScaleRadius/2,true);
 		
 		bkColor.dispose();

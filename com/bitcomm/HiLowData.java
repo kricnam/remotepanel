@@ -7,16 +7,16 @@ package com.bitcomm;
  *
  */
 public class HiLowData extends MeasureData{
-	public enum ValueUnit {
-		non,
-		nGyh,
-		uGyh,
-		mGyh
-	};
+	final static byte	nGyh = 1;
+	final static byte	uGyh = 2;
+	final static byte	mGyh = 3;
+	final static byte	NaI=1;
+	final static byte   SSD=2;
+
 	short DataLength;
 	char DataNum;
 	DateTime date;
-	byte cNaIUnit;
+	Byte cNaIUnit;
 	int  nNaIValue;
 	int  nNaI_dr_count;
 	int  nNaI_cr_count;
@@ -33,13 +33,7 @@ public class HiLowData extends MeasureData{
 	GPSData gps;
 	byte cFOMA;
 	byte cValidType;
-	enum ValidType
-	{
-		none,
-		NaI,
-		SSD
-	};
-
+	
 	HiLowData(byte[] Data)
 	{
 		DataLength =(short) ToChar(Data,5);

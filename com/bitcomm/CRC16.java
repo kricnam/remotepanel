@@ -56,4 +56,15 @@ public class CRC16 {
 		}
 		return crc;
 	}
+	/* CRC 計算 */
+	static char crc16(char start, byte[] data,int offset,int len)
+	{
+		char crc=start;
+		
+		for(int i=0;i<len;i++) {
+			crc=crc16_byte(data[offset+i],crc);
+		}
+		return crc;
+	}
+
 }
