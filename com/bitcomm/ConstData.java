@@ -25,5 +25,22 @@ public class ConstData {
 	static String strStationNum = "Measure Point Number";
 	static String strURL = "Server Name/IP";
 	static String strNormal = "Normal";
-	
+	static String strCommErr = "Communication Error";
+	static String strMonitorErr = "Measurement Device Trouble";
+	static String strBattryLow = "Battery Exhaustion";
+	static String strDetectorErr = "Detector Trouble";
+	static String strGPSFail = "GPS Failure";
+	static String strNoConnect = "Unconnection";
+	static String strLoAlarm = "Alarm1";
+	static String strHiAlarm = "Alarm2";
+	static String strHihiAlarm = "Alarm3";
+	static String strAbnoralData = "Non-complete Data";
+	static String strDoesRate = "Dose Rate";
+	static String strOffline = "OFF LINE";
+	static String strMonitor = "Measurement Device";
+	static String strCommuni = "Communication";
+	static String strBattry = "Battery";
+	static String strAlarm = "Alarm";
+	static String strDetector = "Detector";
+	static String strGPS = "GPS";
 }
