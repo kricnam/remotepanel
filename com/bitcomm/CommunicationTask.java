@@ -1,16 +1,10 @@
 package com.bitcomm;
 
-import gnu.java.security.util.ByteBufferOutputStream;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
 
 public class CommunicationTask extends Thread {
 
