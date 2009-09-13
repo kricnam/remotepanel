@@ -2,6 +2,7 @@ package com.bitcomm;
 
 public class ConstData {
 	static String strName = "Monitoring Post PC Software";
+	static String strDataTitel = "Gamma Ray Monitor";
 	static String strTitle = "CURRENT DATA";
 	static String strConfig = "Config";
 	static String strTrend = "Trend Graph Data";

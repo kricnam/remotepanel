@@ -25,6 +25,18 @@ public class CommunicationPort {
 		this.nPort = nPort; 
 	}
 
+	public void Connect(String strServer,int nPort) throws Exception
+	{
+		this.strServer = strServer;
+		this.nPort = nPort;
+		Connect();
+	}
+	boolean IsConnected()
+	{
+		if (socket==null) return false;
+		return socket.isConnected();
+	}
+
 	public void Connect() throws Exception
 	{
 		try {
@@ -38,6 +50,21 @@ public class CommunicationPort {
 			throw e;
 		}
 	}
+
+	public void Close() throws Exception
+	{
+		try {
+			if (socket!=null)
+			{
+				socket.close();
+			}
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
+	}
+
 	public void Send(byte[]buff) throws Exception
 	{
 		output.write(buff);
@@ -60,6 +87,8 @@ public class CommunicationPort {
 			{
 				if (buffer[0] != DataPacket.SOH)
 					pos = 0;
+				se.printStackTrace();
+				ch = -1;
 				//throw se;
 			}
 						

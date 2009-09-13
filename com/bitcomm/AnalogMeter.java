@@ -3,6 +3,8 @@
  */
 package com.bitcomm;
 
+import gnu.classpath.jdwp.event.filters.ClassOnlyFilter;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -66,6 +68,20 @@ public class AnalogMeter extends Canvas {
 	public RGB rgbBK;
 
 	public String strUnit;
+	public RGB rgbLED;
+	public RGB rgbMoni;
+	public RGB rgbGPS;
+	public RGB rgbAlarm;
+	public RGB rgbComm;
+	public RGB rgbDetector;
+	public RGB rgbBatty;
+	public String strLED;
+	public String strMoni;
+	public String strDector;
+	public String strAlarm;
+	public String strComm;
+	public String strGPS;
+	public String strBattry;
 
 	public AnalogMeter(Composite parent, int style) {
 		super(parent, style);
@@ -92,6 +108,21 @@ public class AnalogMeter extends Canvas {
 		nMaxScale = 180;
 
 		rgbBK = new RGB(172, 178, 179);
+		rgbLED = MeterView.rgbOff;
+		 
+		rgbMoni= MeterView.rgbOff;
+		rgbGPS= MeterView.rgbOff;
+		rgbAlarm= MeterView.rgbOff;
+		rgbComm= MeterView.rgbOff;
+		rgbDetector= MeterView.rgbOff;
+		rgbBatty= MeterView.rgbOff;
+		strLED = ConstData.strOffline;
+		strMoni = ConstData.strMonitor;
+		strDector=ConstData.strDetector;
+		strComm = ConstData.strCommuni;
+		strAlarm = ConstData.strAlarm;
+		strGPS = ConstData.strGPS;
+		strBattry = ConstData.strBattry;
 		
 
 	}
@@ -101,7 +132,10 @@ public class AnalogMeter extends Canvas {
 			pointGaugeCenter = this.getSize();
 			pointGaugeCenter.x /= 2;
 			pointGaugeCenter.y /= 2;
-			nScaleRadius = Math.min(pointGaugeCenter.x, pointGaugeCenter.y) * 90 / 100;
+			if (EnableAnalog)
+				nScaleRadius = Math.min(pointGaugeCenter.x, pointGaugeCenter.y) * 90 / 100;
+			else
+				nScaleRadius = Math.min(pointGaugeCenter.x, pointGaugeCenter.y) ;
 			nScaleBarWidePercentage = 3;
 			nScaleRadiusPercentage = 90;
 			nMinormark = 50;
@@ -187,11 +221,6 @@ public class AnalogMeter extends Canvas {
 
 	}
 
-	void resize(ControlEvent e)
-	{
-		//GC gc = e.gc;
-		setSize(getParent().getClientArea().width,getParent().getClientArea().height);
-	}
 	void paintControl(PaintEvent e) {
 		GC gc = e.gc;
 		Point size = getSize();
@@ -207,6 +236,7 @@ public class AnalogMeter extends Canvas {
 	void drawDigiValue(GC gc) {
 		FontData fdata = new FontData("NI7SEG", pointGaugeCenter.x/8, SWT.NORMAL);
 		FontData ftime = new FontData("NI7SEG", pointGaugeCenter.x/10, SWT.NORMAL);
+		FontData fontUnit = new FontData("Times", pointGaugeCenter.x/16, SWT.NORMAL);
 		RGB rgb1 = new RGB(222, 231, 214);
 		RGB rgb2 = new RGB(22, 22, 22);
 
@@ -214,8 +244,8 @@ public class AnalogMeter extends Canvas {
 		Color fgColor = new Color(gc.getDevice(), rgb2);
 		Font ft = new Font(gc.getDevice(), fdata);
 		Font ft1 = new Font(gc.getDevice(),ftime);
+		Font fUnit = new Font(gc.getDevice(),fontUnit);
 		gc.setBackground(bkColor);
-		
 		gc.setFont(ft);
 		
 		Point p = gc.stringExtent("888888888.88");
@@ -255,12 +285,15 @@ public class AnalogMeter extends Canvas {
 		}
 		ft1.dispose();
 		ft.dispose();
-		gc.setFont(gc.getDevice().getSystemFont());
 		
+		gc.setFont(fUnit);
+		gc.drawString(ConstData.strDoesRate, pointGaugeCenter.x - p.x / 2 , 
+				pointGaugeCenter.y-nScaleRadius/2 - p.y/2 -4,true);
 		if (strUnit!=null)
 			gc.drawString(strUnit, pointGaugeCenter.x - p.x / 2 + p.x + 10,
-				pointGaugeCenter.y - nScaleRadius/2,true);
-		
+				pointGaugeCenter.y - nScaleRadius/2 + pt.y/2,true);
+		fUnit.dispose();
+		gc.setFont(gc.getDevice().getSystemFont());
 		bkColor.dispose();
 		fgColor.dispose();
 		
@@ -333,17 +366,31 @@ public class AnalogMeter extends Canvas {
 	
 		drawScale(gc);
 		gc.setForeground(logoColor);
-
-		if (Enable)
+		FontData font = new FontData("Time", pointGaugeCenter.x/32, SWT.NORMAL);
+		Font ft = new Font(gc.getDevice(), font);
+		int X = pointGaugeCenter.x/10;
+		int Y = Math.min(pointGaugeCenter.y/6, X) ;
+		//if (Enable)
 		{
-		gc.setBackground(this.getDisplay().getSystemColor(SWT.COLOR_GREEN));
-		gc.fillRoundRectangle(10,Height-26, 20, 16, 3, 3);
-		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-		gc.drawRoundRectangle(10,Height-26, 20, 16, 3, 3);
-		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
-		gc.setFont(this.getDisplay().getSystemFont());
-		gc.drawText(ConstData.strNormal, 32, Height-26,true);
+			gc.setFont(ft);
+			drawLED(gc,X,Height - 4*Y ,X / 3 * 2,
+					Y / 2,strLED,rgbLED);
+			drawLED(gc,X,	Height - 3*Y ,X / 3 * 2,
+					Y / 2,strMoni,rgbMoni);
+			drawLED(gc,X,Height - 2*Y ,X / 3 * 2,
+					Y / 2,strBattry,rgbBatty);
+			drawLED(gc,X,Height - Y ,X / 3 * 2,
+					Y / 2,strComm,rgbComm);
+			drawLED(gc,X+pointGaugeCenter.x,Height - 3*Y ,X / 3 * 2,
+					Y / 2,strGPS,rgbGPS);
+			drawLED(gc,X+pointGaugeCenter.x,Height - 2*Y ,X / 3 * 2,
+					Y / 2,strAlarm,rgbAlarm);
+			drawLED(gc,X+pointGaugeCenter.x,Height - Y ,X / 3 * 2,
+					Y / 2,strDector,rgbDetector);
+			
 		}
+		ft.dispose();
+		gc.setFont(this.getDisplay().getSystemFont());
 
 		bkColor.dispose();
 		fgColor.dispose();
@@ -351,12 +398,37 @@ public class AnalogMeter extends Canvas {
 		logoColor.dispose();
 	}
 
+	void drawLED(GC gc, int X, int Y, int width,int height,String strIndi,RGB rgb)
+	{
+		Color colorLED = new Color(gc.getDevice(), rgb);
+		gc.setBackground(colorLED);
+		double bright = 0.3*rgb.red+0.59*rgb.green+0.11*rgb.blue;
+		gc.fillRoundRectangle(X, Y, width,height, 3, 3);
+		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+		gc.drawRoundRectangle(X, Y, width,height, 3, 3);
+		if (bright > 128)				
+			gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		else
+			gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+		gc.drawRoundRectangle(X-1, Y-1, width+2,height+2, 5, 5);
+		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+		
+		
+		if (strIndi != null)
+		{
+			
+			gc.drawString(strIndi, X + width +3 , Y  ,	true);
+		}
+		colorLED.dispose();
+	}
 	/*
 	 * （非 Javadoc）
 	 * 
 	 * @see org.eclipse.swt.widgets.Control#setSize(int, int)
 	 */
 	@Override
+	
+	
 	public void setSize(int width, int height) {
 		// TODO 自动生成方法存根
 		super.setSize(width, height);
