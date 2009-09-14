@@ -12,7 +12,6 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -90,11 +89,11 @@ public class AlokaPanel {
 		Image imgNum = new Image(d,"com/bitcomm/resource/numbers.png");
 		Image imgReport = new Image(d,"com/bitcomm/resource/report.png");
 		Image imgSpectrum = new Image(d,"com/bitcomm/resource/spectrum.png");
-		Image imgClose = new Image(d,"com/bitcomm/resource/power_on_blue.png");
+		Image imgClose = new Image(d,"com/bitcomm/resource/power_off.png");
 
 		itemSetup.setText(ConstData.strConfig);
 		itemSetup.setImage(imgSetup);
-		imgSetup.dispose();
+		
 
 		itemSetup.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
@@ -134,7 +133,7 @@ public class AlokaPanel {
 
 		itemTrend.setText(ConstData.strTrend);
 		itemTrend.setImage(imgNum);
-		imgNum.dispose();
+		
 
 		itemReport.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
@@ -151,11 +150,11 @@ public class AlokaPanel {
 
 		itemReport.setText(ConstData.strReport);
 		itemReport.setImage(imgReport);
-		imgReport.dispose();
+		
 
 		itemSpectrum.setText(ConstData.strSpetru);
 		itemSpectrum.setImage(imgSpectrum);
-		imgSpectrum.dispose();
+		
 
 		itemSpectrum.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
@@ -171,7 +170,7 @@ public class AlokaPanel {
 
 		itemClose.setText(ConstData.strClose);
 		itemClose.setImage(imgClose);
-		imgClose.dispose();
+		
 		itemClose.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
 				d.dispose();
@@ -234,6 +233,11 @@ public class AlokaPanel {
 			}
 		}
 		meter[0].dataTask.Stop = true;
+		imgSetup.dispose();
+		imgNum.dispose();
+		imgReport.dispose();
+		imgSpectrum.dispose();
+		imgClose.dispose();
 
 	}
 }
