@@ -35,7 +35,7 @@ public class CommunicationTask extends Thread {
 		Command cmd = new Command(Command.CommandType.CurrentData);
 		DataPacket cmdPacket = new DataPacket((byte) 1, cmd.ByteStream());
 
-		while (!Stop || !face.isDisposed()) {
+		while (!Stop && !face.isDisposed()) {
 			try
 			{
 				port.Send(cmdPacket.ByteStream());
@@ -51,8 +51,10 @@ public class CommunicationTask extends Thread {
 				sleep(1000);
 				DataPacket packet=port.RecvPacket();
 				if (packet==null) continue;
-				if (packet.bValid && !face.isDisposed()) 
+				if (packet.bValid && !face.isDisposed() && 
+						packet.getPacketType() == Command.CommandType.CurrentData) 
 				{
+					
 					face.data = new HiLowData(packet.ByteStream());
 					
 					face.getDisplay().asyncExec(new Runnable() {
@@ -64,15 +66,17 @@ public class CommunicationTask extends Thread {
 
 				}
 
-				sleep(10000);
+				sleep(600000);
 			} 
 			catch (InterruptedException e) {
 				// TODO 自动生成 catch 块
 				e.printStackTrace();
+				return;
 			}
 			catch (Exception e) {
 				// TODO 自动生成 catch 块
 				e.printStackTrace();
+				return;
 			}
 
 		};

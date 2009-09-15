@@ -23,7 +23,17 @@ public class DateTime extends MeasureData{
 		minute = Data[start+5];
 		bValid = true;
 	}
-	
+	byte[] ByteStream()
+	{
+		byte[] out = new byte[6];
+		out[0]= (byte) ((year>>8)&0x00FF);
+		out[1]= (byte) (year & 0x00FF);
+		out[2]= month;
+		out[3]=day;
+		out[4]=hour;
+		out[5]=minute;
+		return out;
+	}
 	public String toStringDate()
 	{
 		if (bValid)

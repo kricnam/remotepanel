@@ -1,11 +1,10 @@
 package com.bitcomm;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -46,6 +45,9 @@ public class MeterView extends Composite  {
 	public void setValue()
 	{
 		//data.nStatus |= 0x0000001;
+		if (dataTask.isAlive())
+			dataTask.Stop = true;
+		
 		if ((data.nStatus & 0x10000001) > 0 )
 		{
 			meter.rgbLED = rgbRed;

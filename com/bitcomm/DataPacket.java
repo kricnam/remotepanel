@@ -84,9 +84,9 @@ public class DataPacket {
 	}
 
 	boolean Is_CRC_OK(byte[] Data, int start, int size) {
-		int i;
+		
 		char crc = (char) 0xFFFF;
-		i = start;
+		
 		int data_length = Data[start + 2] * 256 + Data[start + 3];
 		if (data_length > (size - 3))
 			return false;
@@ -124,4 +124,9 @@ public class DataPacket {
 		return -1;
 	}
 
+	Command.CommandType getPacketType()
+	{
+		Command cmd = new Command(Content);
+		return cmd.Type();
+	}
 }
