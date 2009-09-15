@@ -87,7 +87,7 @@ public class CommunicationPort {
 			{
 				if (buffer[0] != DataPacket.SOH)
 					pos = 0;
-				se.printStackTrace();
+				//se.printStackTrace();
 				ch = -1;
 				//throw se;
 			}

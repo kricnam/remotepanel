@@ -38,7 +38,19 @@ public class CommunicationTask extends Thread {
 		while (!Stop && !face.isDisposed()) {
 			try
 			{
-				port.Send(cmdPacket.ByteStream());
+				//port.Send(cmdPacket.ByteStream());
+				CommunicationHistoryData his=new CommunicationHistoryData(port,(byte)1);
+				his.startTime.year = 2009;
+				his.startTime.month = (byte)9;
+				his.startTime.day = (byte)9;
+				his.startTime.hour = 0;
+				his.startTime.minute = 0;
+				his.endTime.year = 2009;
+				his.endTime.month = (byte)9;
+				his.endTime.day = (byte)10;
+				his.endTime.hour = 0;
+				his.endTime.minute = 0;
+				his.Confirm();
 			}
 			catch(Exception e)
 			{

@@ -9,10 +9,12 @@ public class CommunicationHistoryData {
 	{
 		this.port = port;
 		this.MachineNum = MachineNum;
+		startTime = new DateTime();
+		endTime = new DateTime();
 	}
-	void Request() throws Exception
+	void Confirm() throws Exception
 	{
-		byte[] cmd = new Command(Command.CommandType.HistoryDataRequest).ByteStream();
+		byte[] cmd = new Command(Command.CommandType.HistoryDataConfirm).ByteStream();
 		byte[] start = startTime.ByteStream();
 		byte[] end = endTime.ByteStream();
 		short length =(short) (cmd.length + start.length + end.length + 2);
