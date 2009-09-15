@@ -12,20 +12,14 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -36,14 +30,11 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public class AlokaPanel {
 
-	/**
-	 * @param args
-	 */
 	static Display d;
 	static Shell shell;
 
 	public static void main(String[] args) {
-		// TODO 自动生成方法存根
+		
 		d = new Display();
 		shell =new Shell(d,SWT.MIN);
 		shell.setText(ConstData.strName);
@@ -224,7 +215,6 @@ public class AlokaPanel {
 		Meters.pack();
 		shell.open();
 		shell.layout();
-		int i=0;
 		while (!shell.isDisposed()){
 			if (!d.readAndDispatch()) 
 			{
