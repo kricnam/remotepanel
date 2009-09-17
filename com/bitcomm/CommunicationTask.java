@@ -51,6 +51,11 @@ public class CommunicationTask extends Thread {
 				his.endTime.hour = 0;
 				his.endTime.minute = 0;
 				his.Confirm();
+				his.ConfirmAnswer();
+				his.DataRequest();
+				HiLowData data = his.DataAnswer();
+				if (data!=null)
+					System.out.println(data.CSVString());
 			}
 			catch(Exception e)
 			{
