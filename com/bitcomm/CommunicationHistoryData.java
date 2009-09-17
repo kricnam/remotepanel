@@ -5,6 +5,7 @@ public class CommunicationHistoryData {
 	byte MachineNum;
 	DateTime startTime;
 	DateTime endTime;
+	DataConfirm Confirmed;
 	CommunicationHistoryData(CommunicationPort port, byte MachineNum)
 	{
 		this.port = port;
@@ -32,6 +33,38 @@ public class CommunicationHistoryData {
 		{
 			throw e;
 		}
+	}
+	
+	void ConfirmAnswer() throws Exception
+	{
+		DataPacket packet = port.RecvPacket();
+		if (packet.getPacketType()==Command.CommandType.HistoryDataConfirm)
+		{
+			Confirmed = new DataConfirm(packet.ByteStream());
+		}
+	}
+	
+	void DataRequest() throws Exception 
+	{
+		DataPacket packet = new DataPacket(MachineNum,
+				new DataRequest(Confirmed.startNo,Confirmed.endNo,Confirmed.nCount).ByteStream());
+		try{
+			port.Send(packet.ByteStream());
+		}
+		catch(Exception e)
+		{
+			throw e;
+		}
+	}
+	
+	HiLowData DataAnswer() throws Exception
+	{
+		DataPacket packet = port.RecvPacket();
+		if (packet.getPacketType()==Command.CommandType.HistoryDataRequest)
+		{
+			 return new HiLowData(packet.ByteStream());
+		}
+		return null;
 	}
 
 }

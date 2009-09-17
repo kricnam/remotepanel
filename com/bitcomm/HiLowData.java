@@ -12,7 +12,8 @@ public class HiLowData extends MeasureData{
 	final static byte	mGyh = 3;
 	final static byte	NaI=1;
 	final static byte   SSD=2;
-
+	
+	int nMachineNum;
 	short DataLength;
 	char DataNum;
 	DateTime date;
@@ -36,6 +37,7 @@ public class HiLowData extends MeasureData{
 	
 	HiLowData(byte[] Data)
 	{
+		nMachineNum = Data[1];
 		DataLength =(short) ToChar(Data,5);
 		DataNum = (char) ToChar(Data,7);
 		date = new DateTime(Data,9);
@@ -56,5 +58,15 @@ public class HiLowData extends MeasureData{
 		gps = new GPSData(Data,56);
 		cFOMA = Data[68];
 		cValidType = Data[69];
+	}
+	
+	String CSVString()
+	{
+		return String.valueOf(nMachineNum)+","+
+		String.valueOf((int)DataNum) + "," +
+		date.CSVString() + "," +
+		String.valueOf((int)cValidType) + ","+
+		String.valueOf((float)nNaIValue/10.0)+","+
+		String.valueOf((int)cNaIUnit);
 	}
 }

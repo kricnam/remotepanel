@@ -56,4 +56,8 @@ public class DateTime extends MeasureData{
 			return new String("--:--");
 	}
 
+	String CSVString()
+	{
+		return "\"" + toStringDate() + " " + toStringTime() + "\""; 
+	}
 }
