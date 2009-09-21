@@ -2,6 +2,12 @@
  * 
  */
 package com.bitcomm;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Formatter;
+
 /**
  * @author mxx
  *
@@ -12,7 +18,7 @@ public class HiLowData extends MeasureData{
 	final static byte	mGyh = 3;
 	final static byte	NaI=1;
 	final static byte   SSD=2;
-	
+	final static String strHead="ChNo,DatNo,Date,Flag,NaI Dose Rate,Unit,NaI Counts(DR),NaI Counts(CR),SSD Dose Rate,Unit,SSD Counts(DR),PT,MT,Status,HV,Temp,LV,GPSDate,N,E,H,SAT,GEOD,FOM";
 	int nMachineNum;
 	short DataLength;
 	char DataNum;
@@ -67,6 +73,33 @@ public class HiLowData extends MeasureData{
 		date.CSVString() + "," +
 		String.valueOf((int)cValidType) + ","+
 		String.valueOf((float)nNaIValue/10.0)+","+
-		String.valueOf((int)cNaIUnit);
+		String.valueOf((int)cNaIUnit)+","+
+		String.valueOf((int)nNaI_dr_count)+","+
+		String.valueOf((int)nNaI_cr_count)+","+
+		String.valueOf((int)nSSDrate)+","+
+		String.valueOf((int)cSSDUnit)+","+
+		String.valueOf((int)nSSD_dr_count)+","+
+		String.valueOf((int)cPT)+","+
+		String.valueOf((int)nMTime)+","+
+		String.valueOf((int)nStatus)+","+
+		String.valueOf((float)nHVVolt/10.0)+","+
+		String.valueOf((float)nThermoral/10.0)+","+
+		String.valueOf((float)nBattVoltage/10.0)+","+
+		dateGPS.CSVString()+","+
+		gps.CSVString()+","+
+		String.valueOf((int)cFOMA);
+	}
+	void Save() throws Exception, IOException
+	{
+		StringBuilder sb = new StringBuilder();
+		Formatter formatter = new Formatter(sb);
+		formatter.format("root/S%02d%02d%02d00.dat", date.year%100,date.month,date.day);
+		String strFileName = sb.toString();
+		File file = new File(strFileName);
+		boolean head = !file.exists();
+		FileWriter fout = new FileWriter(file,true);
+		if (head) fout.write(strHead+"\r\n");
+		fout.write(CSVString()+"\r\n");
+		fout.close();
 	}
 }

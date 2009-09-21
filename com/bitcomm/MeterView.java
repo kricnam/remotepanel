@@ -192,5 +192,13 @@ public class MeterView extends Composite  {
 		meter.Enable = b;
 	}
 
+	public void Pause(boolean pause)
+	{
+		dataTask.Pause = pause;
+	}
+	public boolean isPaused()
+	{
+		return dataTask.Paused;
+	}
 
 }

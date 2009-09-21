@@ -5,6 +5,7 @@ package com.bitcomm;
 
 
 
+import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -34,7 +35,9 @@ public class AlokaPanel {
 	static Shell shell;
 	static MeterView []meter;
 	public static void main(String[] args) {
-		
+		File root = new File("root");
+		if (!root.exists())
+					root.mkdir();
 		d = new Display();
 		shell =new Shell(d,SWT.MIN);
 		shell.setText(ConstData.strName);

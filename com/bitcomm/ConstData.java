@@ -51,4 +51,6 @@ public class ConstData {
 	static String strUnknown = "Unknown";
 	static String strMachineNum = "Machine Number";
 	static String strKeyServerURL = "ServerURL";
+	static String strChoseType = "Data Type Choice";
+	
 }

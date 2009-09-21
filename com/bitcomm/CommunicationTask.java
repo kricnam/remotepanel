@@ -11,11 +11,18 @@ public class CommunicationTask extends Thread {
 	CommunicationPort port; 
 	MeterView face;
 	boolean Stop;
-
+	boolean Pause;
+	boolean Paused;
+	int nError;
+	int nInterval;
 	CommunicationTask(MeterView face,CommunicationPort port) {
 		this.face = face;
 		this.port = port;
 		Stop = false;
+		Pause = false;
+		Paused = false;
+		nError=0;
+		nInterval = 600;
 	}
 
 	public void run() {
@@ -36,31 +43,23 @@ public class CommunicationTask extends Thread {
 		DataPacket cmdPacket = new DataPacket((byte) 1, cmd.ByteStream());
 
 		while (!Stop && !face.isDisposed()) {
+			
+			try 
+			{
+				while(Pause){
+					Paused = true;
+					sleep(1000);
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				continue;
+			}
+			Paused = false;
+				
 			try
 			{
-				//port.Send(cmdPacket.ByteStream());
-//				CommunicationHistoryData his=new CommunicationHistoryData(port,(byte)1);
-//				his.startTime.year = 2009;
-//				his.startTime.month = (byte)9;
-//				his.startTime.day = (byte)9;
-//				his.startTime.hour = 0;
-//				his.startTime.minute = 0;
-//				his.endTime.year = 2009;
-//				his.endTime.month = (byte)9;
-//				his.endTime.day = (byte)10;
-//				his.endTime.hour = 0;
-//				his.endTime.minute = 0;
-//				his.Confirm();
-//				his.ConfirmAnswer();
-//				his.DataRequest();
-//				HiLowData data = his.DataAnswer();
-//				if (data!=null)
-//					System.out.println(data.CSVString());
-//				his.Confirmed.startNo+=1;
-//				his.DataRequest();
-//				data = his.DataAnswer();
-//				if (data!=null)
-//					System.out.println(data.CSVString());
+				port.Send(cmdPacket.ByteStream());
 			}
 			catch(Exception e)
 			{
@@ -70,25 +69,30 @@ public class CommunicationTask extends Thread {
 			}
 
 			try{
-				sleep(1000);
-//				DataPacket packet=port.RecvPacket();
-//				if (packet==null) continue;
-//				if (packet.bValid && !face.isDisposed() && 
-//						packet.getPacketType() == Command.CommandType.CurrentData) 
-//				{
-//					
-//					face.data = new HiLowData(packet.ByteStream());
-//					
-//					face.getDisplay().asyncExec(new Runnable() {
-//						public void run() {
-//							if (!face.isDisposed())
-//								face.setValue();
-//						}
-//					});
-//
-//				}
+				DataPacket packet=port.RecvPacket();
+				if (packet==null) 
+					{
+						nError++;
+						continue;
+					}
+				
+				
+				if (packet.bValid && !face.isDisposed() && 
+						packet.getPacketType() == Command.CommandType.CurrentData) 
+				{
+					nError=0;
+					face.data = new HiLowData(packet.ByteStream());
+					
+					face.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							if (!face.isDisposed())
+								face.setValue();
+						}
+					});
 
-				sleep(600000);
+				}
+
+				sleep(nInterval*1000);
 			} 
 			catch (InterruptedException e) {
 				// TODO 自动生成 catch 块
@@ -97,6 +101,7 @@ public class CommunicationTask extends Thread {
 			}
 			catch (Exception e) {
 				// TODO 自动生成 catch 块
+				nError++;
 				e.printStackTrace();
 				return;
 			}
