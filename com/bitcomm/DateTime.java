@@ -2,6 +2,7 @@ package com.bitcomm;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Formatter;
 
 public class DateTime extends MeasureData{ 
 	short year;
@@ -58,6 +59,10 @@ public class DateTime extends MeasureData{
 
 	String CSVString()
 	{
-		return "\"" + toStringDate() + " " + toStringTime() + "\""; 
+		StringBuilder sb = new StringBuilder();
+		Formatter formatter = new Formatter(sb);
+		formatter.format("\"%04d/%02d/%02d %02d:%02d\"", year,month,day,hour,minute);
+		return sb.toString();
+ 
 	}
 }

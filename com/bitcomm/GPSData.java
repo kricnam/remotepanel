@@ -1,5 +1,7 @@
 package com.bitcomm;
 
+import java.util.Formatter;
+
 public class GPSData extends MeasureData {
 	byte lgDegree;
 	byte lgMinute;
@@ -26,6 +28,12 @@ public class GPSData extends MeasureData {
 	{
 		return String.valueOf((int)laDegree)+" "+String.valueOf((int)laMinute);
 	}
-
-
+	String CSVString()
+	{
+		StringBuilder sb = new StringBuilder();
+		Formatter formatter = new Formatter(sb);
+		formatter.format("%03d%02d%02d,%03d%02d%02d,%d,%d,%d", laDegree,laMinute,lgSecond10/10,
+				lgDegree,lgMinute,lgSecond10/10,nAltitude,nSatlite,nGeoSys);
+		return sb.toString();
+	}
 }
