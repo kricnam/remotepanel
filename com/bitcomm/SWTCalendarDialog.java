@@ -1,8 +1,13 @@
 package com.bitcomm;
 import org.eclipse.swt.SWT;
 
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 
 import org.eclipse.swt.widgets.Shell;
@@ -10,6 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.vafada.swtcalendar.SWTCalendar;
 
 import org.vafada.swtcalendar.SWTCalendarListener;
+
 
 
 
@@ -38,8 +44,51 @@ public class SWTCalendarDialog {
 
     }
 
+    public SWTCalendarDialog(Shell parent, Image img,int x,int y) {
 
+        this.display = parent.getDisplay();
 
+        shell = new Shell(parent,  SWT.APPLICATION_MODAL | SWT.CLOSE);
+        shell.setLocation(x, y);
+        shell.setLayout(new RowLayout());
+
+        swtcal = new SWTCalendar(shell);
+        shell.setText("Calendar");
+        if (img!=null) shell.setImage(img);
+        
+
+    }
+
+    public SWTCalendarDialog(Shell parent, Image img) {
+
+        this.display = parent.getDisplay();
+
+        shell = new Shell(parent,  SWT.APPLICATION_MODAL | SWT.CLOSE);
+        shell.setLayout(new RowLayout(SWT.VERTICAL));
+
+        swtcal = new SWTCalendar(shell);
+        Button but = new Button(shell,SWT.PUSH);
+        but.setText("Close");
+        but.addSelectionListener(new SelectionListener(){
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				shell.dispose();
+				
+			}
+        	
+        });
+        shell.setText("Calendar");
+        if (img!=null) shell.setImage(img);
+        
+
+    }
+  
     public void open() {
 
         shell.pack();

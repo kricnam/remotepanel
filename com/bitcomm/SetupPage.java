@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Text;
 public class SetupPage extends PreferencePage {
 	Text StationNum;
 	Text urlAddress;
+	
 	/* （非 Javadoc）
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
@@ -31,21 +32,23 @@ public class SetupPage extends PreferencePage {
 		Composite comp= new Composite(parent,SWT.NONE);
 		comp.setLayout(new GridLayout(2,false));
 		IPreferenceStore  prefStore = getPreferenceStore();
-		new Label(comp,SWT.LEFT).setText(ConstData.strStationNum);
+		Label num = new Label(comp,SWT.LEFT);
+		num.setText(ConstData.strStationNum);
+		num.setEnabled(false);
 		StationNum = new Text(comp,SWT.BORDER);
 		StationNum.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		StationNum.setText(prefStore.getString("StationNum"));
+		StationNum.setEnabled(false);
 		new Label(comp,SWT.LEFT).setText(ConstData.strURL);
 		urlAddress = new Text(comp,SWT.BORDER);
 		urlAddress.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		urlAddress.setText(prefStore.getString("ServerURL"));
+		urlAddress.setText(prefStore.getString(ConstData.strKeyServerURL));
 		
 		return comp;
 	}
 	
 	protected void performDefaults(){
 		
-		IPreferenceStore store = getPreferenceStore();
 		StationNum.setText("4");//(store.getDefaultString("StationNum"));
 		urlAddress.setText("localhost");//store.getDefaultString("ServerURL"));
 		
@@ -62,7 +65,7 @@ public class SetupPage extends PreferencePage {
 		if (StationNum!=null)
 			store.setValue("StationNum", StationNum.getText());
 		if (urlAddress!=null)
-			store.setValue("ServerURL", urlAddress.getText());
+			store.setValue(ConstData.strKeyServerURL, urlAddress.getText());
 		
 		return super.performOk();
 	}

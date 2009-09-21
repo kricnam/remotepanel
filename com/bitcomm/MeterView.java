@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Label;
 public class MeterView extends Composite  {
 	Group group;
 	AnalogMeter meter;
+	int nMachineNum;
 	Label label;
 	HiLowData data;
 	CommunicationTask dataTask;
@@ -19,6 +20,7 @@ public class MeterView extends Composite  {
 	final static RGB rgbGreen = new RGB(150,250,150);
 	final static RGB rgbRed = new RGB(255,90,100);
 	final static RGB rgbOff = new RGB(190,190,200);
+	final static RGB rgbYellow = new RGB(250,255,150);
 	public MeterView(Composite parent, int style) {
 		super(parent, style);
 		initialize();
@@ -44,17 +46,21 @@ public class MeterView extends Composite  {
 	
 	public void setValue()
 	{
-		//data.nStatus |= 0x0000001;
-		if (dataTask.isAlive())
-			dataTask.Stop = true;
 		
 		if ((data.nStatus & 0x10000001) > 0 )
 		{
-			meter.rgbLED = rgbRed;
+			
 			if ((data.nStatus & 0x10000000) > 0 )
+			{
+				meter.rgbLED = rgbRed;
 				meter.strLED = ConstData.strNoConnect;
+			}
+				
 			if ((data.nStatus & 0x00000001) > 0 )
+			{	
+				meter.rgbLED = rgbYellow;
 				meter.strLED = ConstData.strAbnoralData;
+			}
 		}
 		else
 		{

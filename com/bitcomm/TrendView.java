@@ -21,7 +21,7 @@ import org.vafada.swtcalendar.SWTCalendarListener;
 
 public class TrendView extends Composite {
 
-	final SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日");
+	final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	Composite optionBar;
 	ChartGraph graph;
 	Display display;
