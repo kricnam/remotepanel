@@ -47,8 +47,9 @@ public class CommunicationHistoryData {
 	void DataRequest() throws Exception 
 	{
 		DataPacket packet = new DataPacket(MachineNum,
-				new DataRequest(Confirmed.startNo,Confirmed.endNo,Confirmed.nCount).ByteStream());
+				new DataRequest(Confirmed.startNo,Confirmed.endNo,Confirmed.nCount).ByteStream());//Confirmed.nCount)
 		try{
+			
 			port.Send(packet.ByteStream());
 		}
 		catch(Exception e)
@@ -60,6 +61,7 @@ public class CommunicationHistoryData {
 	HiLowData DataAnswer() throws Exception
 	{
 		DataPacket packet = port.RecvPacket();
+		if (packet==null) return null;
 		if (packet.getPacketType()==Command.CommandType.HistoryDataRequest)
 		{
 			 return new HiLowData(packet.ByteStream());

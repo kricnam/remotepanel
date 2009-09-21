@@ -229,9 +229,9 @@ public class AnalogMeter extends Canvas {
 	}
 
 	void drawDigiValue(GC gc) {
-		FontData fdata = new FontData("NI7SEG", pointGaugeCenter.x/8, SWT.NORMAL);
-		FontData ftime = new FontData("NI7SEG", pointGaugeCenter.x/10, SWT.NORMAL);
-		FontData fontUnit = new FontData("Times", pointGaugeCenter.x/16, SWT.NORMAL);
+		FontData fdata = new FontData("NI7SEG", pointGaugeCenter.x/8 , SWT.NORMAL);
+		FontData ftime = new FontData("NI7SEG", pointGaugeCenter.x/10 , SWT.NORMAL);
+		FontData fontUnit = new FontData("Times", pointGaugeCenter.x/16 , SWT.NORMAL);
 		RGB rgb1 = new RGB(222, 231, 214);
 		RGB rgb2 = new RGB(22, 22, 22);
 
@@ -244,9 +244,6 @@ public class AnalogMeter extends Canvas {
 		gc.setFont(ft);
 		
 		Point p = gc.stringExtent("888888888.88");
-		//gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
-		//gc.drawRectangle(pointGaugeCenter.x - p.x / 2, pointGaugeCenter.y-nScaleRadius/2, p.x, p.y);
-		
 		
 		gc.setForeground(bkColor);
 		gc.drawRectangle(pointGaugeCenter.x - p.x / 2 -3, pointGaugeCenter.y-nScaleRadius/2-3 , p.x+8, p.y+8);
@@ -256,7 +253,7 @@ public class AnalogMeter extends Canvas {
 		gc.fillRoundRectangle(pointGaugeCenter.x - p.x / 2 , pointGaugeCenter.y-nScaleRadius/2+p.y+9 , p.x+3, p.y+3,2,2);
 		String str = String.valueOf(nValue);
 		Point pt = gc.stringExtent(str);
-
+		int dataEndY = pointGaugeCenter.y-nScaleRadius/2+2*p.y+12;
 		if (Enable)
 		{
 			gc.drawString(str, pointGaugeCenter.x - p.x / 2 + (p.x - pt.x),
@@ -270,13 +267,11 @@ public class AnalogMeter extends Canvas {
 			Point pTime = gc.stringExtent(strTime);
 			gc.drawString(strTime ,pointGaugeCenter.x - pTime.x/2,
 					pointGaugeCenter.y - nScaleRadius/2 + p.y + 8 + pt.y/5 ,true);
-			//
 		}
 		else
 		{
 			gc.drawString(".", pointGaugeCenter.x - p.x / 2 + (p.x - pt.x),
 					pointGaugeCenter.y - nScaleRadius/2);
-
 		}
 		ft1.dispose();
 		ft.dispose();
@@ -288,7 +283,74 @@ public class AnalogMeter extends Canvas {
 			gc.drawString(strUnit, pointGaugeCenter.x - p.x / 2 + p.x + 10,
 				pointGaugeCenter.y - nScaleRadius/2 + pt.y/2,true);
 		fUnit.dispose();
+		fUnit = null;
+		
+		
+		int led_font_size;
+		int col = 2;
+
+		
+		if (Width > Height)
+		{
+			led_font_size = (Height - dataEndY) / 6;
+		
+			if (led_font_size * 36 > Width / 2)
+			{
+				led_font_size = Width /36;
+			}		
+		}
+		else
+		{
+			led_font_size = (Height - dataEndY) / 10;
+			col = 1;
+		}
+		
+		
+		
+		led_font_size = (led_font_size-2)*72/gc.getDevice().getDPI().y;
+		fontUnit.setHeight(led_font_size);
+		
+		Font ftLED = new Font(gc.getDevice(), fontUnit);
+		
+		gc.setFont(ftLED);
+		pt = gc.stringExtent(ConstData.strMonitorErr);
+		int X = pointGaugeCenter.x/10;
+		int startY = dataEndY + pt.y;
+		
+		if (col==1)
+		{
+			//One clumne
+			drawLED(gc,X,startY, pt.y,
+					pt.y ,strLED,rgbLED);
+			drawLED(gc,X,	startY+pt.y,pt.y,
+					pt.y,strMoni,rgbMoni);
+			drawLED(gc,X,startY+2*pt.y,pt.y,
+					pt.y,strBattry,rgbBatty);
+			drawLED(gc,X,startY+3*pt.y ,pt.y,
+					pt.y,strComm,rgbComm);
+			drawLED(gc,X,startY+4*pt.y ,pt.y,
+					pt.y,strGPS,rgbGPS);
+			drawLED(gc,X,startY+5*pt.y ,pt.y,
+					pt.y,strAlarm,rgbAlarm);
+			drawLED(gc,X,startY+6*pt.y ,pt.y,
+					pt.y,strDector,rgbDetector);
+	
+		}
+		else
+		{
+			drawLED(gc,X,startY,pt.y,	pt.y,strLED,rgbLED);
+			drawLED(gc,X,startY + pt.y ,pt.y,pt.y,strMoni,rgbMoni);
+			drawLED(gc,X,startY + 2*pt.y ,pt.y,pt.y,strBattry,rgbBatty);
+			drawLED(gc,X,startY + 3*pt.y ,pt.y,pt.y,strComm,rgbComm);
+			drawLED(gc,X+pointGaugeCenter.x,startY+ pt.y ,pt.y,pt.y,strGPS,rgbGPS);
+			drawLED(gc,X+pointGaugeCenter.x,startY+ 2*pt.y ,pt.y,pt.y,strAlarm,rgbAlarm);
+			drawLED(gc,X+pointGaugeCenter.x,startY+ 3*pt.y ,pt.y,pt.y,strDector,rgbDetector);
+		}	
 		gc.setFont(gc.getDevice().getSystemFont());
+		ftLED.dispose();
+		
+
+		
 		bkColor.dispose();
 		fgColor.dispose();
 		
@@ -360,32 +422,6 @@ public class AnalogMeter extends Canvas {
 		gc.setForeground(fgColor);
 	
 		drawScale(gc);
-		gc.setForeground(logoColor);
-		FontData font = new FontData("Time", pointGaugeCenter.x/32, SWT.NORMAL);
-		Font ft = new Font(gc.getDevice(), font);
-		int X = pointGaugeCenter.x/10;
-		int Y = Math.min(pointGaugeCenter.y/6, X) ;
-		//if (Enable)
-		{
-			gc.setFont(ft);
-			drawLED(gc,X,Height - 4*Y ,X / 3 * 2,
-					Y / 2,strLED,rgbLED);
-			drawLED(gc,X,	Height - 3*Y ,X / 3 * 2,
-					Y / 2,strMoni,rgbMoni);
-			drawLED(gc,X,Height - 2*Y ,X / 3 * 2,
-					Y / 2,strBattry,rgbBatty);
-			drawLED(gc,X,Height - Y ,X / 3 * 2,
-					Y / 2,strComm,rgbComm);
-			drawLED(gc,X+pointGaugeCenter.x,Height - 3*Y ,X / 3 * 2,
-					Y / 2,strGPS,rgbGPS);
-			drawLED(gc,X+pointGaugeCenter.x,Height - 2*Y ,X / 3 * 2,
-					Y / 2,strAlarm,rgbAlarm);
-			drawLED(gc,X+pointGaugeCenter.x,Height - Y ,X / 3 * 2,
-					Y / 2,strDector,rgbDetector);
-			
-		}
-		ft.dispose();
-		gc.setFont(this.getDisplay().getSystemFont());
 
 		bkColor.dispose();
 		fgColor.dispose();
@@ -396,23 +432,26 @@ public class AnalogMeter extends Canvas {
 	void drawLED(GC gc, int X, int Y, int width,int height,String strIndi,RGB rgb)
 	{
 		Color colorLED = new Color(gc.getDevice(), rgb);
+		int nLEDheight = height *2 /3;
+		int nLEDY = Y + height /6;
+		
 		gc.setBackground(colorLED);
 		double bright = 0.3*rgb.red+0.59*rgb.green+0.11*rgb.blue;
-		gc.fillRoundRectangle(X, Y, width,height, 3, 3);
+		gc.fillRoundRectangle(X, nLEDY, width,nLEDheight, 3, 3);
 		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
-		gc.drawRoundRectangle(X, Y, width,height, 3, 3);
+		gc.drawRoundRectangle(X, nLEDY, width,nLEDheight, 3, 3);
 		if (bright > 128)				
 			gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		else
 			gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-		gc.drawRoundRectangle(X-1, Y-1, width+2,height+2, 5, 5);
+		gc.drawRoundRectangle(X-1, nLEDY-1, width+2,nLEDheight+2, 5, 5);
 		gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
 		
 		
 		if (strIndi != null)
 		{
 			
-			gc.drawString(strIndi, X + width +3 , Y  ,	true);
+			gc.drawString(strIndi, X + width +3 , Y   ,	true);
 		}
 		colorLED.dispose();
 	}

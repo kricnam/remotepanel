@@ -32,7 +32,7 @@ public class AlokaPanel {
 
 	static Display d;
 	static Shell shell;
-
+	static MeterView []meter;
 	public static void main(String[] args) {
 		
 		d = new Display();
@@ -74,13 +74,16 @@ public class AlokaPanel {
 		ToolItem itemTrend = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemReport = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemSpectrum = new ToolItem(toolbar,SWT.PUSH);
+		ToolItem itemBackup = new ToolItem(toolbar,SWT.BORDER);
 		ToolItem itemClose = new ToolItem(toolbar,SWT.PUSH);
+		
 
 		Image imgSetup = new Image(d,"com/bitcomm/resource/setup.png");
 		Image imgNum = new Image(d,"com/bitcomm/resource/numbers.png");
 		Image imgReport = new Image(d,"com/bitcomm/resource/report.png");
 		Image imgSpectrum = new Image(d,"com/bitcomm/resource/spectrum.png");
 		Image imgClose = new Image(d,"com/bitcomm/resource/power_off.png");
+		Image imgBackup = new Image(d,"com/bitcomm/resource/backup.png");
 
 		itemSetup.setText(ConstData.strConfig);
 		itemSetup.setImage(imgSetup);
@@ -90,10 +93,24 @@ public class AlokaPanel {
 			public void widgetSelected(SelectionEvent e){
 
 				PreferenceManager manager= new PreferenceManager();
+				PreferenceStore store = new PreferenceStore("config.ini");
+				
 				PreferenceNode node1= new PreferenceNode("System",ConstData.strSysSetup,null,SetupPage.class.getName());
 				manager.addToRoot(node1);
+				int nNum = store.getInt("StationNum");
+				if (nNum==0) nNum = 4;
+				PreferenceNode[] node = new PreferenceNode[nNum];
+				for (int i =0;i< nNum;i++)
+				{
+					node[i] = new PreferenceNode("System.Station"+String.valueOf(i+1),
+							ConstData.strStation+" "+String.valueOf(i+1),
+							null,
+							SetupStationPage.class.getName());
+					manager.addToRoot(node[i]);
+				}
+				
 				PreferenceDialog dlg = new PreferenceDialog(shell,manager);
-				PreferenceStore store = new PreferenceStore("config.ini");
+				
 				try{
 					store.load();
 					dlg.setPreferenceStore(store);
@@ -159,6 +176,23 @@ public class AlokaPanel {
 			}
 		});
 
+		itemBackup.setText(ConstData.strBackup);
+		itemBackup.setImage(imgBackup);
+		itemBackup.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				Shell diag = new Shell(shell);
+				diag.setLayout(new FillLayout());
+				diag.setText(ConstData.strBackup);
+				new BackupView(diag,SWT.BORDER,meter);
+				diag.open();
+				diag.layout();
+					
+			}
+			public void widgetDefaultSelected(SelectionEvent e){
+			}
+		});
+		
+		
 		itemClose.setText(ConstData.strClose);
 		itemClose.setImage(imgClose);
 		
@@ -169,13 +203,9 @@ public class AlokaPanel {
 			public void widgetDefaultSelected(SelectionEvent e){
 			}
 		});
-
 		toolbar.pack();
 
-		//Meters.setBounds(tool.getSize().x, 0, shell.getClientArea().width - 80, shell.getClientArea().height);
-
 		GridLayout meterLayout= new GridLayout();
-		//
 		Meters.setLayout(meterLayout);
 		Meters.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 
@@ -190,21 +220,28 @@ public class AlokaPanel {
 			return;
 		}
 		int Num = store.getInt("StationNum");
-		MeterView []meter = new MeterView[Num];
-
+		meter = new MeterView[Num];
+		String strIP = store.getString(ConstData.strKeyServerURL);
 		for (int i=0 ; i < Num ;i++)
 		{
 			meter[i] = new MeterView(Meters,SWT.NONE);
 			meter[i].setLayoutData(layoutData);
 			meter[i].Enable(false);
 			meter[i].setTitle(ConstData.strDataTitel+" "+String.valueOf(i+1));
-			meter[i].setStationName(ConstData.strStation+" "+String.valueOf(i+1));
+			String strName = store.getString(ConstData.strStation.replace(" ", "_")
+					+"_"+String.valueOf(i+1)+"_Name");
+			if (strName == null || strName.length() == 0) strName = "Unknow"; 
+			meter[i].setStationName(strName);
 			if (i==0)
 			{
 				meter[i].Enable(true);
-
-				meter[i].ComPort.strServer="61.135.144.51";
-				meter[i].ComPort.nPort = 9998;
+				meter[i].nMachineNum = store.getInt(
+						ConstData.strStation.replace(" ", "_")
+						+"_"+String.valueOf(i+1)+"_MNUM");
+				meter[i].ComPort.strServer=strIP;
+				meter[i].ComPort.nPort = store.getInt(
+						ConstData.strStation.replace(" ", "_")
+						+"_"+String.valueOf(i+1)+"_Port");;
 				meter[i].dataTask.start();
 			}
 		}
@@ -213,6 +250,8 @@ public class AlokaPanel {
 		meterLayout.numColumns = (int)(Math.ceil(Math.sqrt(Num)));
 		if (Num==8) meterLayout.numColumns = 4;
 		Meters.pack();
+		
+		
 		shell.open();
 		shell.layout();
 		while (!shell.isDisposed()){

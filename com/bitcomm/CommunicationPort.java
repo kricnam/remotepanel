@@ -39,6 +39,8 @@ public class CommunicationPort {
 
 	public void Connect() throws Exception
 	{
+		if (socket!=null && socket.isConnected())
+			return;
 		try {
 			socket = new Socket(strServer, nPort);
 			socket.setSoTimeout(5000);

@@ -39,23 +39,28 @@ public class CommunicationTask extends Thread {
 			try
 			{
 				//port.Send(cmdPacket.ByteStream());
-				CommunicationHistoryData his=new CommunicationHistoryData(port,(byte)1);
-				his.startTime.year = 2009;
-				his.startTime.month = (byte)9;
-				his.startTime.day = (byte)9;
-				his.startTime.hour = 0;
-				his.startTime.minute = 0;
-				his.endTime.year = 2009;
-				his.endTime.month = (byte)9;
-				his.endTime.day = (byte)10;
-				his.endTime.hour = 0;
-				his.endTime.minute = 0;
-				his.Confirm();
-				his.ConfirmAnswer();
-				his.DataRequest();
-				HiLowData data = his.DataAnswer();
-				if (data!=null)
-					System.out.println(data.CSVString());
+//				CommunicationHistoryData his=new CommunicationHistoryData(port,(byte)1);
+//				his.startTime.year = 2009;
+//				his.startTime.month = (byte)9;
+//				his.startTime.day = (byte)9;
+//				his.startTime.hour = 0;
+//				his.startTime.minute = 0;
+//				his.endTime.year = 2009;
+//				his.endTime.month = (byte)9;
+//				his.endTime.day = (byte)10;
+//				his.endTime.hour = 0;
+//				his.endTime.minute = 0;
+//				his.Confirm();
+//				his.ConfirmAnswer();
+//				his.DataRequest();
+//				HiLowData data = his.DataAnswer();
+//				if (data!=null)
+//					System.out.println(data.CSVString());
+//				his.Confirmed.startNo+=1;
+//				his.DataRequest();
+//				data = his.DataAnswer();
+//				if (data!=null)
+//					System.out.println(data.CSVString());
 			}
 			catch(Exception e)
 			{
@@ -66,22 +71,22 @@ public class CommunicationTask extends Thread {
 
 			try{
 				sleep(1000);
-				DataPacket packet=port.RecvPacket();
-				if (packet==null) continue;
-				if (packet.bValid && !face.isDisposed() && 
-						packet.getPacketType() == Command.CommandType.CurrentData) 
-				{
-					
-					face.data = new HiLowData(packet.ByteStream());
-					
-					face.getDisplay().asyncExec(new Runnable() {
-						public void run() {
-							if (!face.isDisposed())
-								face.setValue();
-						}
-					});
-
-				}
+//				DataPacket packet=port.RecvPacket();
+//				if (packet==null) continue;
+//				if (packet.bValid && !face.isDisposed() && 
+//						packet.getPacketType() == Command.CommandType.CurrentData) 
+//				{
+//					
+//					face.data = new HiLowData(packet.ByteStream());
+//					
+//					face.getDisplay().asyncExec(new Runnable() {
+//						public void run() {
+//							if (!face.isDisposed())
+//								face.setValue();
+//						}
+//					});
+//
+//				}
 
 				sleep(600000);
 			} 

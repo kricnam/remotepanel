@@ -173,7 +173,7 @@ public class ChartGraph3D extends Canvas {
 		int deltY = (int)Math.round(Data.length*nDepthStep*Math.sin(degree));
 
 		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
-		Color gray= getDisplay().getSystemColor(SWT.COLOR_GRAY);
+		Color gray= getDisplay().getSystemColor(SWT.COLOR_WHITE);
 		Color oldbk = gc.getBackground();
 		gc.setBackground(gray);
 		gc.setForeground(gray);
