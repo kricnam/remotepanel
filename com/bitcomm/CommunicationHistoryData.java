@@ -1,21 +1,39 @@
 package com.bitcomm;
 
 public class CommunicationHistoryData {
+	final static int DoseRate=0;
+	final static int Spectrum=1;
 	CommunicationPort port;
 	byte MachineNum;
 	DateTime startTime;
 	DateTime endTime;
 	DataConfirm Confirmed;
-	CommunicationHistoryData(CommunicationPort port, byte MachineNum)
+	int DataType;
+	Command cmdConfirm;
+	Command cmdRequest;
+	CommunicationHistoryData(CommunicationPort port, byte MachineNum,int DataType)
 	{
 		this.port = port;
 		this.MachineNum = MachineNum;
+		this.DataType = DataType;
 		startTime = new DateTime();
 		endTime = new DateTime();
+		if (DataType==DoseRate)
+		{
+			cmdConfirm = new Command(Command.CommandType.DoseRateHistoryDataConfirm);
+			cmdRequest = new Command(Command.CommandType.DoseRateHistoryDataRequest);
+		}
+		else
+		{
+			cmdConfirm = new Command(Command.CommandType.SpectrumDataConfirm);
+			cmdRequest = new Command(Command.CommandType.SpectrumDataRequest);
+		}
+		
 	}
 	void Confirm() throws Exception
 	{
-		byte[] cmd = new Command(Command.CommandType.HistoryDataConfirm).ByteStream();
+		byte[] cmd;
+		cmd = cmdConfirm.ByteStream();
 		byte[] start = startTime.ByteStream();
 		byte[] end = endTime.ByteStream();
 		short length =(short) (cmd.length + start.length + end.length + 2);
@@ -38,16 +56,17 @@ public class CommunicationHistoryData {
 	void ConfirmAnswer() throws Exception
 	{
 		DataPacket packet = port.RecvPacket();
-		if (packet.getPacketType()==Command.CommandType.HistoryDataConfirm)
+		if (packet.getPacketType() == cmdConfirm.Type())
 		{
 			Confirmed = new DataConfirm(packet.ByteStream());
 		}
+		
 	}
 	
 	void DataRequest() throws Exception 
 	{
 		DataPacket packet = new DataPacket(MachineNum,
-				new DataRequest(Confirmed.startNo,Confirmed.endNo,Confirmed.nCount).ByteStream());//Confirmed.nCount)
+				new DataRequest(cmdRequest,Confirmed.startNo,Confirmed.endNo,Confirmed.nCount).ByteStream());//Confirmed.nCount)
 		try{
 			
 			port.Send(packet.ByteStream());
@@ -58,15 +77,28 @@ public class CommunicationHistoryData {
 		}
 	}
 	
-	HiLowData DataAnswer() throws Exception
+	HiLowData DataAnswerDoseRate() throws Exception
 	{
 		DataPacket packet = port.RecvPacket();
 		if (packet==null) return null;
-		if (packet.getPacketType()==Command.CommandType.HistoryDataRequest)
+		if (packet.getPacketType()== Command.CommandType.DoseRateHistoryDataRequest)
 		{
 			 return new HiLowData(packet.ByteStream());
 		}
+			
 		return null;
 	}
 
+	SpectrumData DataAnswerSpectrum() throws Exception
+	{
+		DataPacket packet = port.RecvPacket();
+		if (packet==null) return null;
+		
+		if (packet.getPacketType()== Command.CommandType.SpectrumDataRequest)
+		{
+			 return new SpectrumData(packet.ByteStream());
+		}
+			
+		return null;
+	}
 }

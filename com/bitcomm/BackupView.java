@@ -332,20 +332,24 @@ public class BackupView extends Composite implements Listener {
 			box.open();
 			return;
 		}
-
+		int DataType ;
+		if (chkData.getSelection()) DataType = CommunicationHistoryData.DoseRate;
+		else
+			DataType = CommunicationHistoryData.Spectrum;
 		for (int i = 0; i < station.length; i++) {
 			if (list.getItem(station[i]).equals(ConstData.strUnknown))
 				continue;
 			int n = station[i];
 
-			if (chkData.getSelection()) {
-				meter[n].Pause(true);
-				BackupHilowData bk = new BackupHilowData(this,
+			meter[n].Pause(true);
+			//while (!meter[n].isPaused());
+			BackupDataTask bk = new BackupDataTask(DataType,this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
 						end);
-				bk.start();
-			}
+			bk.start();
+
 		}
 
 	}
+	
 }

@@ -14,8 +14,10 @@ public class Command {
 		HealthCheck,
 		Alarm,
 		CurrentData,
-		HistoryDataRequest,
-		HistoryDataConfirm,
+		DoseRateHistoryDataRequest,
+		DoseRateHistoryDataConfirm,
+		SpectrumHistoryDataRequest,
+		SpectrumHistoryDataConfirm,
 		SpectrumDataRequest,
 		SpectrumDataConfirm,
 		Unknown
@@ -47,11 +49,11 @@ public class Command {
 			CommandCode[0]='r';
 			CommandCode[1]='a';
 			break;
-		case HistoryDataRequest:
+		case DoseRateHistoryDataRequest:
 			CommandCode[0]='h';
 			CommandCode[1]='a';
 			break;
-		case HistoryDataConfirm:
+		case DoseRateHistoryDataConfirm:
 			CommandCode[0]='h';
 			CommandCode[1]='A';
 			break;
@@ -78,9 +80,9 @@ public class Command {
 		if (CommandCode[0]=='h' && CommandCode[1]=='c')
 			return CommandType.SpectrumDataRequest;
 		if (CommandCode[0]=='h' && CommandCode[1]=='a')
-			return CommandType.HistoryDataRequest;
+			return CommandType.DoseRateHistoryDataRequest;
 		if (CommandCode[0]=='h' && CommandCode[1]=='A')
-			return CommandType.HistoryDataConfirm;
+			return CommandType.DoseRateHistoryDataConfirm;
 
 		return CommandType.Unknown;
 	}

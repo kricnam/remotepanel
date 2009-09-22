@@ -87,7 +87,7 @@ public class DataPacket {
 		
 		char crc = (char) 0xFFFF;
 		
-		int data_length = Data[start + 2] * 256 + Data[start + 3];
+		int data_length = ((Data[start + 2] << 8)&0x0000FF00) | (Data[start + 3] & 0x000000FF);
 		if (data_length > (size - 3))
 			return false;
 

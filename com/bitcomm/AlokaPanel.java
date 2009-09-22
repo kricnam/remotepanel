@@ -21,6 +21,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -201,7 +204,7 @@ public class AlokaPanel {
 		
 		itemClose.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
-				d.dispose();
+				shell.close();
 			}
 			public void widgetDefaultSelected(SelectionEvent e){
 			}
@@ -254,6 +257,21 @@ public class AlokaPanel {
 		if (Num==8) meterLayout.numColumns = 4;
 		Meters.pack();
 		
+		shell.addListener(SWT.Close, new Listener() {
+		      public void handleEvent(Event event) {
+		    	    
+					MessageBox box = new MessageBox(shell, SWT.ICON_WARNING
+							| SWT.YES |SWT.NO);
+					box.setMessage("Do you really want to quit?");
+					box.setText("QUIT");
+					
+					if (box.open() == SWT.YES)
+				          event.doit = true;
+				        else
+				          event.doit = false;
+					return;
+		      }
+		    });
 		
 		shell.open();
 		shell.layout();

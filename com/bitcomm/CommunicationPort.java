@@ -93,7 +93,7 @@ public class CommunicationPort {
 				ch = -1;
 				//throw se;
 			}
-						
+			System.out.println(String.valueOf(pos)+":"+String.valueOf(ch));
 			if (ch < 0 ) break;
 			
 			if (pos >= buffer.length) pos = 0;
@@ -109,7 +109,7 @@ public class CommunicationPort {
 			{
 				buffer[pos++] = (byte) ch;// buffer.put((byte) ch);
 
-				if (pos > 6) 
+				if (pos > 4096 || ch ==DataPacket.EOT) 
 				{
 					DataPacket packet = new DataPacket(buffer, pos);
 					if (packet.bValid) {
