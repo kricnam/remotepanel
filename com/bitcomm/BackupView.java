@@ -341,11 +341,12 @@ public class BackupView extends Composite implements Listener {
 				continue;
 			int n = station[i];
 
-			meter[n].Pause(true);
+			
 			//while (!meter[n].isPaused());
 			BackupDataTask bk = new BackupDataTask(DataType,this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
 						end);
+			bk.meter = meter[n];
 			bk.start();
 
 		}

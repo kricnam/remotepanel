@@ -52,5 +52,6 @@ public class ConstData {
 	static String strMachineNum = "Machine Number";
 	static String strKeyServerURL = "ServerURL";
 	static String strChoseType = "Data Type Choice";
+	static String strInterval = "Interval(s)";
 	
 }

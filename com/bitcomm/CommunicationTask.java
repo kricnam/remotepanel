@@ -91,8 +91,9 @@ public class CommunicationTask extends Thread {
 					});
 
 				}
-
+				Paused = true;	
 				sleep(nInterval*1000);
+				Paused = false;
 			} 
 			catch (InterruptedException e) {
 				// TODO 自动生成 catch 块

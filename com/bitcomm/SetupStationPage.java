@@ -14,6 +14,7 @@ public class SetupStationPage extends PreferencePage {
 	Text StationName;
 	Text urlPort;
 	Text MachineNum;
+	Text Interval;
 	String strBase;
 	@Override
 	public boolean performOk() {
@@ -36,6 +37,8 @@ public class SetupStationPage extends PreferencePage {
 		super.performDefaults();
 		StationName.setText(getTitle());
 		urlPort.setText("9998");
+		MachineNum.setText("1");
+		Interval.setText("600");
 	}
 
 	@Override
@@ -62,6 +65,11 @@ public class SetupStationPage extends PreferencePage {
 		MachineNum = new Text(comp,SWT.BORDER);
 		MachineNum.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		MachineNum.setText(prefStore.getString(strBase+"_MNUM"));
+		
+		new Label(comp,SWT.LEFT).setText(ConstData.strInterval);
+		Interval = new Text(comp,SWT.BORDER);
+		Interval.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Interval.setText(prefStore.getString(strBase+"_INTERVAL"));
 		return comp;
 
 	}

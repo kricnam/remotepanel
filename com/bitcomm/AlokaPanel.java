@@ -247,7 +247,12 @@ public class AlokaPanel {
 				meter[i].ComPort.strServer=strIP;
 				meter[i].ComPort.nPort = store.getInt(
 						ConstData.strStation.replace(" ", "_")
-						+"_"+String.valueOf(i+1)+"_Port");;
+						+"_"+String.valueOf(i+1)+"_Port");
+				meter[i].dataTask.nInterval = store.getInt(
+						ConstData.strStation.replace(" ", "_")
+						+"_"+String.valueOf(i+1)+"_INTERVAL");
+				if (meter[i].dataTask.nInterval==0) meter[i].dataTask.nInterval=600;
+				
 				meter[i].dataTask.start();
 			}
 		}

@@ -9,6 +9,7 @@ public class BackupDataTask extends Thread {
 	DateTime start;
 	DateTime end;
 	int DataType;
+	MeterView meter;
 	BackupDataTask(int DataType,BackupView UI,CommunicationPort port,byte MachineNum,
 			DateTime start,DateTime end)
 	{
@@ -41,7 +42,7 @@ public class BackupDataTask extends Thread {
 			
 		});
 		
-		
+		meter.Pause(true);
 		try {
 			his.Confirm();
 			Print("Confirm data...\n");
@@ -50,6 +51,7 @@ public class BackupDataTask extends Thread {
 			HiLowData data=null;
 			SpectrumData dataS=null;
 			final int sum=his.Confirmed.nCount;
+			Print("Total "+String.valueOf(sum)+" records will be read.\n");
 			int p=0;
 			while( his.Confirmed.nCount>0)
 			{
@@ -59,6 +61,9 @@ public class BackupDataTask extends Thread {
 				if (DataType == CommunicationHistoryData.DoseRate)
 				{
 					data = his.DataAnswerDoseRate();
+					if (data==null) his.DataAnswerDoseRate();
+					if (data==null) his.DataAnswerDoseRate();
+					if (data==null) his.DataAnswerDoseRate();
 				}
 				else
 				{
@@ -112,6 +117,7 @@ public class BackupDataTask extends Thread {
 			}
 			
 		});
+		meter.Pause(false);
 	}
 	
 	void Print(String str)
