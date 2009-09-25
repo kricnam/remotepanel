@@ -1,5 +1,7 @@
 package com.bitcomm;
 
+import java.io.IOException;
+
 public class CommunicationHistoryData {
 	final static int DoseRate=0;
 	final static int Spectrum=1;
@@ -101,4 +103,23 @@ public class CommunicationHistoryData {
 			
 		return null;
 	}
+	
+	void Terminate() throws Exception
+	{
+		DataPacket packet = new DataPacket(MachineNum,
+				new Command(Command.CommandType.HistroryDataTerminateNotify).ByteStream());
+			
+		port.Send(packet.ByteStream());
+	}
+	
+	boolean GetAck() throws IOException
+	{
+		Command cmd = port.GetAck();
+		if (cmd==null) cmd = port.GetAck();
+		if (cmd==null) cmd = port.GetAck();
+		if (cmd!=null)
+			return cmd.Type() == Command.CommandType.HistroryDataTerminateNotify;
+		return false;
+	}
+			
 }

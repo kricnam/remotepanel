@@ -1,5 +1,6 @@
 package com.bitcomm;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -72,6 +73,50 @@ public class CommunicationPort {
 		output.write(buff);
 	}
 
+	Command GetAck() throws IOException
+	{
+		pos=0;
+		if (buffer == null) buffer = new byte[6000];
+		buffer[0]=0;
+
+		int ch=-1;
+		
+		do{
+			try
+			{
+				ch = input.read();
+			}
+			catch (SocketTimeoutException se) 
+			{
+				if (buffer[0] != DataPacket.ACK ||buffer[0] != DataPacket.NAK)
+					pos = 0;
+				//se.printStackTrace();
+				ch = -1;
+				//throw se;
+			}
+			if (ch < 0 ) break;
+			if (pos==0 && (ch == DataPacket.ACK || ch == DataPacket.NAK))
+			{
+				buffer[pos++] = (byte) ch;
+				continue;
+			}
+			
+			if (buffer[0]==DataPacket.ACK || buffer[0]==DataPacket.NAK)
+			{
+				buffer[pos++] = (byte) ch;
+			}
+			
+			if (pos==4)
+			{
+				Command cmd = new Command(buffer,2);
+				return cmd;
+			}
+			
+		}while(true);
+		return null;
+		
+	}
+	
 	public DataPacket RecvPacket() throws Exception
 	{
 		pos=0;

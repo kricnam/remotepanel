@@ -126,7 +126,7 @@ public class DataPacket {
 
 	Command.CommandType getPacketType()
 	{
-		Command cmd = new Command(Content);
+		Command cmd = new Command(Content,0);
 		return cmd.Type();
 	}
 }

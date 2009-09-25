@@ -20,19 +20,20 @@ public class Command {
 		SpectrumHistoryDataConfirm,
 		SpectrumDataRequest,
 		SpectrumDataConfirm,
+		HistroryDataTerminateNotify,
 		Unknown
     }
 	Command()
 	{
 		CommandCode = new byte[2];
 	}
-	Command(byte[] cmd)
+	Command(byte[] cmd, int start)
 	{
 		CommandCode = new byte[2];
 		if (cmd !=null)
 		{
-			CommandCode[0]=cmd[0];
-			CommandCode[1]=cmd[1];
+			CommandCode[0]=cmd[start];
+			CommandCode[1]=cmd[start+1];
 		}
 	}
 	Command(CommandType nType)
@@ -65,6 +66,9 @@ public class Command {
 			CommandCode[0]='h';
 			CommandCode[1]='C';
 			break;
+		case HistroryDataTerminateNotify:
+			CommandCode[0]='h';
+			CommandCode[1]='x';	
 		default:
 			break;
 			
@@ -83,6 +87,8 @@ public class Command {
 			return CommandType.DoseRateHistoryDataRequest;
 		if (CommandCode[0]=='h' && CommandCode[1]=='A')
 			return CommandType.DoseRateHistoryDataConfirm;
+		if (CommandCode[0]=='h' && CommandCode[1]=='x')
+			return CommandType.HistroryDataTerminateNotify;
 
 		return CommandType.Unknown;
 	}

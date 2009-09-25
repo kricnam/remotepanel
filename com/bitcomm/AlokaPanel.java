@@ -135,8 +135,10 @@ public class AlokaPanel {
 		itemTrend.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
 				Shell s = new Shell(shell);
+				s.setSize(900, 700);
 				s.setLayout(new FillLayout());
-				new TrendView(s,SWT.BORDER);
+				TrendView trend=new TrendView(s,SWT.BORDER);
+				trend.meter = meter;
 				s.open();
 				s.layout();
 

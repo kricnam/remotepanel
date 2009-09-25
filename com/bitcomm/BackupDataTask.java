@@ -82,6 +82,7 @@ public class BackupDataTask extends Thread {
 				}
 				if (dataS!=null)
 				{
+					Print("Save Data No."+String.valueOf(dataS.DataNum)+"\n");
 					dataS.Save();
 				}
 				final int q = p;
@@ -98,6 +99,16 @@ public class BackupDataTask extends Thread {
 				his.Confirmed.nCount--;
 				
 			}
+			boolean done;
+			his.Terminate();
+			done = his.GetAck();
+			if (!done)
+			{
+				his.Terminate();
+				done = his.GetAck();
+			}
+			Print("terminate notify ack="+String.valueOf(done)+"\n");
+			Print("Done\n");
 			
 
 		} 

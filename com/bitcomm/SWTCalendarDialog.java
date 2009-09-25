@@ -6,6 +6,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
@@ -54,11 +56,12 @@ public class SWTCalendarDialog {
         this.display = parent.getDisplay();
 
         shell = new Shell(parent,  SWT.APPLICATION_MODAL | SWT.CLOSE);
-        shell.setLayout(new RowLayout(SWT.VERTICAL));
+        shell.setLayout(new GridLayout());
 
         swtcal = new SWTCalendar(shell);
         Button but = new Button(shell,SWT.PUSH);
         but.setText("Close");
+        but.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
         but.addSelectionListener(new SelectionListener(){
 
 			public void widgetDefaultSelected(SelectionEvent e) {

@@ -30,6 +30,7 @@ public class ChartGraph extends Canvas {
 	int nXMarkNum;
 	int nYMarkNum;
 	
+	int pos;
 	
 	public ChartGraph(Composite parent, int style) {
 		super(parent, style);
@@ -48,7 +49,44 @@ public class ChartGraph extends Canvas {
 		xScaleRate=1;
 		nXMarkNum = 0;
 		nYMarkNum = 0;
+		pos = 0;
 	}
+	
+	void setData(double val,int col)
+	{
+		if (Data!=null && col < Data.length && pos < Data[col].length)
+			Data[col][pos++]=val;
+	}
+	
+	void ResetData()
+	{
+		if (Data!=null)
+		{
+			for (int i=0;i<Data.length;i++)
+				{
+					for (int j=0;j< Data[i].length;j++)
+					{
+						Data[i][j]=0;
+					}
+				}
+		}
+		MaxCount=0;
+		nScaleMax=0;
+		nScaleMin = nScaleMax;
+		pos = 0;
+	}
+	
+	void setAutoTransform()
+	{
+		nMaxData = 0;
+		nMinData = nMaxData;
+		nScaleMax = 0;
+		nScaleMin = nScaleMax;
+		MaxCount = 0;
+	
+	}
+	
+	
 	void paintControl(PaintEvent e) {
 		GC gc = e.gc;
 		
@@ -120,7 +158,8 @@ public class ChartGraph extends Canvas {
 			YOffset = -nScaleMin ;
 		else 
 			YOffset = 0;
-		
+		System.out.println("Scale min="+String.valueOf(nScaleMin));
+		System.out.println("Scale max="+String.valueOf(nScaleMax));
 		xRate = (double) (width-2*Margin)/MaxCount;
 	}
 	
@@ -137,7 +176,7 @@ public class ChartGraph extends Canvas {
 		
 		for (int i=0;i<11;i++)
 		{
-			ys = (int)Math.round((YOffset- nScaleMin-i*avg)/yRate)+Margin;
+			ys = height - (int)Math.round((YOffset + nScaleMin + i*avg)/yRate) -Margin;
 			gc.drawLine((int)Margin,y+ys,x+width-Margin,y+ys);
 			
 			DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
@@ -145,7 +184,7 @@ public class ChartGraph extends Canvas {
 			gc.drawString(strValue, Margin, ys,true);
 		}
 		avg = MaxCount / nXMarkNum;
-		for (int i=0;i<nXMarkNum;i++)
+		for (int i=0;i<nXMarkNum+1;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
 			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
@@ -162,7 +201,7 @@ public class ChartGraph extends Canvas {
 		int []p = new int[Data[0].length];
 		for (int i = 0; i < Data[0].length;i++)
 		{
-			p[i] = (int)Math.round(( YOffset-Data[0][i])/ yRate)+Margin;
+			p[i] = height - (int)Math.round(( YOffset+Data[0][i])/ yRate) -Margin;
 		}
 		gc.setLineStyle(SWT.LINE_SOLID);
 		for (int i = 0; i < Data[0].length-1;i++)
