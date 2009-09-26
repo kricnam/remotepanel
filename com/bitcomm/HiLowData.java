@@ -6,6 +6,7 @@ package com.bitcomm;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Formatter;
 
 /**
@@ -54,7 +55,7 @@ public class HiLowData extends MeasureData{
 		cSSDUnit = Data[28];
 		nSSDrate = ToInt(Data,29);
 		nSSD_dr_count = ToInt(Data,33);
-		cPT = Data[34];
+		cPT = Data[37];
 		nMTime = (short)ToChar(Data,38);
 		nStatus = ToInt(Data,40);
 		nHVVolt = (short)ToChar(Data,44);
@@ -93,7 +94,8 @@ public class HiLowData extends MeasureData{
 	{
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb);
-		formatter.format("root/S%02d%02d%02d00.dat", date.year%100,date.month,date.day);
+		formatter.format("root/S%02d%02d%02d%02d00.dat", nMachineNum,
+				date.year%100,date.month,date.day);
 		String strFileName = sb.toString();
 		File file = new File(strFileName);
 		boolean head = !file.exists();
@@ -101,5 +103,35 @@ public class HiLowData extends MeasureData{
 		if (head) fout.write(strHead+"\r\n");
 		fout.write(CSVString()+"\r\n");
 		fout.close();
+	}
+	void parse(String str) throws ParseException
+	{
+		String []fields=str.split(",");
+		nMachineNum = Integer.parseInt(fields[0]);
+		DataLength =(short) 0;
+		DataNum = (char) Integer.parseInt(fields[1]);
+		date = new DateTime(fields[2]);
+		cValidType = (byte)Integer.parseInt(fields[3]);;
+		cNaIUnit = (byte)Integer.parseInt(fields[5]);;
+		nNaIValue = Integer.parseInt(fields[4]);
+		nNaI_dr_count = Integer.parseInt(fields[6]);
+		nNaI_cr_count = Integer.parseInt(fields[7]);
+		
+		nSSDrate = Integer.parseInt(fields[8]);
+		cSSDUnit = (byte)Integer.parseInt(fields[9]);
+		
+		nSSD_dr_count = Integer.parseInt(fields[10]);
+		cPT = (byte)Integer.parseInt(fields[11]);
+		nMTime = (short)Integer.parseInt(fields[12]);
+		nStatus = Integer.parseInt(fields[13]);
+		
+		nHVVolt = (short)Integer.parseInt(fields[14]);
+		nThermoral = (short)Integer.parseInt(fields[15]);
+		nBattVoltage = (short)Integer.parseInt(fields[16]);
+		dateGPS = new DateTime(fields[17]);
+		gps = new GPSData(fields[18],fields[19],fields[20],fields[21],fields[22]);
+		
+		cFOMA = (byte)Integer.parseInt(fields[23]);
+		
 	}
 }

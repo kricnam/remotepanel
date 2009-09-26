@@ -3,8 +3,6 @@
  */
 package com.bitcomm;
 
-
-
 import java.io.File;
 import java.io.IOException;
 
@@ -48,7 +46,6 @@ public class AlokaPanel {
 		shell.setImage(imgShell);
 		shell.setMaximized(true);
 
-		//shell.setSize(d.getClientArea().width, d.getClientArea().height);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 
@@ -67,14 +64,8 @@ public class AlokaPanel {
 		logoView.setLayout(new FillLayout());
 		Logo.setLayout(new FillLayout());
 
-
-		//tool.setBounds(0, 0, 80, shell.getClientArea().height);
-
 		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.PUSH|SWT.BORDER);
 		d.beep();
-		//.setBackground(d.getSystemColor(SWT.COLOR_BLACK));
-		//tool.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,true));
-		//new ToolItem(toolbar,SWT.FLAT);
 
 		ToolItem itemSetup = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemTrend = new ToolItem(toolbar,SWT.PUSH);
@@ -175,8 +166,10 @@ public class AlokaPanel {
 		itemSpectrum.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
 				Shell s = new Shell(shell);
-				s.setLayout(new FillLayout());
 				SpectrumView spec = new SpectrumView(s,SWT.BORDER);
+				s.setSize(900, 700);
+				s.setLayout(new FillLayout());
+				spec.meter = meter;
 				s.open();
 				s.layout();
 			}
@@ -273,8 +266,12 @@ public class AlokaPanel {
 					box.setText("QUIT");
 					
 					if (box.open() == SWT.YES)
+					{
 				          event.doit = true;
-				        else
+				          shell.dispose();
+				          d.dispose();
+					}
+				    else
 				          event.doit = false;
 					return;
 		      }
@@ -289,13 +286,14 @@ public class AlokaPanel {
 
 			}
 		}
+
 		meter[0].dataTask.Stop = true;
+
 		imgSetup.dispose();
 		imgNum.dispose();
 		imgReport.dispose();
 		imgSpectrum.dispose();
 		imgClose.dispose();
-
 	}
 }
 

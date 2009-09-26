@@ -82,7 +82,8 @@ public class CommunicationTask extends Thread {
 				{
 					nError=0;
 					face.data = new HiLowData(packet.ByteStream());
-					
+					if (face.data!=null)
+						face.data.Save();
 					face.getDisplay().asyncExec(new Runnable() {
 						public void run() {
 							if (!face.isDisposed())
@@ -92,7 +93,12 @@ public class CommunicationTask extends Thread {
 
 				}
 				Paused = true;	
-				sleep(nInterval*1000);
+				for (int i =0 ;i<nInterval;i++)
+				{
+					sleep(1000);
+					if (face.isDisposed())
+						break;
+				}
 				Paused = false;
 			} 
 			catch (InterruptedException e) {

@@ -50,6 +50,8 @@ public class BackupDataTask extends Thread {
 			Print("Confirm answered.\n");
 			HiLowData data=null;
 			SpectrumData dataS=null;
+			if (his.Confirmed==null)
+				Print("Error read comfirm data.\n");
 			final int sum=his.Confirmed.nCount;
 			Print("Total "+String.valueOf(sum)+" records will be read.\n");
 			int p=0;

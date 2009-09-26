@@ -56,8 +56,8 @@ public class ChartGraph3D extends Canvas {
 		GC gc = e.gc;
 		
 		Point size = getSize();
-		
-		if (nMaxData==nMinData) AutoSetTransform(0,0,size.x,size.y);
+		setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+		if (nMaxData==nMinData) AutoSetTransform(gc,0,0,size.x,size.y);
 		else SetTransform(0,0,size.x,size.y);
 		
 		
@@ -70,6 +70,33 @@ public class ChartGraph3D extends Canvas {
 		drawData(gc, 0, 0,size.x, size.y);
 
 	}
+	void ResetData()
+	{
+		if (Data!=null)
+		{
+			for (int i=0;i<Data.length;i++)
+				{
+					for (int j=0;j< Data[i].length;j++)
+					{
+						Data[i][j]=0;
+					}
+				}
+		}
+		MaxCount=0;
+		nScaleMax=0;
+		nScaleMin = nScaleMax;
+	}
+	
+	void setAutoTransform()
+	{
+		nMaxData = 0;
+		nMinData = nMaxData;
+		nScaleMax = 0;
+		nScaleMin = nScaleMax;
+		MaxCount = 0;
+	
+	}
+
 	/* （非 Javadoc）
 	 * @see org.eclipse.swt.widgets.Canvas#drawBackground(org.eclipse.swt.graphics.GC, int, int, int, int)
 	 */
@@ -82,9 +109,11 @@ public class ChartGraph3D extends Canvas {
 		else drawAxis(gc, x, y, width, height);
 	}
 
-	public void AutoSetTransform(int x, int y, int width, int height)
+	public void AutoSetTransform(GC gc,int x, int y, int width, int height)
 	{
+		Point pt = gc.stringExtent("0000");
 		Margin = Math.min((int)(width * 0.04),(int)(height * 0.04));
+		Margin = Math.max(Margin, pt.y*2);
 		
 		nMaxData = 0;
 			for (int j=0;j < Data.length;j++)
@@ -108,7 +137,7 @@ public class ChartGraph3D extends Canvas {
 	{
 		if (nScaleMax == nScaleMin)
 		{
-			nScaleMax = Math.ceil(nMaxData );
+			nScaleMax = ((int)Math.ceil(nMaxData)/100 + 1)*100;
 			nScaleMin = Math.floor(nMinData);
 		}
 
@@ -119,7 +148,7 @@ public class ChartGraph3D extends Canvas {
 				MaxCount = Math.max(MaxCount, Data[j].length);
 		}
 
-		yRate = nRange  / (height-2*Margin -Math.abs(Data.length*nDepthStep*Math.sin(degree)));
+		yRate = nRange  / (height-2*Margin -Math.abs((Data.length-1)*nDepthStep*Math.sin(degree)));
 		
 		if (nScaleMin < 0)
 			YOffset =  -nScaleMin ;
@@ -128,13 +157,18 @@ public class ChartGraph3D extends Canvas {
 		
 		//YOffset += Math.round(Math.abs(Data.length * nDepthStep*Math.cos(degree)));
 		
-		xRate = (double) (width-2*Margin - Math.abs(Data.length * nDepthStep*Math.cos(degree)))/MaxCount;
+		xRate = (double) (width-2*Margin - Math.abs((Data.length-1) * nDepthStep*Math.cos(degree)))/MaxCount;
 	}
 	
 	
 	public void drawAxis(GC gc, int x, int y, int width, int height) {
 		// TODO 自动生成方法存根
-		Color gray= getDisplay().getSystemColor(SWT.COLOR_GRAY);		
+		Color gray= getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);		
+		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
+		
+		gc.setForeground(black);
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.drawRectangle(x+Margin, y+Margin, width-2*Margin, height-2*Margin);
 		
 		gc.setForeground(gray);
 		gc.setLineStyle(SWT.LINE_DOT);
@@ -142,9 +176,9 @@ public class ChartGraph3D extends Canvas {
 		double avg = (nScaleMax-nScaleMin)/10;
 		int ys;
 		
-		for (int i=0;i<11;i++)
+		for (int i=1;i<11;i++)
 		{
-			ys = (int)Math.round((YOffset- nScaleMin-i*avg)/yRate)+Margin;
+			ys = height -(int)Math.round((YOffset + nScaleMin+i*avg)/yRate)- Margin;
 			gc.drawLine((int)Margin,y+ys,x+width-Margin,y+ys);
 			
 			DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
@@ -152,16 +186,13 @@ public class ChartGraph3D extends Canvas {
 			gc.drawString(strValue, Margin, ys,true);
 		}
 		avg = MaxCount / nXMarkNum;
-		for (int i=0;i<nXMarkNum;i++)
+		for (int i=0;i<nXMarkNum+1;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
 			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
-			gc.drawString(String.valueOf(i*avg*xScaleRate),x+Margin+ys-20 , y+height-Margin,true);
+			gc.drawString(String.valueOf((int)(i*avg*xScaleRate)),x+Margin+ys-20 , y+height-Margin,true);
 		}
-		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
-		gc.setForeground(black);
-		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.drawRectangle(x+Margin, y+Margin, width-2*Margin, height-2*Margin);
+		
 		
 	}
 	public void drawAxis3D(GC gc, int x, int y, int width, int height) {
@@ -190,7 +221,7 @@ public class ChartGraph3D extends Canvas {
 
 		for (int i=0;i<11;i++)
 		{
-			ys = (int)Math.round((YOffset- nScaleMin-i*avg)/yRate)+Margin+Math.abs(deltY);
+			ys = height - (int)Math.round((YOffset+ nScaleMin+i*avg)/yRate)-Margin+Math.abs(deltY);
 			gc.drawLine((int)Margin,y+ys,Margin+deltX,y+ys+deltY);
 			DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
 			String strValue  = df.format(nScaleMin+i*avg);
@@ -222,23 +253,24 @@ public class ChartGraph3D extends Canvas {
 		
 	}
 	public void drawData(GC gc, int x, int y, int width, int height) {
+		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
 		for (int j=0;j<Data.length;j++)
 		{
 			int deltX = (int)Math.round(j*nDepthStep*Math.cos(degree));
 			int deltY = (int)Math.round(j*nDepthStep*Math.sin(degree));
-			int DY = (int)Math.round(Data.length*nDepthStep*Math.sin(degree));
+			//int DY = (int)Math.round(Data.length*nDepthStep*Math.sin(degree));
 			
 			
 		int []p = new int[Data[j].length];
 		for (int i = 0; i < Data[j].length;i++)
 		{
-			p[i] = (int)Math.round((YOffset-Data[j][i])/ yRate)+Margin;
+			p[i] = height - (int)Math.round((YOffset+Data[j][i])/ yRate) - Margin;
 		}
 		gc.setLineStyle(SWT.LINE_SOLID);
 
 		for (int i = 0; i < Data[j].length-1;i++)
-			gc.drawLine((int)(Margin + x+ (int)(i*xRate))+deltX, p[i]+deltY-DY,
-					Margin + x+(int)((i+1)*xRate)+deltX,p[i+1]+deltY-DY);
+			gc.drawLine((int)(Margin + x+ (int)(i*xRate))+deltX, p[i]+deltY,
+					Margin + x+(int)((i+1)*xRate)+deltX,p[i+1]+deltY);
 		}
 	}
 
