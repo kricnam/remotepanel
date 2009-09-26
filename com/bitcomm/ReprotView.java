@@ -154,7 +154,7 @@ public class ReprotView extends Composite {
 		RowLayout optionLayout = new RowLayout();
 		optionLayout.marginLeft = 10;
 		
-		optionLayout.justify = true		;
+		optionLayout.justify = true;
 		optionLayout.fill = true;
 		
 		

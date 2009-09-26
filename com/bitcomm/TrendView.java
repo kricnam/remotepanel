@@ -1,10 +1,16 @@
 package com.bitcomm;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -14,17 +20,50 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.vafada.swtcalendar.SWTCalendarEvent;
 import org.vafada.swtcalendar.SWTCalendarListener;
 
-public class TrendView extends Composite {
+public class TrendView extends Composite implements Listener {
 
 	final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	Composite optionBar;
+	
 	ChartGraph graph;
+	
 	Display display;
+
+	Label labelFrom;
+
+	Text textFrom;
+
+	Button calFrom;
+
+	Label labelTo;
+
+	Text textTo;
+
+	Button calTo;
+
+	Spinner hour;
+
+	Spinner minute;
+
+	List list;
+
+	Button butDate;
+
+	Button butPeriod;
+
+	MeterView[] meter;
+	Button butLog;
+	
 	public TrendView(Composite parent, int style) {
 		super(parent, style);
 		display=parent.getDisplay();
@@ -44,94 +83,283 @@ public class TrendView extends Composite {
 	}
 	
 	private void initOptionBar(){
-		optionBar = new Composite(this,SWT.BORDER);
-		RowLayout optionLayout = new RowLayout();
-		optionLayout.marginLeft = 10;
-		
-		//optionLayout.justify = true;
-		optionLayout.fill = true;
+		optionBar = new Composite(this, SWT.BORDER);
+		GridLayout optionLayout = new GridLayout(3, true);
 		optionBar.setLayout(optionLayout);
-		optionBar.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,false));
-		Button butSetup = new Button(optionBar,SWT.PUSH);
-		Button butDate = new Button(optionBar,SWT.PUSH);
-		final Text textDate = new Text(optionBar,SWT.BORDER);
-		Button butTime = new Button(optionBar,SWT.PUSH);
-		final Text textTime = new Text(optionBar,SWT.BORDER);
+		optionBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
 
-		Button butDate1 = new Button(optionBar,SWT.PUSH);
-		final Text textDate1 = new Text(optionBar,SWT.BORDER);
-		
-		Button butPrint = new Button(optionBar,SWT.PUSH);
-		
+		butDate = new Button(optionBar, SWT.RADIO);
 		butDate.setText(ConstData.strStartDate);
-		butTime.setText(ConstData.strStartTime);
-		butDate1.setText(ConstData.strEndDate);
-		
-		butPrint.setText(ConstData.strPrint);
-		butSetup.setText("");
-		textDate.setLayoutData(new RowData(100,16));
-		textDate1.setLayoutData(new RowData(100,16));
-		textTime.setLayoutData(new RowData(50,16));
+		butDate
+				.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true,
+						false));
+		butDate.setSelection(true);
 
-		textDate.setEditable(false);
+		GridData dateGrid = new GridData(SWT.END, SWT.CENTER, false, false);
+
+		butPeriod = new Button(optionBar, SWT.RADIO);
+		butPeriod.setText(ConstData.strEndDate);
+		butPeriod.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true,
+				false));
+
+		Group grpStation = new Group(optionBar, SWT.BORDER);
+		grpStation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
+				1, 4));
+		grpStation.setLayout(new RowLayout(SWT.VERTICAL));
+		grpStation.setText(ConstData.strStation);
+		list = new List(grpStation, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		list.setLayoutData(new RowData(220,120));
 		
 
+
+		Composite inputDate = new Composite(optionBar, SWT.NONE);
+		inputDate.setLayout(new GridLayout(3, false));
+		inputDate.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false,
+				false));
+
+		labelFrom = new Label(inputDate, SWT.NONE);
+		labelFrom.setText("From");
+		labelFrom.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+				false));
+		textFrom = new Text(inputDate, SWT.BORDER);
+		dateGrid.widthHint = 100;
+		textFrom.setLayoutData(dateGrid);
+		calFrom = new Button(inputDate, SWT.DOWN | SWT.ARROW);
+		GridData dateGrid1 = new GridData(SWT.END, SWT.CENTER, false, false);
+		calFrom.setLayoutData(dateGrid1);
+		calFrom.setData(textFrom);
+
+		Composite inputEnd = new Composite(optionBar, SWT.NONE);
+		inputEnd.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+				false));
+		inputEnd.setLayout(new GridLayout(3, false));
+
+		labelTo = new Label(inputEnd, SWT.NONE);
+		labelTo.setText("To");
+		labelTo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+				false));
+		textTo = new Text(inputEnd, SWT.BORDER);
+		textTo.setLayoutData(dateGrid);
+		calTo = new Button(inputEnd, SWT.DOWN | SWT.ARROW);
+		calTo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+				false));
+		calTo.setData(textTo);
+		calTo.setEnabled(false);
+		textTo.setEnabled(false);
+		labelTo.setEnabled(false);
+
+		Group grpTime = new Group(optionBar, SWT.NONE);
+		grpTime.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		grpTime.setText(ConstData.strStartTime);
+		grpTime.setLayout(new GridLayout(3, false));
+		hour = new Spinner(grpTime, SWT.NONE);
+		hour.setMaximum(23);
+		Label comma = new Label(grpTime, SWT.NONE);
+		comma.setText(":");
+		minute = new Spinner(grpTime, SWT.NONE);
+		minute.setMaximum(59);
+
+		Button butStart = new Button(optionBar, SWT.PUSH);
+		butStart.setText(ConstData.strStart);
+		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false,
+				1, 1));
+
+		butStart.addSelectionListener(new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				process();
+			}
+
+		});
+
+		PreferenceStore store = new PreferenceStore("./config.ini");
+		try {
+			store.load();
+		} catch (IOException eio) {
+			MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
+			box.setMessage(eio.getMessage());
+			box.setText("open config fail");
+			box.open();
+			return;
+		}
+		int num = store.getInt("StationNum");
+		if (num == 0)
+			num = 1;
+		String[] str = new String[num];
+		for (int i = 0; i < num; i++) {
+			String key = ConstData.strStation.replace(" ", "_") + "_"
+					+ String.valueOf(i + 1) + "_Name";
+
+			String strName = store.getString(key);
+
+			if (strName == null || strName.length() == 0)
+				str[i] = ConstData.strUnknown;
+			else
+				str[i] = strName;
+		}
+		list.setItems(str);
 		
-		butDate.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                final SWTCalendarDialog cal = new SWTCalendarDialog(display);
-                cal.addDateChangedListener(new SWTCalendarListener() {
-                    public void dateChanged(SWTCalendarEvent calendarEvent) {
-                        textDate.setText(formatter.format(calendarEvent.getCalendar().getTime()));
-                    }
-                });
-                if (textDate.getText() != null && textDate.getText().length() > 0) {
-                    try {
-                        Date d = formatter.parse(textDate.getText());
-                        cal.setDate(d);
-                    } catch (ParseException pe) {
-                    	pe.printStackTrace();
-                    }
-                }
-                cal.open();
-            }
-        });
-		butDate1.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                final SWTCalendarDialog cal = new SWTCalendarDialog(display);
-                cal.addDateChangedListener(new SWTCalendarListener() {
-                    public void dateChanged(SWTCalendarEvent calendarEvent) {
-                        textDate1.setText(formatter.format(calendarEvent.getCalendar().getTime()));
-                    }
-                });
-                if (textDate.getText() != null && textDate.getText().length() > 0) {
-                    try {
-                        Date d = formatter.parse(textDate.getText());
-                        cal.setDate(d);
-                    } catch (ParseException pe) {
-                    	pe.printStackTrace();
-                    }
-                }
-                cal.open();
-            }
-        });
+		butLog = new Button(optionBar, SWT.CHECK);
+		butLog.setText("LOG");
+		butLog.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
+				1, 1));
+
+
+		butDate.addListener(SWT.Selection, this);
+		butPeriod.addListener(SWT.Selection, this);
+
+		calFrom.addListener(SWT.Selection, this);
+		calTo.addListener(SWT.Selection, this);
 
 	}
+	
+	public void handleEvent(Event event) {
+
+		if (event.widget.toString().indexOf(ConstData.strStartDate) >= 0) {
+			calTo.setEnabled(false);
+			textTo.setEnabled(false);
+			labelTo.setEnabled(false);
+			return;
+		}
+		if (event.widget.toString().indexOf(ConstData.strEndDate) >= 0) {
+			calTo.setEnabled(true);
+			textTo.setEnabled(true);
+			labelTo.setEnabled(true);
+			return;
+		}
+		final Text text = (Text) event.widget.getData();
+
+		if (text == null)
+			return;
+
+		Image img = new Image(display, "com/bitcomm/resource/calendar.png");
+		SWTCalendarDialog cal = new SWTCalendarDialog(getShell(), img);
+		cal.addDateChangedListener(new SWTCalendarListener() {
+			public void dateChanged(SWTCalendarEvent calendarEvent) {
+				text.setText(formatter.format(calendarEvent.getCalendar()
+						.getTime()));
+			}
+		});
+		if (text.getText() != null && text.getText().length() > 0) {
+			try {
+				Date d = formatter.parse(text.getText());
+				cal.setDate(d);
+			} catch (ParseException pe) {
+				pe.printStackTrace();
+			}
+		}
+		cal.open();
+		img.dispose();
+	}
+	
+
 	private void initGraph(){
 		Composite com = new Composite(this,SWT.BORDER);
 		com.setLayout(new FillLayout());
 		com.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 		graph = new ChartGraph(com,SWT.NONE);
-		graph.Data = new double[1][360];
-		for (int i=0;i<360 ;i++)
-		{
-			graph.Data[0][i]= Math.sin(i*Math.PI/180);
-		}
-		graph.Margin =20;
-		graph.nMaxData = 2;
-		graph.nMinData = -2;
-		graph.nXMarkNum = 10;
+		graph.Margin =40;
+		graph.nMaxData = 100;
+		graph.nMinData = 0;
+		graph.nXMarkNum = 16;
 		graph.nYMarkNum = 10;
+		graph.Data = new double[1][240];
+
+		for (int i=0;i<graph.Data[0].length ;i++)
+		{
+			graph.Data[0][i]= graph.nMinData;
+		}
+		
 	}
+	
+	void process() {
+		DateTime start;
+		DateTime end;
+		Date startDate = null;
+		Date endDate = null;
+		try {
+			startDate = formatter.parse(textFrom.getText());
+		} catch (ParseException e) {
+			MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
+			box.setMessage(e.getMessage()
+					+ "\r\nPlease select a valid date for start date.");
+			box.setText("Date Setting Error");
+			box.open();
+			return;
+		}
+		if (butPeriod.getSelection()) {
+			try {
+				endDate = formatter.parse(textTo.getText());
+			} catch (ParseException e) {
+				MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR
+						| SWT.OK);
+				box.setMessage(e.getMessage()
+						+ "\r\nPlease select a valid date for end date.");
+				box.setText("Date Setting Error");
+				box.open();
+				return;
+			}
+		}
+
+		start = new DateTime();
+		end = new DateTime();
+		Calendar cal = Calendar.getInstance();
+
+		if (endDate != null) {
+			cal.setTime(endDate);
+		} else {
+			cal.setTime(startDate);
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+		}
+
+		end.year = (short) cal.get(Calendar.YEAR);
+		end.month = (byte) (cal.get(Calendar.MONTH) + 1);
+		end.day = (byte) cal.get(Calendar.DAY_OF_MONTH);
+		end.hour = (byte) cal.get(Calendar.HOUR_OF_DAY);
+		end.minute = (byte) cal.get(Calendar.MINUTE);
+		end.bValid = true;
+
+		cal.setTime(startDate);
+		start.year = (short) cal.get(Calendar.YEAR);
+		start.month = (byte) (cal.get(Calendar.MONTH) + 1);
+		start.day = (byte) cal.get(Calendar.DAY_OF_MONTH);
+		start.hour = (byte) (hour.getSelection() & 0x00ff);
+		start.minute = (byte) minute.getSelection();
+		start.bValid = true;
+
+		int[] station = list.getSelectionIndices();
+
+		if (station.length == 0) {
+			MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
+			box.setText("No measure point selected");
+			box.setMessage("Please select a measure point to draw.");
+			box.open();
+			return;
+		}
+		
+		
+		for (int i = 0; i < station.length; i++) {
+			if (list.getItem(station[i]).equals(ConstData.strUnknown))
+				continue;
+			int n = station[i];
+
+			System.out.println(n);
+			//while (!meter[n].isPaused());
+			TrendDrawTask task = new TrendDrawTask(this,
+						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
+						end);
+			task.meter = meter[n];
+			graph.logScale = butLog.getSelection();
+			task.start();
+
+		}
+
+	}
+
 
 }

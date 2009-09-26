@@ -43,6 +43,27 @@ public class SpectrumData extends MeasureData{
 		nBattVoltage = (short)ToChar(Data,4049);		
 	}
 	
+	public SpectrumData() {
+		Channel = new int[1000];
+		nMachineNum=0;
+		DataLength = 0;
+		DataNum = 0;
+		dateEnd = new DateTime();
+		for(int i=0;i<1000;i++)
+			Channel[i]=0;
+		nCollectTime = 0;
+		Time = 0;
+		nStatus = 0;
+		nNaIData = 0;
+		dateGPS = new DateTime();
+		gps = new GPSData();
+		cFOMA = 0;
+		nHVVolt = 0;
+		nThermoral = 0;
+		nBattVoltage = 0;		
+	}
+
+	
 	void Save()throws Exception, IOException
 	{
 		StringBuilder sb = new StringBuilder();
@@ -54,7 +75,8 @@ public class SpectrumData extends MeasureData{
 		file = new File(sb.toString());
 		if (!file.exists()) file.mkdirs();
 		
-		do {
+		num+= (dateEnd.hour * 60 + dateEnd.minute ) / nCollectTime;
+		
 			sb = null;
 			formatter=null;
 			sb = new StringBuilder();
@@ -65,7 +87,7 @@ public class SpectrumData extends MeasureData{
 				(dateEnd.hour < 12)?"A":"P",num);
 			file = new File(sb.toString()+".spc");
 			num++;
-		} while (file.exists());
+		
 		formatter = null;
 		sb=null;
 		sb = new StringBuilder();
