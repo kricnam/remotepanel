@@ -81,7 +81,7 @@ public class CommunicationTask extends Thread {
 						packet.getPacketType() == Command.CommandType.CurrentData) 
 				{
 					nError=0;
-					face.data = new HiLowData(packet.ByteStream());
+					face.data = new DoesRateData(packet.ByteStream());
 					if (face.data!=null)
 						face.data.Save();
 					face.getDisplay().asyncExec(new Runnable() {

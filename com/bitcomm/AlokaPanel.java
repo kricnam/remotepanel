@@ -40,12 +40,13 @@ public class AlokaPanel {
 		if (!root.exists())
 					root.mkdir();
 		d = new Display();
+		
 		shell =new Shell(d,SWT.MIN);
 		shell.setText(ConstData.strName);
 		Image imgShell = new Image(d,"com/bitcomm/resource/burn.png");
 		shell.setImage(imgShell);
 		shell.setMaximized(true);
-
+		
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
 

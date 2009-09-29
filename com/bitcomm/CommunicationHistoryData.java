@@ -79,13 +79,13 @@ public class CommunicationHistoryData {
 		}
 	}
 	
-	HiLowData DataAnswerDoseRate() throws Exception
+	DoesRateData DataAnswerDoseRate() throws Exception
 	{
 		DataPacket packet = port.RecvPacket();
 		if (packet==null) return null;
 		if (packet.getPacketType()== Command.CommandType.DoseRateHistoryDataRequest)
 		{
-			 return new HiLowData(packet.ByteStream());
+			 return new DoesRateData(packet.ByteStream());
 		}
 			
 		return null;

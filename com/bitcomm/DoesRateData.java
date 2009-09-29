@@ -3,11 +3,8 @@
  */
 package com.bitcomm;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Formatter;
 
 /**
  * @author mxx
@@ -19,7 +16,7 @@ public class DoesRateData extends MeasureData{
 	final static byte	mGyh = 3;
 	final static byte	NaI=1;
 	final static byte   SSD=2;
-	final static String strHead="ChNo,DatNo,Date,Flag,NaI Dose Rate,Unit,NaI Counts(DR),NaI Counts(CR),SSD Dose Rate,Unit,SSD Counts(DR),PT,MT,Status,HV,Temp,LV,GPSDate,N,E,H,SAT,GEOD,FOM";
+	
 	int nMachineNum;
 	short DataLength;
 	char DataNum;
@@ -97,17 +94,9 @@ public class DoesRateData extends MeasureData{
 	}
 	void Save() throws Exception, IOException
 	{
-		StringBuilder sb = new StringBuilder();
-		Formatter formatter = new Formatter(sb);
-		formatter.format("root/S%02d%02d%02d%02d00.dat", nMachineNum,
-				date.year%100,date.month,date.day);
-		String strFileName = sb.toString();
-		File file = new File(strFileName);
-		boolean head = !file.exists();
-		FileWriter fout = new FileWriter(file,true);
-		if (head) fout.write(strHead+"\r\n");
-		fout.write(CSVString()+"\r\n");
-		fout.close();
+		DoesRateFile file = new DoesRateFile(nMachineNum,date);
+		file.setData(this);
+		file.save();
 	}
 	void parse(String str) throws ParseException
 	{

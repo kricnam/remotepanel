@@ -41,6 +41,32 @@ public class DateTime extends MeasureData{
 		minute = (byte)cal.get(Calendar.MINUTE);
 		bValid = true;
 	}
+	
+	void setTime(Calendar cal)
+	{
+		year = (short) cal.get(Calendar.YEAR);
+		month = (byte) (cal.get(Calendar.MONTH) + 1);
+		day = (byte) cal.get(Calendar.DAY_OF_MONTH);
+		hour = (byte) cal.get(Calendar.HOUR_OF_DAY);
+		minute = (byte) cal.get(Calendar.MINUTE);
+		bValid = true;
+	}
+	
+	Calendar getTime()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(year, month-1, day, hour, minute);
+		return cal;
+	}
+	
+	void addMinute(int Minute)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(year, month-1, day, hour, minute);
+		cal.add(Calendar.MINUTE, Minute);
+		setTime(cal);
+	}
+	
 	byte[] ByteStream()
 	{
 		byte[] out = new byte[6];

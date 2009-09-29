@@ -304,8 +304,8 @@ public class BackupView extends Composite implements Listener {
 			cal.setTime(endDate);
 		} else {
 			cal.setTime(startDate);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
+			//cal.set(Calendar.HOUR_OF_DAY, 23);
+			//cal.set(Calendar.MINUTE, 59);
 		}
 
 		end.year = (short) cal.get(Calendar.YEAR);

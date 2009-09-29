@@ -14,7 +14,7 @@ public class MeterView extends Composite  {
 	AnalogMeter meter;
 	int nMachineNum;
 	Label label;
-	HiLowData data;
+	DoesRateData data;
 	CommunicationTask dataTask;
 	CommunicationPort ComPort;
 	final static RGB rgbGreen = new RGB(150,250,150);
@@ -139,19 +139,19 @@ public class MeterView extends Composite  {
 			meter.strMoni = ConstData.strMonitor;
 		}
 		
-		if (data.cValidType == HiLowData.NaI)
+		if (data.cValidType == DoesRateData.NaI)
 		{
 				meter.nValue = data.nNaIValue/10.0;
 				meter.dateData = data.date;
 				switch(data.cNaIUnit)
 				{
-					case HiLowData.nGyh:
+					case DoesRateData.nGyh:
 							meter.strUnit = "nGy/h";
 							break;
-					case HiLowData.uGyh:
+					case DoesRateData.uGyh:
 							meter.strUnit = "uGy/h";
 							break;
-					case HiLowData.mGyh:
+					case DoesRateData.mGyh:
 							meter.strUnit = "mGy/h";
 							break;
 				}
@@ -162,13 +162,13 @@ public class MeterView extends Composite  {
 			meter.dateData = data.date;
 			switch(data.cSSDUnit)
 			{
-				case HiLowData.nGyh:
+				case DoesRateData.nGyh:
 						meter.strUnit = "nGy/h";
 						break;
-				case HiLowData.uGyh:
+				case DoesRateData.uGyh:
 						meter.strUnit = "uGy/h";
 						break;
-				case HiLowData.mGyh:
+				case DoesRateData.mGyh:
 						meter.strUnit = "mGy/h";
 						break;
 			}

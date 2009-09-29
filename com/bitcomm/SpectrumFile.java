@@ -40,7 +40,7 @@ public class SpectrumFile extends File {
 				n,time.year%100,time.month,time.day,
 				time.year%100,time.month,time.day,
 				"A",1);
-		System.out.println(sb.toString());
+		//System.out.println(sb.toString());
 		int PT = getPT(sb.toString()); 
 		sb.delete(0, sb.length()+1);
 		formatter.format("spectrum/%02d-%02d%02d%02d/%02d%02d%02d%s%03d.spc",
@@ -48,7 +48,7 @@ public class SpectrumFile extends File {
 				time.year%100,time.month,time.day,
 				(time.hour < 12)?"A":"P",
 				(time.hour * 60 + time.minute ) / PT+1);
-		System.out.println(sb.toString());
+		//System.out.println(sb.toString());
 		return sb.toString();
 	}
 	
@@ -68,10 +68,8 @@ public class SpectrumFile extends File {
 		return -1;
 	}
 	
-	public SpectrumFile(String arg0) {
+	public SpectrumFile(String arg0) throws IOException, ParseException {
 		super(arg0);
-		try
-		{
 	    FileInputStream fstream = new FileInputStream(arg0);
 	    // Get the object of DataInputStream
 	    DataInputStream in = new DataInputStream(fstream);
@@ -85,13 +83,13 @@ public class SpectrumFile extends File {
 	    	while ((strLine = br.readLine()) != null)   {
 	    		if (strLine.indexOf("DatNo")>-1)
 	    		{
-	    			System.out.println("DatNo");
+	    			//System.out.println("DatNo");
 	    			data.DataNum = (short)Integer.parseInt(strLine.substring(strLine.indexOf("=")+1));
 	    			continue;
 	    		}
 	    		if (strLine.indexOf("Date")==0)
 	    		{
-	    			System.out.println("Date");
+	    			//System.out.println("Date");
 	    			SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy/MM/dd");
 	    			Date date = formatter1.parse(strLine.substring(strLine.indexOf("=")+1));
 	    			Calendar cal = Calendar.getInstance();
@@ -103,7 +101,7 @@ public class SpectrumFile extends File {
 	    		}
 	    		if (strLine.indexOf("Time")>-1)
 	    		{
-	    			System.out.println("Time");
+	    			//System.out.println("Time");
 	    			strLine = strLine.substring(strLine.indexOf("=")+1);
 	    			strLine = strLine.trim();
 	    			int i = strLine.indexOf(":");
@@ -123,7 +121,7 @@ public class SpectrumFile extends File {
 	    				strLine = br.readLine();
 	    				if (strLine!=null)
 	    					data.Channel[i]=Integer.parseInt(strLine);
-	    				System.out.println(String.valueOf(i)+": "+String.valueOf(data.Channel[i]));
+	    				//System.out.println(String.valueOf(i)+": "+String.valueOf(data.Channel[i]));
 	    			}
 	    			break;
 	    		}
@@ -132,14 +130,6 @@ public class SpectrumFile extends File {
 	    }
 	    //Close the input stream
 	    in.close();
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }

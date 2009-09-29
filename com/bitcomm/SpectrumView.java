@@ -1,5 +1,6 @@
 package com.bitcomm;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,6 +60,8 @@ public class SpectrumView extends Composite implements Listener {
 
 	MeterView[] meter;
 	Button butLog;
+	Button butNext;
+	Button butPrev;
 
 	public SpectrumView(Composite parent, int style) {
 		super(parent, style);
@@ -202,6 +205,39 @@ public class SpectrumView extends Composite implements Listener {
 		butLog.setText("LOG");
 		butLog.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
 				1, 1));
+		
+		Group grpNav = new Group(optionBar, SWT.NONE);
+		butNext =new Button(grpNav, SWT.ARROW|SWT.UP);
+		butPrev =new Button(grpNav, SWT.ARROW|SWT.DOWN);
+		grpNav.setLayout(new GridLayout(2, true));
+		grpNav.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		butNext.addSelectionListener(new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				graph3d.pos+=1;
+				if (graph3d.pos > (graph3d.Data.length-1))
+					graph3d.pos = 0;
+				graph3d.UpdateSelection();
+			}
+
+		});
+		butPrev.addSelectionListener(new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				graph3d.pos-=1;
+				if (graph3d.pos < 0)
+					graph3d.pos = graph3d.Data.length-1;
+				graph3d.UpdateSelection();
+			}
+
+		});
+
 
 
 		butDate.addListener(SWT.Selection, this);
@@ -216,18 +252,14 @@ public class SpectrumView extends Composite implements Listener {
 		com.setLayout(new FillLayout());
 		com.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 		graph3d = new ChartGraph3D(com,SWT.NONE);
-		graph3d.Data = new double[10][10];
-		for (int j=0;j<10;j++)
-		for (int i=0;i<10 ;i++)
-		{
-			graph3d.Data[j][i]= 0;
-		}
-		graph3d.Margin = 40;
+		graph3d.Data = new double[10][11];
+		
+		graph3d.Margin = 63;
 		graph3d.nMaxData = 2;
 		graph3d.nMinData = -2;
 		graph3d.nXMarkNum = 10;
 		graph3d.nYMarkNum = 10;
-		graph3d.nDepthStep = 10;
+		graph3d.nDepthStep = 2;
 		//graph3d.setBackground(graph3d.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 	}
 
@@ -270,7 +302,7 @@ public class SpectrumView extends Composite implements Listener {
 		
 	}
 
-	void process() {
+	void process()  {
 		DateTime start;
 		DateTime end;
 		Date startDate = null;
@@ -307,25 +339,19 @@ public class SpectrumView extends Composite implements Listener {
 			cal.setTime(endDate);
 		} else {
 			cal.setTime(startDate);
-			cal.set(Calendar.HOUR_OF_DAY, 23);
-			cal.set(Calendar.MINUTE, 59);
+			//cal.set(Calendar.HOUR_OF_DAY, 23);
+			//cal.set(Calendar.MINUTE, 59);
 		}
-
-		end.year = (short) cal.get(Calendar.YEAR);
-		end.month = (byte) (cal.get(Calendar.MONTH) + 1);
-		end.day = (byte) cal.get(Calendar.DAY_OF_MONTH);
-		end.hour = (byte) cal.get(Calendar.HOUR_OF_DAY);
-		end.minute = (byte) cal.get(Calendar.MINUTE);
-		end.bValid = true;
-
+		
+		end.setTime(cal);
+		
+		
 		cal.setTime(startDate);
-		start.year = (short) cal.get(Calendar.YEAR);
-		start.month = (byte) (cal.get(Calendar.MONTH) + 1);
-		start.day = (byte) cal.get(Calendar.DAY_OF_MONTH);
-		start.hour = (byte) (hour.getSelection() & 0x00ff);
-		start.minute = (byte) minute.getSelection();
-		start.bValid = true;
-
+		cal.set(Calendar.HOUR_OF_DAY, hour.getSelection());
+		cal.set(Calendar.MINUTE, minute.getSelection());
+		
+		start.setTime(cal);
+		
 		int station = list.getSelectionIndex();
 
 		if (station <  0) {
@@ -340,11 +366,13 @@ public class SpectrumView extends Composite implements Listener {
 				return;
 		int n = meter[station].nMachineNum;
 	
-		if (butDate.getSelection())
-		{
 			String strFileName;
-			try {
+			int PT=0;
+			try
+			{
 				strFileName = SpectrumFile.getFileName(n, start);
+				
+				PT = SpectrumFile.getPT(strFileName);
 			} catch (IOException e) {
 				MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
 				box.setText("Read File Fail");
@@ -353,19 +381,88 @@ public class SpectrumView extends Composite implements Listener {
 				return;
 			}
 			
-			SpectrumFile file = new SpectrumFile(strFileName);
-			graph3d.Data = null;
-			graph3d.Data = new double[1][1000];
-			for(int i=0;i<1000;i++)
-				graph3d.Data[0][i]=file.data.Channel[i];
+		if (butDate.getSelection())
+		{
+			SpectrumFile file;
+			try {
+				file = new SpectrumFile(strFileName);
+				graph3d.Data = null;
+				graph3d.Data = new double[1][1000];
+				for(int i=0;i<1000;i++)
+					graph3d.Data[0][i]=file.data.Channel[i];
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
 			graph3d.setAutoTransform();
 			graph3d.redraw();
 			
 		}
-		//if ()
-
-		
-
+		else
+		{
+			cal = start.getTime();
+			DateTime date = new DateTime();
+			date.setTime(cal);
+			System.out.println(cal.toString());
+			System.out.println(end.getTime().toString());
+			long nfile = end.getTime().getTimeInMillis()-cal.getTimeInMillis();
+			
+			nfile = nfile/60000 /PT ;
+			graph3d.Data = null;
+			graph3d.Data = new double[(int)nfile][1000];
+			System.out.println("Total files:"+String.valueOf(nfile));
+			for (int t=0;t<nfile;t++)
+			{
+				try {
+					strFileName = SpectrumFile.getFileName(n, date);
+					//System.out.println(strFileName);
+					SpectrumFile file;
+					try {
+						
+						file = new SpectrumFile(strFileName);
+						for(int i=0;i<1000;i++)
+							graph3d.Data[t][i]=file.data.Channel[i];
+						date.addMinute(PT);
+						if (end.getTime().before(date.getTime()))
+							break;
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					
+				}
+				catch (FileNotFoundException ee)
+				{
+					MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
+					box.setText("Read File Fail");
+					box.setMessage(strFileName +" not found.Please goto backup to download date first."+ee.getMessage());
+					box.open();
+					break;
+				
+					
+				}
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
+					box.setText("Read File Fail");
+					box.setMessage(e.getMessage());
+					box.open();
+					e.printStackTrace();
+					return;
+					
+				}
+			};
+			
+			graph3d.setAutoTransform();
+			graph3d.redraw();
+			
+		}
 	}
 
 }

@@ -20,17 +20,22 @@ import org.eclipse.swt.widgets.Text;
 
 import org.vafada.swtcalendar.SWTCalendarEvent;
 import org.vafada.swtcalendar.SWTCalendarListener;
+
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
-public class ReprotView extends Composite {
+public class ReprotView extends Composite implements Listener{
 	CTabFolder folder;
 	Image img;
 	Composite comDaily;
 	Composite comMonth;
     final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     final SimpleDateFormat monformatter= new SimpleDateFormat("yyyy-MM");
+    Text textDate;
+    Button butDate;
 	Table dailyTab;
 	Table monthTab;
 	public ReprotView(Composite parent, int style) {
@@ -82,33 +87,14 @@ public class ReprotView extends Composite {
 		
 		
 		optionBar.setLayout(optionLayout);
-		Button butDate = new Button(optionBar,SWT.NONE);
-		final Text textDate = new Text(optionBar,SWT.BORDER);
+		butDate = new Button(optionBar,SWT.NONE);
+		textDate = new Text(optionBar,SWT.BORDER);
+		
 		Button butPrint = new Button(optionBar,SWT.NONE);
 		
 		butDate.setText(ConstData.strDate);
 		
-        butDate.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                final SWTCalendarDialog cal = new SWTCalendarDialog(folder.getShell().getDisplay());
-                
-                cal.addDateChangedListener(new SWTCalendarListener() {
-                    public void dateChanged(SWTCalendarEvent calendarEvent) {
-                        textDate.setText(formatter.format(calendarEvent.getCalendar().getTime()));
-                    }
-                });
-                
-                if (textDate.getText() != null && textDate.getText().length() > 0) {
-                    try {
-                        Date d = formatter.parse(textDate.getText());
-                        cal.setDate(d);
-                    } catch (ParseException pe) {
-                    	pe.printStackTrace();
-                    }
-                }
-                cal.open();
-            }
-        });
+        butDate.addListener(SWT.Selection,this);
 
 		
 		butPrint.setText(ConstData.strPrint);
@@ -167,7 +153,8 @@ public class ReprotView extends Composite {
 		
         butDate.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
-                final SWTCalendarDialog cal = new SWTCalendarDialog(folder.getShell().getDisplay());
+            	Image img = new Image(getDisplay(), "com/bitcomm/resource/calendar.png");
+                final SWTCalendarDialog cal = new SWTCalendarDialog(getShell(),img);
                 cal.addDateChangedListener(new SWTCalendarListener() {
                     public void dateChanged(SWTCalendarEvent calendarEvent) {
                         textDate.setText(monformatter.format(calendarEvent.getCalendar().getTime()));
@@ -217,5 +204,56 @@ public class ReprotView extends Composite {
 			monthTab.getColumn(i).pack();
 		}
 	}
+	
+	public void handleEvent(Event event) {
+		final Text text = textDate;
+		System.out.println(event.toString());
+		if (text == null)
+			return;
+
+		Image img = new Image(getDisplay(), "com/bitcomm/resource/calendar.png");
+		SWTCalendarDialog cal = new SWTCalendarDialog(getShell(), img);
+		cal.addDateChangedListener(new SWTCalendarListener() {
+			public void dateChanged(SWTCalendarEvent calendarEvent) {
+				text.setText(formatter.format(calendarEvent.getCalendar()
+						.getTime()));
+			}
+		});
+		if (text.getText() != null && text.getText().length() > 0) {
+			try {
+				Date d = formatter.parse(text.getText());
+				cal.setDate(d);
+			} catch (ParseException pe) {
+				pe.printStackTrace();
+			}
+		}
+		cal.open();
+		img.dispose();
+		fillDailyReport();
+	}
+	
+	void fillDailyReport()
+	{
+		System.out.println("Daily Process");
+		Date date;
+		try {
+			date = formatter.parse(textDate.getText());
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			DateTime d=new DateTime();
+			d.setTime(cal);
+			DoesRateFile file = new DoesRateFile(DoesRateFile.getFileName(1,d));
+			file.load();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+		
+	}
+	
 
 }

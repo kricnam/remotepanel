@@ -28,12 +28,13 @@ public class ChartGraph3D extends Canvas {
 	double xScaleRate;  // 
 	int nXMarkNum;
 	int nYMarkNum;
-	
+	int pos;
 	int nDepthStep;
 	double degree;
+	boolean UpDateSelect;
 	public ChartGraph3D(Composite parent, int style) {
 		// TODO 自动生成构造函数存根
-		super(parent, style);
+		super(parent, style|SWT.DOUBLE_BUFFERED|SWT.NO_BACKGROUND);
 		// TODO 自动生成构造函数存根
 		addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
@@ -51,25 +52,41 @@ public class ChartGraph3D extends Canvas {
 		nYMarkNum = 0;
 		nDepthStep = 1;
 		degree = -Math.PI / 4;
+		pos = 0;
+		UpDateSelect =false;
 	}
 	void paintControl(PaintEvent e) {
 		GC gc = e.gc;
 		
 		Point size = getSize();
+		
+		if (Data!=null)
+		{
+			if (nMaxData==nMinData) AutoSetTransform(gc,0,0,size.x,size.y);
+			else SetTransform(0,0,size.x,size.y);
+		}
+		
+		gc.setAntialias(SWT.ON);
+		gc.setAdvanced(true);
+		if (UpDateSelect)
+		{
+			UpDateSelect = false;
+			
+			//DrawSelection(gc,0, 0, size.x, size.y);
+			//return;
+		}
 		setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-		if (nMaxData==nMinData) AutoSetTransform(gc,0,0,size.x,size.y);
-		else SetTransform(0,0,size.x,size.y);
-		
-		
-		//Color white= getDisplay().getSystemColor(SWT.COLOR_WHITE);
-		//setBackground(white);
-		
 		drawBackground(gc, 0, 0, size.x, size.y);
 		
-		
-		drawData(gc, 0, 0,size.x, size.y);
-
+		if (Data!=null)	drawData(gc, 0, 0,size.x, size.y);
 	}
+	
+	void UpdateSelection()
+	{
+		UpDateSelect = true;
+		redraw();
+	}
+	
 	void ResetData()
 	{
 		if (Data!=null)
@@ -105,15 +122,18 @@ public class ChartGraph3D extends Canvas {
 		// TODO 自动生成方法存根
 		//super.drawBackground(gc, x, y, width, height);
 		
-		if (Data.length>1) drawAxis3D(gc, x, y, width, height);
+		if (Data!=null && Data.length>1) drawAxis3D(gc, x, y, width, height);
 		else drawAxis(gc, x, y, width, height);
 	}
 
 	public void AutoSetTransform(GC gc,int x, int y, int width, int height)
 	{
-		Point pt = gc.stringExtent("0000");
-		Margin = Math.min((int)(width * 0.04),(int)(height * 0.04));
+		Point pt = gc.stringExtent("00000");
+		System.out.println("MArgin:"+String.valueOf(Margin));
+		Margin = Math.max(Margin,Math.max((int)(width * 0.04),(int)(height * 0.04)));
+		System.out.println("MArgin:"+String.valueOf(Margin));
 		Margin = Math.max(Margin, pt.y*2);
+		System.out.println("MArgin:"+String.valueOf(Margin));
 		
 		nMaxData = 0;
 			for (int j=0;j < Data.length;j++)
@@ -128,7 +148,8 @@ public class ChartGraph3D extends Canvas {
 			for (int j=0;j < Data.length;j++)
 				for(int i=0 ; i< Data[j].length;i++)
 					nMinData = Math.min(nMinData , Data[j][i]);
-		
+		//nDepthStep = height / 3 /(Data.length+2);
+		//if (nDepthStep==0) nDepthStep=1;
 		SetTransform(x,y,width,height);
 
 	}
@@ -137,7 +158,7 @@ public class ChartGraph3D extends Canvas {
 	{
 		if (nScaleMax == nScaleMin)
 		{
-			nScaleMax = ((int)Math.ceil(nMaxData)/100 + 1)*100;
+			nScaleMax = ((int)Math.ceil(nMaxData)/1000 + 1)*1000;
 			nScaleMin = Math.floor(nMinData);
 		}
 
@@ -155,14 +176,12 @@ public class ChartGraph3D extends Canvas {
 		else 
 			YOffset = 0;
 		
-		//YOffset += Math.round(Math.abs(Data.length * nDepthStep*Math.cos(degree)));
-		
-		xRate = (double) (width-2*Margin - Math.abs((Data.length-1) * nDepthStep*Math.cos(degree)))/MaxCount;
+		xRate = (double) (width-2*Margin - Math.abs((Data.length+2) * nDepthStep*Math.cos(degree)))/MaxCount;
 	}
 	
 	
 	public void drawAxis(GC gc, int x, int y, int width, int height) {
-		// TODO 自动生成方法存根
+		 
 		Color gray= getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);		
 		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
 		
@@ -196,83 +215,162 @@ public class ChartGraph3D extends Canvas {
 		
 	}
 	public void drawAxis3D(GC gc, int x, int y, int width, int height) {
-		// TODO 自动生成方法存根
-		
+		 		
 		double avg = (nScaleMax-nScaleMin)/10;
 		int ys;
-		int deltX = (int)Math.round(Data.length*nDepthStep*Math.cos(degree));
-		int deltY = (int)Math.round(Data.length*nDepthStep*Math.sin(degree));
+		int deltX = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.cos(degree)));
+		int deltY = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.sin(degree)));
 
 		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
-		Color gray= getDisplay().getSystemColor(SWT.COLOR_WHITE);
-		Color oldbk = gc.getBackground();
-		gc.setBackground(gray);
-		gc.setForeground(gray);
-		//gc.fillRectangle(x,y,width,height);
-		gc.fillRectangle(x+Margin+deltX, y+Margin, width-2*Margin-deltX, height-2*Margin-Math.abs(deltY));
-		//);
-		gc.setBackground(oldbk);
-
-				
-		//gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));	
-		
+		Color gray= getDisplay().getSystemColor(SWT.COLOR_GRAY);
+		int []p=new int[12];
+		p[0]=Margin;p[1]=Margin+deltY;
+		p[2]=Margin;p[3]=height-Margin;
+		p[4]=width-Margin-deltX;p[5]=p[3];
+		p[6]=width-Margin;p[7]=p[5]-deltY;
+		p[8]=p[6];p[9]=Margin;
+		p[10]=Margin+deltX;p[11]=p[9];
 		gc.setForeground(black);
+		gc.setBackground(gray);
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.drawPolygon(p);
+		gc.fillPolygon(p);
+		
+		gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.setLineStyle(SWT.LINE_DOT);
-
-		for (int i=0;i<11;i++)
+		// draw Vertical / scale
+		
+		for (int i=1;i<11;i++)
 		{
-			ys = height - (int)Math.round((YOffset+ nScaleMin+i*avg)/yRate)-Margin+Math.abs(deltY);
-			gc.drawLine((int)Margin,y+ys,Margin+deltX,y+ys+deltY);
-			DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
+			ys = height - (int)Math.round((YOffset+ nScaleMin+i*avg/yRate))-Margin;
+			if (i<10) gc.drawLine((int)Margin,y+ys,Margin+deltX,y+ys-deltY);
+			
+			DecimalFormat   df   =new   java.text.DecimalFormat("##");  
 			String strValue  = df.format(nScaleMin+i*avg);
-			gc.drawString(strValue, Margin, ys,true);
+			gc.drawString(strValue, 3, ys,true);
 		}
+		
+		
+		//draw Herizon / scale
 		avg = MaxCount / nXMarkNum;
 		for (int i=0;i<=nXMarkNum;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
 			gc.drawLine(x+Margin+ys,y+height-Margin,
-					x+Margin+ys+deltX,y+height-Margin+deltY);
-			gc.drawString(String.valueOf(i*avg*xScaleRate),x+Margin+ys-20 , y+height-Margin,true);
+					x+Margin+ys+deltX,y+height-Margin-deltY);
+			gc.drawString(String.valueOf((int)(i*avg*xScaleRate)),x+Margin+ys-20 ,
+					y+height-Margin,true);
+		}
+		// draw back herizon scale
+		avg = (nScaleMax-nScaleMin)/10;
+		for (int i=1;i<10;i++)
+		{
+			ys = height - (int)Math.round((YOffset+ nScaleMin+i*avg)/yRate)-Margin;
+			gc.drawLine((int)Margin+deltX,y+ys-deltY,x+width-Margin,y+ys-deltY);
 		}
 		
-		avg = (nScaleMax-nScaleMin)/10;
-		for (int i=0;i<11;i++)
-		{
-			ys = (int)Math.round((YOffset- nScaleMin-i*avg)/yRate)+Margin+Math.abs(deltY);
-			gc.drawLine((int)Margin+Math.abs(deltX),y+ys+deltY,x+width-Margin,y+ys+deltY);
-		}
+		// draw back vertical scale
 		avg = MaxCount / nXMarkNum;
-		for (int i=0;i<=nXMarkNum;i++)
+		for (int i=0;i<= nXMarkNum;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
-			gc.drawLine(x+Margin+ys+deltX,y+Margin,x+Margin+ys+deltX,y+height-Margin+deltY);
+			if (i==0)
+			{
+				gc.setLineStyle(SWT.LINE_SOLID);
+				gc.setForeground(black);
+				gc.drawLine(x+Margin+ys+deltX,y+Margin,x+Margin+ys+deltX,y+height-Margin-deltY);
+				gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+				gc.setLineStyle(SWT.LINE_DOT);
+			}
+			gc.drawLine(x+Margin+ys+deltX,y+Margin,x+Margin+ys+deltX,y+height-Margin-deltY);
 		}
 		gc.setLineStyle(SWT.LINE_SOLID);
 
 		
 	}
+
 	public void drawData(GC gc, int x, int y, int width, int height) {
 		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
-		for (int j=0;j<Data.length;j++)
+		gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+
+		for (int j=Data.length-1;j>-1;j--)
 		{
-			int deltX = (int)Math.round(j*nDepthStep*Math.cos(degree));
-			int deltY = (int)Math.round(j*nDepthStep*Math.sin(degree));
+			int deltX = (int)Math.round((j+2)*nDepthStep*Math.cos(degree));
+			int deltY = (int)Math.round((j+2)*nDepthStep*Math.sin(degree));
 			//int DY = (int)Math.round(Data.length*nDepthStep*Math.sin(degree));
 			
 			
-		int []p = new int[Data[j].length];
-		for (int i = 0; i < Data[j].length;i++)
+		int []p ;
+		if (Data.length==1)
 		{
-			p[i] = height - (int)Math.round((YOffset+Data[j][i])/ yRate) - Margin;
-		}
-		gc.setLineStyle(SWT.LINE_SOLID);
+			p = new int[Data[0].length];
+			for (int i = 0; i < Data[0].length;i++)
+			{
+				p[i] = height - (int)Math.round((YOffset+Data[0][i])/ yRate) - Margin;
+			}
+			gc.setLineStyle(SWT.LINE_SOLID);
 
-		for (int i = 0; i < Data[j].length-1;i++)
+			for (int i = 0; i < Data[0].length-1;i++)
+				gc.drawLine((int)(Margin + x+ (int)(i*xRate))+deltX, p[i]+deltY,
+						Margin + x+(int)((i+1)*xRate)+deltX,p[i+1]+deltY);
+
+		}
+		else
+		{
+			p = new int[Data[j].length*2+4];
+			p[0]=Margin + x + deltX;
+			p[1]=height - Margin + deltY;
+			for (int i = 0; i < Data[j].length;i++)
+			{
+				p[2*(i+1)]= (int)(Margin + x+ (int)Math.round(i*xRate))+deltX;
+				p[2*(i+1)+1] = height - (int)Math.round((YOffset+Data[j][i])/ yRate) - Margin + deltY;
+			}
+			p[(Data[j].length+1)*2]= (int)(Margin + x+ (int)Math.round(Data[j].length*xRate))+deltX;;
+			p[(Data[j].length+1)*2+1]=p[1];
+
+			if (j==pos) 
+			{
+				gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
+				gc.drawPolygon(p);
+				gc.fillPolygon(p);
+				gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
+
+			}
+			else
+			{
+				gc.drawPolygon(p);
+				gc.fillPolygon(p);
+			}
+		}
+		
+		}
+		
+	}
+	
+	void DrawSelection(GC gc, int x, int y, int width, int height)
+	{
+		//gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
+		//gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+
+		
+		
+		int deltX = (int)Math.round((pos+2)*nDepthStep*Math.cos(degree));
+		int deltY = (int)Math.round((pos+2)*nDepthStep*Math.sin(degree));
+			//int DY = (int)Math.round(Data.length*nDepthStep*Math.sin(degree));
+			
+		int []p = new int[Data[pos].length];
+		for (int i = 0; i < Data[pos].length;i++)
+		{
+			p[i] = height - (int)Math.round((YOffset+Data[0][i])/ yRate) - Margin;
+		}	
+
+		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_RED));
+		for (int i = 0; i < Data[pos].length-1;i++)
 			gc.drawLine((int)(Margin + x+ (int)(i*xRate))+deltX, p[i]+deltY,
 					Margin + x+(int)((i+1)*xRate)+deltX,p[i+1]+deltY);
-		}
+				//gc.fillPolygon(p);
+		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
+		
 	}
-
 
 }

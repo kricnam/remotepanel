@@ -48,7 +48,7 @@ public class BackupDataTask extends Thread {
 			Print("Confirm data...\n");
 			his.ConfirmAnswer();
 			Print("Confirm answered.\n");
-			HiLowData data=null;
+			DoesRateData data=null;
 			SpectrumData dataS=null;
 			if (his.Confirmed==null)
 				Print("Error read comfirm data.\n");

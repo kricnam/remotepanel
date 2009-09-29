@@ -52,7 +52,7 @@ public class TrendDrawTask extends Thread {
 			
 			his.ConfirmAnswer();
 			
-			HiLowData data=null;
+			DoesRateData data=null;
 			final int sum=his.Confirmed.nCount;
 			UI.graph.Data = new double[1][sum];
 			UI.graph.strScaleX = new String[sum];
@@ -128,13 +128,13 @@ public class TrendDrawTask extends Thread {
 		meter.Pause(false);
 	}
 	
-	void DrawUI(HiLowData data)
+	void DrawUI(DoesRateData data)
 	{
 		final double val ;
 		final String strT ;
 		if (UI.isDisposed()) return;
 		if (data==null) return;
-		if (data.cValidType==HiLowData.nGyh)
+		if (data.cValidType==DoesRateData.nGyh)
 		{
 				val = data.nNaIValue/10.0 * Math.pow(1000, data.cNaIUnit -1);
 		}
