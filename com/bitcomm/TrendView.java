@@ -348,7 +348,7 @@ public class TrendView extends Composite implements Listener {
 				continue;
 			int n = station[i];
 
-			System.out.println(n);
+			//System.out.println(n);
 			//while (!meter[n].isPaused());
 			TrendDrawTask task = new TrendDrawTask(this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
