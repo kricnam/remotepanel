@@ -55,11 +55,17 @@ public class DoesRateFile extends File {
 		return sb.toString();
 	}
 	
-	void setData(DoesRateData data)
+	void setData(DoesRateData data) throws IOException
 	{
 		if (dataArray==null) 
-			dataArray = new ArrayList<DoesRateData>();
+		{
+			if (exists())
+				load();
+			else
+				dataArray = new ArrayList<DoesRateData>();
+		}
 		int index = (data.date.hour * 60 + data.date.minute) / data.cPT;
+
 		while (dataArray.size()< index+1)
 			dataArray.add(null);
 		dataArray.set(index, data);
@@ -83,14 +89,30 @@ public class DoesRateFile extends File {
 	    		DoesRateData does;
 				try {
 					does = new DoesRateData(strLine);
-					if (dataArray.size()< index+1)
-						dataArray.add(null);
-					dataArray.set(index++, does);
-		    		System.out.println(does.CSVString());
-				} catch (ParseException e) {
+				} 
+				catch (ParseException e) 
+				{
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					does = null;
+					//e.printStackTrace();
+				} 
+				catch (NumberFormatException ee)
+				{
+					does = null;
+					//ee.printStackTrace();
 				}
+				if (does!=null)
+					index = (does.date.hour*60+does.date.minute)/does.cPT;
+				
+				if (dataArray.size()< index+1) 
+				{
+					for (int i=0; i< index-dataArray.size()+1;i++)
+						dataArray.add(null);
+				}
+				//System.out.print(String.valueOf(index)+"->");
+				dataArray.set(index++, does);
+				//System.out.println(String.valueOf(index));
+	    		//if (does!=null) System.out.println(does.CSVString());
 	    	}
 	    }
 	}

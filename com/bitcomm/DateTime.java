@@ -30,16 +30,18 @@ public class DateTime extends MeasureData{
 	}
 	DateTime(String strT) throws ParseException
 	{
-		final SimpleDateFormat formatter = new SimpleDateFormat("\"yyyy/MM/dd HH:mm\"");
-		Date date = formatter.parse(strT);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		year = (short)cal.get(Calendar.YEAR);
-		month = (byte)(cal.get(Calendar.MONTH)+1);
-		day =(byte)cal.get(Calendar.DAY_OF_MONTH);
-		hour = (byte)cal.get(Calendar.HOUR_OF_DAY);
-		minute = (byte)cal.get(Calendar.MINUTE);
+		//System.out.println("DATATIME IN:"+strT);
+		strT = strT.replace("\"", "");
+		String[] str = strT.split("[/| |:]");
+		//System.out.println(strT);
+		//System.out.println(str.length);
+		year = (short)Integer.parseInt(str[0]);
+		month = (byte)(Integer.parseInt(str[1]));
+		day =(byte)Integer.parseInt(str[2]);
+		hour = (byte)Integer.parseInt(str[3]);
+		minute = (byte)Integer.parseInt(str[4]);
 		bValid = true;
+		//System.out.println("DATATIEM OUT:"+String.valueOf(year)+" "+String.valueOf(month));
 	}
 	
 	void setTime(Calendar cal)

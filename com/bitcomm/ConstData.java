@@ -53,5 +53,6 @@ public class ConstData {
 	static String strKeyServerURL = "ServerURL";
 	static String strChoseType = "Data Type Choice";
 	static String strInterval = "Interval(s)";
+	static String strMonth = "Month";
 	
 }

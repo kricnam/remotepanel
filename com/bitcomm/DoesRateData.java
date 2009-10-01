@@ -100,6 +100,7 @@ public class DoesRateData extends MeasureData{
 	}
 	void parse(String str) throws ParseException
 	{
+		if (str==null) return;
 		String []fields=str.split(",");
 		nMachineNum = Integer.parseInt(fields[0]);
 		DataLength =(short) 0;
@@ -127,5 +128,13 @@ public class DoesRateData extends MeasureData{
 		
 		cFOMA = (byte)Integer.parseInt(fields[23]);
 		
+	}
+	
+	double getDoesRatenGy()
+	{
+		if (cValidType == NaI)
+			return nNaIValue /10.0 * Math.pow(1000,cNaIUnit-1);
+		else
+			return nSSDrate /10.0 * Math.pow(1000,cSSDUnit-1);
 	}
 }
