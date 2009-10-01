@@ -408,14 +408,14 @@ public class SpectrumView extends Composite implements Listener {
 			cal = start.getTime();
 			DateTime date = new DateTime();
 			date.setTime(cal);
-			System.out.println(cal.toString());
-			System.out.println(end.getTime().toString());
+			//System.out.println(cal.toString());
+			//System.out.println(end.getTime().toString());
 			long nfile = end.getTime().getTimeInMillis()-cal.getTimeInMillis();
 			
 			nfile = nfile/60000 /PT ;
 			graph3d.Data = null;
 			graph3d.Data = new double[(int)nfile][1000];
-			System.out.println("Total files:"+String.valueOf(nfile));
+			//System.out.println("Total files:"+String.valueOf(nfile));
 			for (int t=0;t<nfile;t++)
 			{
 				try {
