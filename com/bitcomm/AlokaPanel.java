@@ -11,6 +11,7 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -146,10 +147,13 @@ public class AlokaPanel {
 		itemReport.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
 				Shell s = new Shell(shell);
-				ReprotView report = new ReprotView(s,SWT.BORDER);
+				s.setSize(900, shell.getClientArea().height);
+				shell.setCursor(d.getSystemCursor(SWT.CURSOR_WAIT));
+				ReprotView report = new ReprotView(meter,s,SWT.BORDER);
 				s.setLayout(new FillLayout());
+				
 				s.open();
-
+				shell.setCursor(null);
 				s.layout();
 			}
 			public void widgetDefaultSelected(SelectionEvent e){
