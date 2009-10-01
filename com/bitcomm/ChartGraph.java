@@ -258,9 +258,9 @@ public class ChartGraph extends Canvas {
 		double avg = (nScaleLogMax-nScaleLogMin)/10;
 		int ys;
 		//Y axis
-		System.out.println(String.valueOf(nScaleLogMax));
-		System.out.println(String.valueOf(nScaleLogMin));
-		System.out.println(String.valueOf(avg));
+		//System.out.println(String.valueOf(nScaleLogMax));
+		//System.out.println(String.valueOf(nScaleLogMin));
+		//System.out.println(String.valueOf(avg));
 		for (int i=0;i<11;i++)
 		{
 			ys = height - (int)Math.round((YLogOffset + nScaleLogMin + i*avg)/yLogRate) -Margin;

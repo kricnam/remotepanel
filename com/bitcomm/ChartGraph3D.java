@@ -129,11 +129,11 @@ public class ChartGraph3D extends Canvas {
 	public void AutoSetTransform(GC gc,int x, int y, int width, int height)
 	{
 		Point pt = gc.stringExtent("00000");
-		System.out.println("MArgin:"+String.valueOf(Margin));
+		//System.out.println("MArgin:"+String.valueOf(Margin));
 		Margin = Math.max(Margin,Math.max((int)(width * 0.04),(int)(height * 0.04)));
-		System.out.println("MArgin:"+String.valueOf(Margin));
+		//System.out.println("MArgin:"+String.valueOf(Margin));
 		Margin = Math.max(Margin, pt.y*2);
-		System.out.println("MArgin:"+String.valueOf(Margin));
+		//System.out.println("MArgin:"+String.valueOf(Margin));
 		
 		nMaxData = 0;
 			for (int j=0;j < Data.length;j++)
