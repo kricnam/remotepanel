@@ -11,7 +11,6 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -36,6 +35,112 @@ public class AlokaPanel {
 	static Display d;
 	static Shell shell;
 	static MeterView []meter;
+	static BackupView backup;
+	static TrendView trend;
+	static SpectrumView spectrum;
+	static ReprotView report;
+	static void MessageBox(String strTitle,String strMsg)
+	{
+		MessageBox box = new MessageBox(shell);
+		box.setText(strTitle);
+		box.setMessage(strMsg);
+		box.open();
+	}
+	
+	static void SaveSetting(String key, String Value)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			store.setValue(key, Value);
+			store.save();
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+		}
+	}
+	
+	static void SaveSetting(String key, int Value)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			store.setValue(key, Value);
+			store.save();
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+		}
+	}
+	
+	static void SaveSetting(String key, boolean Value)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			store.setValue(key, Value);
+			store.save();
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+		}
+	}
+	static int GetSettingInt(String key)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			return store.getInt(key);
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+			return 0;
+		}
+	}
+	
+	static boolean GetSettingBool(String key)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			return store.getBoolean(key);
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+			return false;
+		}
+	}
+	static String GetSettingString(String key)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			return store.getString(key);
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+			return null;
+		}
+	}
+	
 	public static void main(String[] args) {
 		File root = new File("root");
 		if (!root.exists())
@@ -66,7 +171,7 @@ public class AlokaPanel {
 		logoView.setLayout(new FillLayout());
 		Logo.setLayout(new FillLayout());
 
-		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.PUSH|SWT.BORDER);
+		ToolBar toolbar = new ToolBar(tool,SWT.NONE|SWT.VERTICAL|SWT.PUSH|SWT.NONE);
 		d.beep();
 
 		ToolItem itemSetup = new ToolItem(toolbar,SWT.PUSH);
@@ -94,9 +199,19 @@ public class AlokaPanel {
 				PreferenceManager manager= new PreferenceManager();
 				PreferenceStore store = new PreferenceStore("config.ini");
 				
+				try{
+					store.load();
+				}
+				catch(IOException eio)
+				{
+					MessageBox("Error",eio.getMessage());
+					eio.printStackTrace();
+				}
+				
 				PreferenceNode node1= new PreferenceNode("System",ConstData.strSysSetup,null,SetupPage.class.getName());
 				manager.addToRoot(node1);
 				int nNum = store.getInt("StationNum");
+				
 				if (nNum==0) nNum = 4;
 				PreferenceNode[] node = new PreferenceNode[nNum];
 				for (int i =0;i< nNum;i++)
@@ -110,7 +225,8 @@ public class AlokaPanel {
 				
 				PreferenceDialog dlg = new PreferenceDialog(shell,manager);
 				
-				try{
+				try
+				{
 					store.load();
 					dlg.setPreferenceStore(store);
 					dlg.open();
@@ -118,6 +234,7 @@ public class AlokaPanel {
 					
 				}
 				catch(IOException ex){
+					MessageBox("Warning",ex.getMessage());
 					ex.printStackTrace();
 				}
 			}
@@ -127,11 +244,19 @@ public class AlokaPanel {
 
 		itemTrend.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
+				
+				if (trend!=null)
+				{
+					trend.getShell().setActive();
+					return;
+				}
+				if (backup!=null)
+					return;
 				Shell s = new Shell(shell);
-				s.setSize(900, 700);
 				s.setLayout(new FillLayout());
-				TrendView trend=new TrendView(s,SWT.BORDER);
+				trend=new TrendView(s,SWT.BORDER);
 				trend.meter = meter;
+				s.setText(ConstData.strTrend);
 				s.open();
 				s.layout();
 
@@ -146,12 +271,16 @@ public class AlokaPanel {
 
 		itemReport.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
+				if (report!=null)
+				{
+					report.getShell().setActive();
+					return;
+				}
 				Shell s = new Shell(shell);
-				s.setSize(900, shell.getClientArea().height);
 				shell.setCursor(d.getSystemCursor(SWT.CURSOR_WAIT));
-				ReprotView report = new ReprotView(meter,s,SWT.BORDER);
+				report=new ReprotView(meter,s,SWT.BORDER);
 				s.setLayout(new FillLayout());
-				
+				s.setText("Report");
 				s.open();
 				shell.setCursor(null);
 				s.layout();
@@ -170,7 +299,13 @@ public class AlokaPanel {
 
 		itemSpectrum.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
+				if (spectrum!=null)
+				{
+					spectrum.getShell().setActive();
+					return;
+				}
 				Shell s = new Shell(shell);
+				s.setText(ConstData.strSpetru);
 				SpectrumView spec = new SpectrumView(s,SWT.BORDER);
 				s.setSize(900, 700);
 				s.setLayout(new FillLayout());
@@ -186,10 +321,19 @@ public class AlokaPanel {
 		itemBackup.setImage(imgBackup);
 		itemBackup.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
+				if (backup!=null) 
+				{
+						backup.getShell().setActive();
+						return;
+				}
+				if (trend!=null)
+				{
+					return;
+				}
 				Shell diag = new Shell(shell);
 				diag.setLayout(new FillLayout());
 				diag.setText(ConstData.strBackup);
-				new BackupView(diag,SWT.BORDER,meter);
+				backup=new BackupView(diag,SWT.BORDER,meter);
 				diag.open();
 				diag.layout();
 					
@@ -222,9 +366,11 @@ public class AlokaPanel {
 		}
 		catch(IOException eio)
 		{
+			MessageBox("Error",eio.getMessage());
 			eio.printStackTrace();
 			return;
 		}
+		
 		int Num = store.getInt("StationNum");
 		meter = new MeterView[Num];
 		String strIP = store.getString(ConstData.strKeyServerURL);
@@ -299,6 +445,7 @@ public class AlokaPanel {
 		imgReport.dispose();
 		imgSpectrum.dispose();
 		imgClose.dispose();
+		
 	}
 }
 
