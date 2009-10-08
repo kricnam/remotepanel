@@ -80,7 +80,7 @@ public class Command {
 		if (CommandCode[0]=='r' && CommandCode[1]=='a')
 			return CommandType.CurrentData;
 		if (CommandCode[0]=='w' && CommandCode[1]=='a')
-			return CommandType.Alarm;
+			return CommandType.HealthCheck;
 		if (CommandCode[0]=='h' && CommandCode[1]=='c')
 			return CommandType.SpectrumDataRequest;
 		if (CommandCode[0]=='h' && CommandCode[1]=='a')

@@ -33,7 +33,7 @@ public class ChartGraph extends Canvas {
 	double nScaleLogMax;
 	double nScaleLogMin;
 	 
-
+	Color []color;
 	int nXMarkNum;
 	int nYMarkNum;
 	String []strScaleX;
@@ -106,17 +106,19 @@ public class ChartGraph extends Canvas {
 		GC gc = e.gc;
 		
 		Point size = getSize();
-		
-		if (nMaxData==nMinData) AutoSetTransform(gc,0,0,size.x,size.y);
-		else SetTransform(0,0,size.x,size.y);
-		
-		
+		//System.out.println(size.toString());
 		Color white= getDisplay().getSystemColor(SWT.COLOR_WHITE);
 		
 		setBackground(white);
+		if (Data==null) 
+		{
+			drawBackground(gc, 0,0,size.x,size.y);
+			return;
+		}
+		
+		if (nMaxData==nMinData) AutoSetTransform(gc,0,0,size.x,size.y);
+		else SetTransform(0,0,size.x,size.y);
 		drawBackground(gc, 0, 0, size.x, size.y);
-		
-		
 		drawData(gc, 0, 0,size.x, size.y);
 
 	}
@@ -127,17 +129,18 @@ public class ChartGraph extends Canvas {
 	public void drawBackground(GC gc, int x, int y, int width, int height) {
 		// TODO 自动生成方法存根
 		super.drawBackground(gc, x, y, width, height);
-		drawAxis(gc, x, y, width, height);
-		
+		if (Data!=null)
+			drawAxis(gc, x, y, width, height);
 	}
 
 	public void AutoSetTransform(GC gc,int x, int y, int width, int height)
 	{
-		Point pt = gc.stringExtent("0000");
+		Point pt = gc.stringExtent("00000000000");
 		Margin = Math.min((int)(width * 0.04),(int)(height * 0.04));
-		Margin = Math.max(Margin, pt.y*2);
+		Margin = Math.max(Margin, pt.x);
 		
-		nMaxData = 0;
+		if (nMaxData == 0)
+		{
 			for (int j=0;j < Data.length;j++)
 			{
 				MaxCount = Math.max(MaxCount, Data[j].length);
@@ -146,10 +149,13 @@ public class ChartGraph extends Canvas {
 					nMaxData = Math.max(nMaxData , Data[j][i]);
 				}
 			}
-		nMinData = 0;
+		}
+		if (nMinData == 0)
+		{
 			for (int j=0;j < Data.length;j++)
 				for(int i=0 ; i< Data[j].length;i++)
 					nMinData = Math.min(nMinData , Data[j][i]);
+		}
 		
 		SetTransform(x,y,width,height);
 
@@ -159,11 +165,11 @@ public class ChartGraph extends Canvas {
 	{
 		if (nScaleMax == nScaleMin)
 		{
-			nScaleMax = Math.ceil(nMaxData );
+			nScaleMax = Math.ceil(nMaxData/100 )*100;
 			nScaleMin = Math.floor(nMinData);
 		}
 		nScaleLogMax = Math.log10(nScaleMax);
-		nScaleLogMin = (nScaleMin==0)?0:Math.log10(nScaleMin);
+		nScaleLogMin = (nScaleMin==0)?-2:Math.log10(nScaleMin);
 		double nRange = nScaleMax - nScaleMin;
 		double nLogRange = nScaleLogMax - nScaleLogMin;
 		if (MaxCount==0)
@@ -174,6 +180,7 @@ public class ChartGraph extends Canvas {
 
 		yRate = nRange  / (height-2*Margin);
 		yLogRate = nLogRange / (height-2*Margin);
+		//System.out.println("yRate="+String.valueOf(yRate));
 		if (nScaleMin < 0)
 			YOffset = -nScaleMin ;
 		else 
@@ -182,14 +189,11 @@ public class ChartGraph extends Canvas {
 			YLogOffset = -nScaleLogMin ;
 		else 
 			YLogOffset = 0;
-
 		xRate = (double) (width-2*Margin)/MaxCount;
-		
 	}
 	
 	
 	public void drawAxis(GC gc, int x, int y, int width, int height) {
-		// TODO 自动生成方法存根
 		Color gray= getDisplay().getSystemColor(SWT.COLOR_GRAY);		
 		
 		gc.setForeground(gray);
@@ -213,23 +217,26 @@ public class ChartGraph extends Canvas {
 		else if (MaxCount<120) nXMarkNum = MaxCount/(MaxCount/12);
 		double avg = MaxCount / nXMarkNum;
 		int ys;
+		Point pt;
 		for (int i=0;i<nXMarkNum+1;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
 			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
+			pt = gc.stringExtent("00");
 			if (strScaleX!=null)
 					
 			{
 				if ( (int)(i* avg) < MaxCount && strScaleX[(int)(i* avg)]!=null)
-					gc.drawText(strScaleX[(int)(i* avg)],x+Margin+ys-20 , y+height-Margin,true);
+					gc.drawText(strScaleX[(int)(i* avg)],x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
 				else
-					gc.drawText("",x+Margin+ys-20 , y+height-Margin,true);
+					gc.drawText("",x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
 			}
 			else
 			{
-				gc.drawString(String.valueOf(i*avg*xScaleRate),x+Margin+ys-20 , y+height-Margin,true);
+				gc.drawString(String.valueOf(i*avg*xScaleRate),x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
 			}
 		}
+		gc.drawString("Time",x+width-Margin/2 , y+height-Margin,true);
 		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
 		gc.setForeground(black);
 		gc.setLineStyle(SWT.LINE_SOLID);
@@ -239,69 +246,116 @@ public class ChartGraph extends Canvas {
 	
 	public void drawAxisY(GC gc, int x, int y, int width, int height) 
 	{
-		double avg = (nScaleMax-nScaleMin)/10;
+		int count =(int)( Math.floor(nScaleMax)-Math.ceil(nScaleMin));
+		
+		double div = Math.pow(10, Math.floor(Math.log10(count)-1));
+		while (count>10)
+		{
+			count =(int)( (Math.floor(nScaleMax)-Math.ceil(nScaleMin))/div);
+			if (count > 10)	div+=div;
+		}
+		if (count * div < 100)
+		{
+			div =10;
+			count = (int)( (Math.floor(nScaleMax)-Math.ceil(nScaleMin))/div);
+		}
+		if (count==0)
+		{
+			count=1;
+			div = (int)( (Math.floor(nScaleMax)-Math.ceil(nScaleMin))/2);
+		}
+			
 		int ys;
 		//Y axis
-		for (int i=0;i<11;i++)
+		for (int i=0;i<count+1;i++)
 		{
-			ys = height - (int)Math.round((YOffset + nScaleMin + i*avg)/yRate) -Margin;
-			gc.drawLine((int)Margin,y+ys,x+width-Margin,y+ys);
+			double ceil = (((int)nScaleMin/(int)div)+i)*(int)div;
 			
-			DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
-			String strValue  = df.format(nScaleMin+i*avg);
-			if (i>0) gc.drawString(strValue, Margin, ys,true);
+			if (nScaleMin%div > 0) ceil+=div;
+			ys = height - (int)Math.round((YOffset + ceil - nScaleMin)/yRate) -Margin;
+			gc.drawLine((int)x+Margin,y+ys,x+width-Margin,y+ys);
+			
+			DecimalFormat   df   =new   java.text.DecimalFormat("#");  
+			String strValue  = df.format(ceil);
+			Point pt=gc.stringExtent(strValue);
+			gc.drawString(strValue, x+Margin-pt.x, y+ys-pt.y/2,true);
 		}
 	}
 	
 	public void drawLogAxisY(GC gc, int x, int y, int width, int height) 
 	{
-		double avg = (nScaleLogMax-nScaleLogMin)/10;
+		int nLogScaleCount = (int)Math.floor(nScaleLogMax) - (int)Math.ceil(nScaleLogMin)+1; 
+
 		int ys;
 		//Y axis
-		//System.out.println(String.valueOf(nScaleLogMax));
-		//System.out.println(String.valueOf(nScaleLogMin));
-		//System.out.println(String.valueOf(avg));
-		for (int i=0;i<11;i++)
+		Point pt;
+		for (int i=0;i<nLogScaleCount;i++)
 		{
-			ys = height - (int)Math.round((YLogOffset + nScaleLogMin + i*avg)/yLogRate) -Margin;
-			gc.drawLine((int)Margin,y+ys,x+width-Margin,y+ys);
+			double ceil = Math.ceil(nScaleLogMin+i);
+			ys = height - (int)Math.round(( ceil-nScaleLogMin)/yLogRate) -Margin;
+			gc.drawLine((int)Margin+x,y+ys,x+width-Margin,y+ys);
 			
-			DecimalFormat   df   =new   java.text.DecimalFormat("#");  
-			String strValue  = df.format(Math.pow(10, nScaleLogMin+i*avg));
-			if (i>0) gc.drawString(strValue, Margin, ys,true);
+			DecimalFormat   df;
+			if (ceil >= 1) df= new   java.text.DecimalFormat("#");
+			else df = new java.text.DecimalFormat("#0.0#");
+			String strValue  = df.format(Math.pow(10, ceil));
+			pt=gc.stringExtent(strValue);
+			gc.drawString(strValue, Margin+x-pt.x, y+ys-pt.y/2,true);
+			df = null;
+		}
+		if (nLogScaleCount==0)
+		{
+			DecimalFormat   df;
+			df= new   java.text.DecimalFormat("#");
+			String strValue  = df.format(nScaleMax);
+			pt=gc.stringExtent(strValue);
+			gc.drawString(strValue, Margin+x-pt.x, y+Margin-pt.y/2,true);
+			strValue  = df.format(nScaleMin);
+			pt=gc.stringExtent(strValue);
+			gc.drawString(strValue, Margin+x-pt.x, y+height-Margin-pt.y/2,true);
 		}
 	}
 	
 	public void drawData(GC gc, int x, int y, int width, int height) {
-		int []p = new int[Data[0].length];
-		if (logScale)
-		{
-			for (int i = 0; i < Data[0].length;i++)
-			{
-				p[i] = height - (int)Math.round(( YLogOffset+Math.log10(Data[0][i]))/ yLogRate) -Margin;
-			}
-		}
-		else
-		{
-			for (int i = 0; i < Data[0].length;i++)
-			{
-				p[i] = height - (int)Math.round(( YOffset+Data[0][i])/ yRate) -Margin;
-			}
-		}
-		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLUE));
-
-		for (int i = 0; i < Data[0].length-1;i++)
-		{
-			if (p[i+1]== height - Margin) 
-			{
-				gc.drawLine((int)(Margin + x+ (int)(i*xRate)), p[i],Margin + x+(int)((i)*xRate),p[i+1]);
-				continue;
-			}
-			gc.drawLine((int)(Margin + x+ (int)(i*xRate)), p[i],Margin + x+(int)((i+1)*xRate),p[i+1]);
-		}
 		
+		gc.setLineStyle(SWT.LINE_SOLID);
+
+		for (int n=0;n < Data.length; n++)
+		{
+			int []p = new int[Data[n].length];
+			if (logScale)
+			{
+				for (int i = 0; i < Data[0].length;i++)
+				{
+					//p[i] = height - (int)Math.round(( YLogOffset+Math.log10(Data[n][i])-nScaleLogMin)/ yLogRate) -Margin;
+					p[i] = height - (int)Math.round(( Math.log10(Data[n][i])-nScaleLogMin)/ yLogRate) -Margin;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < Data[0].length;i++)
+				{
+					//p[i] = height - (int)Math.round(( YOffset+Data[n][i]-nScaleMin)/ yRate) -Margin;
+					p[i] = height - (int)Math.round(( Data[n][i]-nScaleMin)/ yRate) -Margin;
+				}
+			}
+			
+			if (color!=null && n<color.length && color[n]!=null)
+			{
+				gc.setForeground(color[n]);
+			}
+			else
+				gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLUE));
+
+			for (int i = 0; i < Data[n].length-1;i++)
+			{
+				if (p[i+1]== height - Margin) 
+				{
+					gc.drawLine((int)(Margin + x+ (int)(i*xRate)),y+ p[i],Margin + x+(int)((i)*xRate),y+p[i+1]);
+					continue;
+				}
+				gc.drawLine((int)(Margin + x+ (int)(i*xRate)), y+p[i],Margin + x+(int)((i+1)*xRate),y+p[i+1]);
+			}
+		}
 	}
-
-
 }

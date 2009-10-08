@@ -35,37 +35,28 @@ public class CommunicationPort {
 	boolean IsConnected()
 	{
 		if (socket==null) return false;
-		return socket.isConnected();
+		return !socket.isClosed();
 	}
 
 	public void Connect() throws Exception
 	{
-		if (socket!=null && socket.isConnected())
+		if (socket!=null && !socket.isClosed())
 			return;
-		try {
-			socket = new Socket(strServer, nPort);
-			socket.setSoTimeout(5000);
-			input = socket.getInputStream();
-			output = socket.getOutputStream();
-		}
-		catch(Exception e)
-		{
-			throw e;
-		}
+		socket = null;
+		socket = new Socket(strServer, nPort);
+		socket.setSoTimeout(5000);
+		input = socket.getInputStream();
+		output = socket.getOutputStream();
 	}
 
 	public void Close() throws Exception
 	{
-		try {
 			if (socket!=null)
 			{
 				socket.close();
+				//System.out.println(socket.isClosed());
+				
 			}
-		}
-		catch(Exception e)
-		{
-			throw e;
-		}
 	}
 
 	public void Send(byte[]buff) throws Exception

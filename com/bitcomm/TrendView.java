@@ -10,19 +10,25 @@ import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.printing.PrintDialog;
+import org.eclipse.swt.printing.Printer;
+import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Spinner;
@@ -55,7 +61,7 @@ public class TrendView extends Composite implements Listener {
 
 	Spinner minute;
 
-	List list;
+	Button list[];
 
 	Button butDate;
 
@@ -63,7 +69,10 @@ public class TrendView extends Composite implements Listener {
 
 	MeterView[] meter;
 	Button butLog;
-	
+	Button butPrint;
+	Button butStart;
+	Spinner scaleMin;
+	Spinner scaleMax;
 	public TrendView(Composite parent, int style) {
 		super(parent, style);
 		display=parent.getDisplay();
@@ -79,10 +88,113 @@ public class TrendView extends Composite implements Listener {
 		
 		initOptionBar();
 		initGraph();
-		//pack();
+		getShell().addListener(SWT.Close, new Listener() {
+			
+			
+			public void handleEvent(Event arg0) {
+				// TODO Auto-generated method stub
+				SaveSetting();
+				AlokaPanel.trend=null;
+			}
+		}) ;
+		GetSetting();
+	}
+	
+	void SaveSetting()
+	{
+		if (list!=null)
+		{
+			for(int i=0;i<list.length;i++)
+			{
+				if (list[i]!=null)
+				{
+					AlokaPanel.SaveSetting("TrendColor_R_"+String.valueOf(i), list[i].getBackground().getRGB().red);
+					AlokaPanel.SaveSetting("TrendColor_G_"+String.valueOf(i), list[i].getBackground().getRGB().green);
+					AlokaPanel.SaveSetting("TrendColor_B_"+String.valueOf(i), list[i].getBackground().getRGB().blue);
+					AlokaPanel.SaveSetting("TrendSelect_"+String.valueOf(i), list[i].getSelection());
+				}
+					
+			}
+		}
+		
+		AlokaPanel.SaveSetting("TrendFrom", textFrom.getText());
+		AlokaPanel.SaveSetting("TrendTo", textTo.getText());
+		AlokaPanel.SaveSetting("TrendHour", hour.getSelection());
+		AlokaPanel.SaveSetting("TrendMinute", minute.getSelection());
+		AlokaPanel.SaveSetting("TrendPeriod", butPeriod.getSelection());
+		AlokaPanel.SaveSetting("TrendLog", butLog.getSelection());
+		AlokaPanel.SaveSetting("TrendScaleYMin", scaleMin.getSelection());
+		AlokaPanel.SaveSetting("TrendScaleYMax", scaleMax.getSelection());
+	}
+	
+	void GetSetting()
+	{
+		if (list!=null)
+		{
+			for(int i=0;i<list.length;i++)
+			{
+				if (list[i]!=null)
+				{
+					int r,g,b;
+					r=AlokaPanel.GetSettingInt("TrendColor_R_"+String.valueOf(i));
+					g=AlokaPanel.GetSettingInt("TrendColor_G_"+String.valueOf(i));
+					b=AlokaPanel.GetSettingInt("TrendColor_B_"+String.valueOf(i));
+					Color color = new Color(getDisplay(),r,g,b);
+					if ((r+g+b) < 100) 
+						list[i].setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+					list[i].setBackground(color);
+					list[i].setSelection(AlokaPanel.GetSettingBool("TrendSelect_"+String.valueOf(i)));
+				}
+					
+			}
+		}
+		
+		textFrom.setText(AlokaPanel.GetSettingString("TrendFrom"));
+		textTo.setText(AlokaPanel.GetSettingString("TrendTo")); 
+		hour.setSelection(AlokaPanel.GetSettingInt("TrendHour"));
+		minute.setSelection(AlokaPanel.GetSettingInt("TrendMinute"));
+		butPeriod.setSelection(AlokaPanel.GetSettingBool("TrendPeriod"));
+		if (butPeriod.getSelection())
+		{
+			calTo.setEnabled(true);
+			textTo.setEnabled(true);
+			labelTo.setEnabled(true);
+		}
+		butDate.setSelection(!butPeriod.getSelection());
+		butLog.setSelection(AlokaPanel.GetSettingBool("TrendLog"));
+		if (butLog.getSelection()) graph.logScale = true;
+		scaleMax.setSelection(AlokaPanel.GetSettingInt("TrendScaleYMax"));
+		scaleMin.setSelection(AlokaPanel.GetSettingInt("TrendScaleYMin"));
 	}
 	
 	private void initOptionBar(){
+		PreferenceStore store = new PreferenceStore("./config.ini");
+		try {
+			store.load();
+		} catch (IOException eio) {
+			MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
+			box.setMessage(eio.getMessage());
+			box.setText("open config fail");
+			box.open();
+			return;
+		}
+		int num = store.getInt("StationNum");
+		if (num == 0)
+			num = 1;
+		
+		String[] str = new String[num];
+		for (int i = 0; i < num; i++) {
+			String key = ConstData.strStation.replace(" ", "_") + "_"
+					+ String.valueOf(i + 1) + "_Name";
+
+			String strName = store.getString(key);
+
+			if (strName == null || strName.length() == 0)
+				str[i] = ConstData.strUnknown;
+			else
+				str[i] = strName;
+		}
+
 		optionBar = new Composite(this, SWT.BORDER);
 		GridLayout optionLayout = new GridLayout(3, true);
 		optionBar.setLayout(optionLayout);
@@ -103,16 +215,14 @@ public class TrendView extends Composite implements Listener {
 		butPeriod.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true,
 				false));
 
-		Group grpStation = new Group(optionBar, SWT.BORDER);
+		Group grpStation = new Group(optionBar, SWT.NONE);
 		grpStation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
 				1, 4));
-		grpStation.setLayout(new RowLayout(SWT.VERTICAL));
-		grpStation.setText(ConstData.strStation);
-		list = new List(grpStation, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
-		list.setLayoutData(new RowData(220,120));
 		
-
-
+		int nCol = CalGroupCol(num);
+		grpStation.setLayout(new GridLayout(nCol,true));
+		grpStation.setText(ConstData.strStation);
+		
 		Composite inputDate = new Composite(optionBar, SWT.NONE);
 		inputDate.setLayout(new GridLayout(3, false));
 		inputDate.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false,
@@ -150,20 +260,53 @@ public class TrendView extends Composite implements Listener {
 		labelTo.setEnabled(false);
 
 		Group grpTime = new Group(optionBar, SWT.NONE);
-		grpTime.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		grpTime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		grpTime.setText(ConstData.strStartTime);
 		grpTime.setLayout(new GridLayout(3, false));
 		hour = new Spinner(grpTime, SWT.NONE);
 		hour.setMaximum(23);
+		hour.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		Label comma = new Label(grpTime, SWT.NONE);
 		comma.setText(":");
 		minute = new Spinner(grpTime, SWT.NONE);
+		minute.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		minute.setMaximum(59);
 
-		Button butStart = new Button(optionBar, SWT.PUSH);
+		Group scale = new Group(optionBar,SWT.NONE);
+		scale.setLayout(new GridLayout(5,false));
+		scale.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		scale.setText("Y scale");
+		Label sMin = new Label(scale, SWT.NONE);
+		sMin.setText("Min");
+		scaleMin = new Spinner(scale, SWT.NONE);
+		scaleMin.setMaximum(1000000000);
+		scaleMin.setPageIncrement(1000);
+		Label sMax = new Label(scale, SWT.NONE);
+		sMax.setText("Max");
+		scaleMax = new Spinner(scale, SWT.NONE);
+		scaleMax.setMaximum(1000000000);
+		scaleMin.setPageIncrement(1000);
+		Button butApply = new Button(scale, SWT.PUSH);
+		butApply.setText("Apply");
+		butApply.addSelectionListener(new SelectionListener() {
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				SetGraphScale();
+			}
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+		});
+		
+		Composite cmd = new Composite(optionBar,SWT.BORDER);
+		cmd.setLayout(new GridLayout(2,true));
+		cmd.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,1,1));
+		butStart = new Button(cmd, SWT.PUSH);
 		butStart.setText(ConstData.strStart);
-		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false,
-				1, 1));
+		butStart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		butPrint = new Button(cmd, SWT.PUSH);
+		butPrint.setText(ConstData.strPrint);
+		butPrint.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		butStart.addSelectionListener(new SelectionListener() {
 
@@ -173,41 +316,69 @@ public class TrendView extends Composite implements Listener {
 			public void widgetSelected(SelectionEvent e) {
 				process();
 			}
-
 		});
-
-		PreferenceStore store = new PreferenceStore("./config.ini");
-		try {
-			store.load();
-		} catch (IOException eio) {
-			MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
-			box.setMessage(eio.getMessage());
-			box.setText("open config fail");
-			box.open();
-			return;
+		
+		list = new Button[num];
+		for (int i=0;i< num;i++)
+		{
+			list[i] = new Button(grpStation, SWT.CHECK);
+			list[i].setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
+			list[i].setText(str[i]);
+			list[i].addSelectionListener(new SelectionListener() {
+				
+				
+				public void widgetSelected(SelectionEvent arg0) {
+					// TODO Auto-generated method stub
+					if (!((Button)arg0.widget).getSelection()) return;
+					ColorDialog dlg=new ColorDialog(getShell());
+					
+					RGB rgb = dlg.open();
+					if (rgb!=null)
+					((Button)arg0.widget).setBackground(new Color(getDisplay(),rgb));
+				}
+				
+				
+				public void widgetDefaultSelected(SelectionEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 		}
-		int num = store.getInt("StationNum");
-		if (num == 0)
-			num = 1;
-		String[] str = new String[num];
-		for (int i = 0; i < num; i++) {
-			String key = ConstData.strStation.replace(" ", "_") + "_"
-					+ String.valueOf(i + 1) + "_Name";
-
-			String strName = store.getString(key);
-
-			if (strName == null || strName.length() == 0)
-				str[i] = ConstData.strUnknown;
-			else
-				str[i] = strName;
-		}
-		list.setItems(str);
 		
 		butLog = new Button(optionBar, SWT.CHECK);
 		butLog.setText("LOG");
 		butLog.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
 				1, 1));
+		
+		
+		butLog.addSelectionListener(new SelectionListener() {
+			
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				graph.logScale = butLog.getSelection();
+				graph.redraw();
+			}
+			
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 
+		butPrint.addSelectionListener(new SelectionListener() {
+			
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				PrintGraph();
+			}
+			
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 
 		butDate.addListener(SWT.Selection, this);
 		butPeriod.addListener(SWT.Selection, this);
@@ -215,6 +386,55 @@ public class TrendView extends Composite implements Listener {
 		calFrom.addListener(SWT.Selection, this);
 		calTo.addListener(SWT.Selection, this);
 
+	}
+	
+	protected void SetGraphScale() {
+		if (graph==null) return;
+		if (scaleMin.getSelection() >= scaleMax.getSelection())
+		{
+			AlokaPanel.MessageBox("Error", "Min value shall not greater or equal to Max value!");
+			return;
+		}
+		graph.nScaleMax = scaleMax.getSelection();
+		graph.nScaleMin = scaleMin.getSelection();
+		graph.nMaxData = graph.nScaleMax; 
+		graph.redraw();
+	}
+
+	int CalGroupCol(int num)
+	{
+		if (num < 5) return 1;
+		if (num > 4 && num < 11) return 2;
+		if (num > 10 && num < 16) return 3;
+		return (int)Math.sqrt(num+1);
+	}
+	
+	void PrintGraph()
+	{
+		PrintDialog dlg = new PrintDialog(getShell(),SWT.NONE);
+		PrinterData printData = dlg.open();
+		if (printData==null) return;
+		//System.out.println("printing");
+		Printer printer= new Printer(printData);
+		if (printer.startJob("TrendGraph"))
+		{
+			GC gc = new GC(printer);
+			int Margin = graph.Margin;
+			Rectangle trim = printer.getBounds();
+			Point dpi = printer.getDPI();
+			System.out.println(trim.toString());
+			if (printer.startPage()) {
+				graph.AutoSetTransform(gc,dpi.x, dpi.y, trim.width-2*dpi.x, trim.height-2*dpi.y);
+				graph.drawBackground(gc, dpi.x, dpi.y, trim.width-2*dpi.x, trim.height-2*dpi.y);
+				graph.drawData(gc, dpi.x, dpi.y, trim.width-2*dpi.x, trim.height-2*dpi.y);
+				printer.endPage();
+			}
+			gc.dispose();
+			printer.endJob();
+			graph.Margin = Margin; 
+		}
+		
+		graph.redraw();
 	}
 	
 	public void handleEvent(Event event) {
@@ -258,22 +478,13 @@ public class TrendView extends Composite implements Listener {
 	
 
 	private void initGraph(){
-		Composite com = new Composite(this,SWT.BORDER);
+		
+		Composite com = new Composite(this,SWT.NO_BACKGROUND);
 		com.setLayout(new FillLayout());
 		com.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
-		graph = new ChartGraph(com,SWT.NONE);
-		graph.Margin =40;
-		graph.nMaxData = 100;
-		graph.nMinData = 0;
-		graph.nXMarkNum = 16;
-		graph.nYMarkNum = 10;
-		graph.Data = new double[1][240];
-
-		for (int i=0;i<graph.Data[0].length ;i++)
-		{
-			graph.Data[0][i]= graph.nMinData;
-		}
 		
+
+		graph = new ChartGraph(com,SWT.NO_BACKGROUND);
 	}
 	
 	void process() {
@@ -286,7 +497,7 @@ public class TrendView extends Composite implements Listener {
 		} catch (ParseException e) {
 			MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
 			box.setMessage(e.getMessage()
-					+ "\r\nPlease select a valid date for start date.");
+					+ "\r\nPlease select a valid date.");
 			box.setText("Date Setting Error");
 			box.open();
 			return;
@@ -332,34 +543,45 @@ public class TrendView extends Composite implements Listener {
 		start.minute = (byte) minute.getSelection();
 		start.bValid = true;
 
-		int[] station = list.getSelectionIndices();
+		int station=0;
+		for (int i=0;i<list.length;i++)
+			if (list[i].getSelection()) station++;
 
-		if (station.length == 0) {
+		if (station == 0) {
 			MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
 			box.setText("No measure point selected");
 			box.setMessage("Please select a measure point to draw.");
 			box.open();
 			return;
 		}
-		
-		
-		for (int i = 0; i < station.length; i++) {
-			if (list.getItem(station[i]).equals(ConstData.strUnknown))
+		graph.color = new Color[station];
+		int n=0;
+		butStart.setEnabled(false);
+		butPrint.setEnabled(false);
+		for (int i = 0; i < list.length; i++) {
+			if (list[i].getText().equals(ConstData.strUnknown))
 				continue;
-			int n = station[i];
-
+			
 			//System.out.println(n);
-			//while (!meter[n].isPaused());
-			TrendDrawTask task = new TrendDrawTask(this,
-						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
+			while (!meter[i].isPaused()) {
+				System.out.println("waiting");
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// 
+					//e.printStackTrace();
+				}
+			};
+			TrendDrawTask task = new TrendDrawTask(n,station,this,
+						meter[i].ComPort, (byte) meter[i].nMachineNum, start,
 						end);
-			task.meter = meter[n];
+			task.meter = meter[i];
+			graph.color[n] = list[i].getBackground();
 			graph.logScale = butLog.getSelection();
+			//SetGraphScale();
+			//graph.setAutoTransform();
 			task.start();
-
+			n++;
 		}
-
 	}
-
-
 }

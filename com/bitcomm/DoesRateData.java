@@ -21,7 +21,7 @@ public class DoesRateData extends MeasureData{
 	short DataLength;
 	char DataNum;
 	DateTime date;
-	Byte cNaIUnit;
+	byte cNaIUnit;
 	int  nNaIValue;
 	int  nNaI_dr_count;
 	int  nNaI_cr_count;
@@ -39,12 +39,53 @@ public class DoesRateData extends MeasureData{
 	byte cFOMA;
 	byte cValidType;
 	
+	DoesRateData()
+	{
+		date = new  DateTime();
+		dateGPS = new DateTime();
+		gps = new GPSData();
+	}
+	
 	DoesRateData(String strLine) throws ParseException
 	{
 		parse(strLine);
 	}
 	
 	DoesRateData(byte[] Data)
+	{
+		parse(Data);
+	}
+	
+	String CSVString()
+	{
+		return String.valueOf(nMachineNum)+","+
+		String.valueOf((int)DataNum) + "," +
+		date.CSVString() + "," +
+		String.valueOf((int)cValidType) + ","+
+		String.valueOf((float)nNaIValue/10.0)+","+
+		String.valueOf((int)cNaIUnit)+","+
+		String.valueOf((int)nNaI_dr_count)+","+
+		String.valueOf((int)nNaI_cr_count)+","+
+		String.valueOf((float)nSSDrate/10.0)+","+
+		String.valueOf((int)cSSDUnit)+","+
+		String.valueOf((int)nSSD_dr_count)+","+
+		String.valueOf((int)cPT)+","+
+		String.valueOf((int)nMTime)+","+
+		String.valueOf((int)nStatus)+","+
+		String.valueOf((float)nHVVolt/10.0)+","+
+		String.valueOf((float)nThermoral/10.0)+","+
+		String.valueOf((float)nBattVoltage/10.0)+","+
+		dateGPS.CSVString()+","+
+		gps.CSVString()+","+
+		String.valueOf((int)cFOMA);
+	}
+	void Save() throws Exception, IOException
+	{
+		DoesRateFile file = new DoesRateFile(nMachineNum,date);
+		file.setData(this);
+		file.save();
+	}
+	void parse(byte[] Data)
 	{
 		nMachineNum = Data[1];
 		DataLength =(short) ToChar(Data,5);
@@ -69,35 +110,6 @@ public class DoesRateData extends MeasureData{
 		cValidType = Data[69];
 	}
 	
-	String CSVString()
-	{
-		return String.valueOf(nMachineNum)+","+
-		String.valueOf((int)DataNum) + "," +
-		date.CSVString() + "," +
-		String.valueOf((int)cValidType) + ","+
-		String.valueOf((float)nNaIValue/10.0)+","+
-		String.valueOf((int)cNaIUnit)+","+
-		String.valueOf((int)nNaI_dr_count)+","+
-		String.valueOf((int)nNaI_cr_count)+","+
-		String.valueOf((int)nSSDrate)+","+
-		String.valueOf((int)cSSDUnit)+","+
-		String.valueOf((int)nSSD_dr_count)+","+
-		String.valueOf((int)cPT)+","+
-		String.valueOf((int)nMTime)+","+
-		String.valueOf((int)nStatus)+","+
-		String.valueOf((float)nHVVolt/10.0)+","+
-		String.valueOf((float)nThermoral/10.0)+","+
-		String.valueOf((float)nBattVoltage/10.0)+","+
-		dateGPS.CSVString()+","+
-		gps.CSVString()+","+
-		String.valueOf((int)cFOMA);
-	}
-	void Save() throws Exception, IOException
-	{
-		DoesRateFile file = new DoesRateFile(nMachineNum,date);
-		file.setData(this);
-		file.save();
-	}
 	void parse(String str) throws ParseException
 	{
 		if (str==null) return;

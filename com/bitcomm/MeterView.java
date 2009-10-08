@@ -44,6 +44,20 @@ public class MeterView extends Composite  {
 		dataTask = new CommunicationTask(this,ComPort);
 	}
 	
+	void showOffLine()
+	{
+		meter.rgbLED = rgbRed;
+		meter.strLED = ConstData.strOffline;
+		meter.redraw();
+	}
+	
+	void showConnect()
+	{
+		meter.rgbLED = rgbGreen;
+		meter.strLED = ConstData.strOffline;
+		meter.redraw();
+	}
+	
 	public void setValue()
 	{
 		
@@ -64,8 +78,16 @@ public class MeterView extends Composite  {
 		}
 		else
 		{
-			meter.rgbLED = rgbGreen;
-			meter.strLED = ConstData.strNormal;
+			if (ComPort.IsConnected())
+			{
+				meter.rgbLED = rgbGreen;
+				meter.strLED = ConstData.strNormal;
+			}
+			else
+			{
+				meter.rgbLED = rgbRed;
+				meter.strLED = ConstData.strOffline;				
+			}
 		}
 		
 		if ((data.nStatus & 0x00080000) > 0 )
@@ -105,6 +127,18 @@ public class MeterView extends Composite  {
 		{
 			meter.rgbDetector = rgbRed;
 			meter.strDector = ConstData.strDetectorErr;
+			if ((data.nStatus & 0x00000800) > 0 )
+			{
+				//System.out.println("NaI Detector err.");
+			}
+			if ((data.nStatus & 0x00001000) > 0 )
+			{
+				//System.out.println("SSD Detector err.");
+			}
+			if ((data.nStatus & 0x00002000) > 0 )
+			{
+				//System.out.println("Detector Tempture err.");
+			}
 		}
 		else
 		{
@@ -119,7 +153,7 @@ public class MeterView extends Composite  {
 				meter.strAlarm = ConstData.strHihiAlarm;
 			if ((data.nStatus & 0x00000200) > 0)
 				meter.strAlarm = ConstData.strHiAlarm;
-			if ((data.nStatus & 0x00000300) > 0)
+			if ((data.nStatus & 0x00000400) > 0)
 				meter.strAlarm = ConstData.strLoAlarm;
 		}
 		else

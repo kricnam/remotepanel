@@ -27,6 +27,8 @@ public class SetupStationPage extends PreferencePage {
 			store.setValue(strBase+"_Port", urlPort.getText());
 		if (MachineNum!=null)
 			store.setValue(strBase+"_MNUM", MachineNum.getText());
+		if (Interval!=null)
+			store.setValue(strBase+"_INTERVAL", Interval.getText());
 		return super.performOk();
 
 	}

@@ -69,5 +69,4 @@ public class SetupPage extends PreferencePage {
 		
 		return super.performOk();
 	}
-
 }

@@ -13,8 +13,9 @@ public class TrendDrawTask extends Thread {
 	DateTime start;
 	DateTime end;
 	MeterView meter;
-	
-	TrendDrawTask(TrendView UI,CommunicationPort port,byte MachineNum,
+	int Index;
+	int total;
+	TrendDrawTask(int index,int total,TrendView UI,CommunicationPort port,byte MachineNum,
 			DateTime start,DateTime end)
 	{
 		this.UI=UI;
@@ -22,7 +23,8 @@ public class TrendDrawTask extends Thread {
 		this.MachineNum=MachineNum;
 		this.start = start;
 		this.end = end;
-		
+		Index= index;
+		this.total = total;
 	}
 	@Override
 	public void run() 
@@ -41,9 +43,7 @@ public class TrendDrawTask extends Thread {
 					UI.setCursor(UI.display.getSystemCursor(SWT.CURSOR_WAIT));
 					
 				}
-				
 			}
-			
 		});
 		
 		meter.Pause(true);
@@ -54,9 +54,12 @@ public class TrendDrawTask extends Thread {
 			
 			DoesRateData data=null;
 			final int sum=his.Confirmed.nCount;
-			UI.graph.Data = new double[1][sum];
-			UI.graph.strScaleX = new String[sum];
-			UI.graph.ResetData();
+			if (Index==0)
+			{
+				UI.graph.Data = new double[total][sum];
+				UI.graph.strScaleX = new String[sum];
+				UI.graph.ResetData();
+			}
 			int p=0;
 			while( his.Confirmed.nCount>0)
 			{
@@ -72,8 +75,6 @@ public class TrendDrawTask extends Thread {
 				if (data!=null)
 				{
 					DrawUI(data);
-					//System.out.println(data.CSVString());
-					
 				}
 				
 				his.Confirmed.startNo++;
@@ -108,8 +109,6 @@ public class TrendDrawTask extends Thread {
 						
 						box.open();
 					}
-
-					
 				}
 				
 			});
@@ -121,7 +120,8 @@ public class TrendDrawTask extends Thread {
 			public void run() {
 				if (!UI.isDisposed())
 					UI.setCursor(null);
-				
+				UI.butStart.setEnabled(true);
+				UI.butPrint.setEnabled(true);
 			}
 			
 		});
@@ -134,12 +134,7 @@ public class TrendDrawTask extends Thread {
 		final String strT ;
 		if (UI.isDisposed()) return;
 		if (data==null) return;
-		if (data.cValidType==DoesRateData.nGyh)
-		{
-				val = data.nNaIValue/10.0 * Math.pow(1000, data.cNaIUnit -1);
-		}
-		else
-				val = data.nSSDrate/10.0 * Math.pow(1000, data.cSSDUnit-1);
+		val = data.getDoesRatenGy();
 		
 		strT = data.date.toStringShortDate()+"\r\n"+data.date.toStringTime();
 		UI.getDisplay().asyncExec(new Runnable(){
@@ -147,9 +142,10 @@ public class TrendDrawTask extends Thread {
 			public void run() {
 				if (!UI.isDisposed())
 				{
-					UI.graph.setData(val,0,strT);
+					UI.graph.setData(val,Index,strT);
 					
-					UI.graph.redraw();
+					if (Index==0) UI.graph.redraw();
+					else UI.update();
 				}
 			}
 		});

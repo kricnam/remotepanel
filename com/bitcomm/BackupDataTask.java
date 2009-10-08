@@ -43,6 +43,7 @@ public class BackupDataTask extends Thread {
 		});
 		
 		meter.Pause(true);
+		int err=0;
 		try {
 			his.Confirm();
 			Print("Confirm data...\n");
@@ -57,7 +58,7 @@ public class BackupDataTask extends Thread {
 			int p=0;
 			while( his.Confirmed.nCount>0)
 			{
-				p++;
+				
 				his.DataRequest();
 				Print("Request...\n");
 				if (DataType == CommunicationHistoryData.DoseRate)
@@ -82,11 +83,24 @@ public class BackupDataTask extends Thread {
 					data.Save();
 					Print(data.CSVString()+"\n");
 				}
+				
 				if (dataS!=null)
 				{
 					Print("Save Data No."+String.valueOf(dataS.DataNum)+"\n");
 					dataS.Save();
 				}
+				if (data==null && dataS==null)
+				{
+					err++;
+					if (err<3) 
+					{
+						Print("try again\n");
+						continue;
+					}
+					
+				}
+				err=0;
+				p++;
 				final int q = p;
 				if (!UI.isDisposed())
 				{
@@ -116,7 +130,7 @@ public class BackupDataTask extends Thread {
 		} 
 		catch (Exception e) 
 		{
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		

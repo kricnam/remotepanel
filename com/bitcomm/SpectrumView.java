@@ -9,21 +9,28 @@ import java.util.Date;
 
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.printing.PrintDialog;
+import org.eclipse.swt.printing.Printer;
+import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Spinner;
@@ -52,7 +59,7 @@ public class SpectrumView extends Composite implements Listener {
 
 	Spinner minute;
 
-	List list;
+	Combo list;
 
 	Button butDate;
 
@@ -77,8 +84,78 @@ public class SpectrumView extends Composite implements Listener {
 		
 		initOptionBar();
 		initGraph();
-
+		getShell().addListener(SWT.Close, new Listener() {
+			public void handleEvent(Event arg0) {
+				SaveSetting();
+				AlokaPanel.spectrum=null;
+			}
+		});
+		GetSetting();
+		graph3d.addKeyListener(new KeyListener() {
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				if (arg0.keyCode == SWT.ARROW_UP)
+				{
+					ChangePos(1);
+				}
+				if (arg0.keyCode == SWT.ARROW_DOWN)
+				{
+					ChangePos(-1);
+				}
+				
+			}
+			
+			
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
+	
+	void ChangePos(int n)
+	{
+		if (graph3d.Data==null) return;
+		graph3d.pos+=n;
+		if (graph3d.pos < 0)
+			graph3d.pos = graph3d.Data.length-1;
+		if (graph3d.pos > (graph3d.Data.length-1))
+			graph3d.pos = 0;
+		graph3d.UpdateSelection();
+	}
+	
+	void SaveSetting()
+	{
+		AlokaPanel.SaveSetting("SpectrumSelect", list.getSelectionIndex());
+		AlokaPanel.SaveSetting("SpectrumFrom", textFrom.getText());
+		AlokaPanel.SaveSetting("SpectrumTo", textTo.getText());
+		AlokaPanel.SaveSetting("SpectrumHour", hour.getSelection());
+		AlokaPanel.SaveSetting("SpectrumMinute", minute.getSelection());
+		AlokaPanel.SaveSetting("SpectrumPeriod", butPeriod.getSelection());
+		AlokaPanel.SaveSetting("SpectrumLog", butLog.getSelection());
+		
+	}
+	
+	void GetSetting()
+	{
+		list.select(AlokaPanel.GetSettingInt("SpectrumSelect"));
+		textFrom.setText(AlokaPanel.GetSettingString("SpectrumFrom"));
+		textTo.setText(AlokaPanel.GetSettingString("SpectrumTo")); 
+		hour.setSelection(AlokaPanel.GetSettingInt("SpectrumHour"));
+		minute.setSelection(AlokaPanel.GetSettingInt("SpectrumMinute"));
+		butPeriod.setSelection(AlokaPanel.GetSettingBool("SpectrumPeriod"));
+		if (butPeriod.getSelection())
+		{
+			calTo.setEnabled(true);
+			textTo.setEnabled(true);
+			labelTo.setEnabled(true);
+		}
+		butDate.setSelection(!butPeriod.getSelection());
+		butLog.setSelection(AlokaPanel.GetSettingBool("SpectrumLog"));
+		graph3d.logScale=butLog.getSelection();
+		
+	}
+
 	private void initOptionBar(){
 		optionBar = new Composite(this, SWT.BORDER);
 		GridLayout optionLayout = new GridLayout(3, true);
@@ -100,16 +177,14 @@ public class SpectrumView extends Composite implements Listener {
 		butPeriod.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true,
 				false));
 
-		Group grpStation = new Group(optionBar, SWT.BORDER);
+		Group grpStation = new Group(optionBar, SWT.NONE);
 		grpStation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
-				1, 4));
-		grpStation.setLayout(new RowLayout(SWT.VERTICAL));
+				1, 2));
+		grpStation.setLayout(new GridLayout(1,true));
 		grpStation.setText(ConstData.strStation);
-		list = new List(grpStation, SWT.SINGLE | SWT.V_SCROLL | SWT.BORDER);
-		list.setLayoutData(new RowData(220,120));
+		list = new Combo(grpStation, SWT.SINGLE | SWT.DROP_DOWN | SWT.READ_ONLY);
+		list.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 		
-
-
 		Composite inputDate = new Composite(optionBar, SWT.NONE);
 		inputDate.setLayout(new GridLayout(3, false));
 		inputDate.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false,
@@ -147,21 +222,24 @@ public class SpectrumView extends Composite implements Listener {
 		labelTo.setEnabled(false);
 
 		Group grpTime = new Group(optionBar, SWT.NONE);
-		grpTime.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		grpTime.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		grpTime.setText(ConstData.strStartTime);
 		grpTime.setLayout(new GridLayout(3, false));
 		hour = new Spinner(grpTime, SWT.NONE);
 		hour.setMaximum(23);
+		hour.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		Label comma = new Label(grpTime, SWT.NONE);
 		comma.setText(":");
 		minute = new Spinner(grpTime, SWT.NONE);
 		minute.setMaximum(59);
+		minute.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
-
-		Button butStart = new Button(optionBar, SWT.PUSH);
+		Composite com = new Composite(optionBar, SWT.BORDER);
+		com.setLayout(new GridLayout(5,true));
+		com.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true,2,2));
+		Button butStart = new Button(com, SWT.PUSH);
 		butStart.setText(ConstData.strStart);
-		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false,
-				1, 1));
+		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
 		butStart.addSelectionListener(new SelectionListener() {
 
@@ -169,11 +247,95 @@ public class SpectrumView extends Composite implements Listener {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				graph3d.bSwitch=false;
 				process();
 			}
 
 		});
 
+		Button butPrint = new Button(com, SWT.PUSH);
+		butPrint.setText(ConstData.strPrint);
+		butPrint.addSelectionListener(new SelectionListener() {
+			
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				PrintGraph();
+			}
+			
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		Button butSwitch = new Button(com, SWT.PUSH);
+		butSwitch.setText("Switch");
+		butSwitch.addSelectionListener(new SelectionListener() {
+			
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				graph3d.bSwitch=!graph3d.bSwitch;
+				graph3d.setAutoTransform();
+				graph3d.redraw();
+			}
+			
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		Button butZoom = new Button(com, SWT.PUSH);
+		butZoom.setText("Zoom");
+		butZoom.addSelectionListener(new SelectionListener() {
+			
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				Point size = graph3d.getSize();
+				if (size.x < 2000) size.x*=2;
+				else size.x = getSize().x;
+				graph3d.setSize(size);
+				graph3d.setAutoTransform();
+				graph3d.redraw();
+			}
+			
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+
+		Group grpNav = new Group(com, SWT.NONE);
+		butNext =new Button(grpNav, SWT.ARROW|SWT.UP);
+		butPrev =new Button(grpNav, SWT.ARROW|SWT.DOWN);
+		grpNav.setText("Cursor");
+		grpNav.setLayout(new GridLayout(2, true));
+		grpNav.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		butNext.addSelectionListener(new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				ChangePos(1);
+			}
+
+		});
+		butPrev.addSelectionListener(new SelectionListener() {
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			public void widgetSelected(SelectionEvent e) {
+				ChangePos(-1);
+			}
+
+		});
+
+		
 		PreferenceStore store = new PreferenceStore("./config.ini");
 		try {
 			store.load();
@@ -184,6 +346,7 @@ public class SpectrumView extends Composite implements Listener {
 			box.open();
 			return;
 		}
+		
 		int num = store.getInt("StationNum");
 		if (num == 0)
 			num = 1;
@@ -206,38 +369,19 @@ public class SpectrumView extends Composite implements Listener {
 		butLog.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
 				1, 1));
 		
-		Group grpNav = new Group(optionBar, SWT.NONE);
-		butNext =new Button(grpNav, SWT.ARROW|SWT.UP);
-		butPrev =new Button(grpNav, SWT.ARROW|SWT.DOWN);
-		grpNav.setLayout(new GridLayout(2, true));
-		grpNav.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-		butNext.addSelectionListener(new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
+		
+		butLog.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent arg0) {
+				graph3d.logScale = butLog.getSelection();
+				graph3d.redraw();
 			}
-
-			public void widgetSelected(SelectionEvent e) {
-				graph3d.pos+=1;
-				if (graph3d.pos > (graph3d.Data.length-1))
-					graph3d.pos = 0;
-				graph3d.UpdateSelection();
+			
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
 			}
-
 		});
-		butPrev.addSelectionListener(new SelectionListener() {
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-
-			public void widgetSelected(SelectionEvent e) {
-				graph3d.pos-=1;
-				if (graph3d.pos < 0)
-					graph3d.pos = graph3d.Data.length-1;
-				graph3d.UpdateSelection();
-			}
-
-		});
-
 
 
 		butDate.addListener(SWT.Selection, this);
@@ -247,19 +391,49 @@ public class SpectrumView extends Composite implements Listener {
 		calTo.addListener(SWT.Selection, this);
 
 	}
+	void PrintGraph()
+	{
+		PrintDialog dlg = new PrintDialog(getShell(),SWT.NONE);
+		PrinterData printData = dlg.open();
+		if (printData==null) return;
+		//System.out.println("printing");
+		Printer printer= new Printer(printData);
+		if (printer.startJob("SpetrumGraph"))
+		{
+			GC gc = new GC(printer);
+			Rectangle trim = printer.getBounds();
+			Point dpi = printer.getDPI();
+			//System.out.println(trim.toString());
+			if (printer.startPage()) {
+				graph3d.AutoSetTransform(gc,dpi.x, dpi.y, trim.width-2*dpi.x, trim.height-2*dpi.y);
+				graph3d.drawBackground(gc, dpi.x, dpi.y, trim.width-2*dpi.x, trim.height-2*dpi.y);
+				graph3d.drawData(gc, dpi.x, dpi.y, trim.width-2*dpi.x, trim.height-2*dpi.y);
+				printer.endPage();
+				graph3d.setAutoTransform();
+			}
+			gc.dispose();
+			printer.endJob();
+		}
+		graph3d.redraw();
+	}
+
 	private void initGraph(){
 		Composite com = new Composite(this,SWT.BORDER);
 		com.setLayout(new FillLayout());
 		com.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
-		graph3d = new ChartGraph3D(com,SWT.NONE);
-		graph3d.Data = new double[10][11];
+		ScrolledComposite sc=new ScrolledComposite(com, SWT.H_SCROLL);
+		graph3d = new ChartGraph3D(sc,SWT.NONE);
+		graph3d.setSize(880,463);
+		sc.setContent(graph3d);
 		
-		graph3d.Margin = 63;
-		graph3d.nMaxData = 2;
-		graph3d.nMinData = -2;
+		//graph3d.Margin = 63;
+		//graph3d.nMaxData = 2;
+		//graph3d.nMinData = -2;
 		graph3d.nXMarkNum = 10;
 		graph3d.nYMarkNum = 10;
-		graph3d.nDepthStep = 2;
+		//graph3d.nDepthStep = 2;
+		graph3d.setAutoTransform();
+		graph3d.logScale = true;
 		//graph3d.setBackground(graph3d.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 	}
 
@@ -366,20 +540,21 @@ public class SpectrumView extends Composite implements Listener {
 				return;
 		int n = meter[station].nMachineNum;
 	
-			String strFileName;
-			int PT=0;
-			try
-			{
-				strFileName = SpectrumFile.getFileName(n, start);
-				
-				PT = SpectrumFile.getPT(strFileName);
-			} catch (IOException e) {
+		String strFileName;
+		int PT=0;
+		try
+		{
+			PT = SpectrumFile.getPT(n,start);
+			strFileName = SpectrumFile.getFileName(n, start,PT);
+		} 
+		catch (IOException e) 
+		{
 				MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
 				box.setText("Read File Fail");
-				box.setMessage("Please goto backup to download date first.");
+				box.setMessage("Please goto backup to download data first.");
 				box.open();
 				return;
-			}
+		}
 			
 		if (butDate.getSelection())
 		{
@@ -388,11 +563,16 @@ public class SpectrumView extends Composite implements Listener {
 				file = new SpectrumFile(strFileName);
 				graph3d.Data = null;
 				graph3d.Data = new double[1][1000];
+				graph3d.Index = new String[1];
+				graph3d.pos =0;
 				for(int i=0;i<1000;i++)
 					graph3d.Data[0][i]=file.data.Channel[i];
+				graph3d.Index[0]=file.getName().substring(0, file.getName().length()-4)
+				+" "+file.data.dateEnd.toStringDate()						
+			+ " "+file.data.dateEnd.toStringTime();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				AlokaPanel.MessageBox("Error", e.getMessage());
+				//e.printStackTrace();
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -415,37 +595,41 @@ public class SpectrumView extends Composite implements Listener {
 			nfile = nfile/60000 /PT ;
 			graph3d.Data = null;
 			graph3d.Data = new double[(int)nfile][1000];
+			graph3d.Index = new String[(int)nfile];
 			//System.out.println("Total files:"+String.valueOf(nfile));
 			for (int t=0;t<nfile;t++)
 			{
 				try {
-					strFileName = SpectrumFile.getFileName(n, date);
+					strFileName = SpectrumFile.getFileName(n, date,PT);
 					//System.out.println(strFileName);
-					SpectrumFile file;
+					SpectrumFile file = null;
 					try {
 						
 						file = new SpectrumFile(strFileName);
 						for(int i=0;i<1000;i++)
 							graph3d.Data[t][i]=file.data.Channel[i];
-						date.addMinute(PT);
-						if (end.getTime().before(date.getTime()))
-							break;
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
+						graph3d.Index[t]=file.getName().substring(0, file.getName().length()-4)
+						+" "+file.data.dateEnd.toStringDate()
+						+" "+file.data.dateEnd.toStringTime();
+						//System.out.println(graph3d.Index[t]);
+					} 
+					catch (ParseException e) 
+					{
 						e.printStackTrace();
 					}
+					catch (FileNotFoundException ee)
+					{
+						MessageBox box = new MessageBox(getShell(), SWT.ICON_WARNING | SWT.YES|SWT.NO);
+						box.setText("Read File Fail");
+						box.setMessage(ee.getMessage()+"\nPlease goto backup to download data first.\nContinue read or stop?");
+						int choice =box.open();
+						if (choice == SWT.YES) continue;
+						else break;
+					}
 					
-					
-				}
-				catch (FileNotFoundException ee)
-				{
-					MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
-					box.setText("Read File Fail");
-					box.setMessage(strFileName +" not found.Please goto backup to download date first."+ee.getMessage());
-					box.open();
-					break;
-				
-					
+					date.addMinute(PT);
+					if (end.getTime().before(date.getTime()))
+						break;
 				}
 				catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -455,7 +639,6 @@ public class SpectrumView extends Composite implements Listener {
 					box.open();
 					e.printStackTrace();
 					return;
-					
 				}
 			};
 			

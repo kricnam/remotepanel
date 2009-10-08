@@ -54,5 +54,7 @@ public class ConstData {
 	static String strChoseType = "Data Type Choice";
 	static String strInterval = "Interval(s)";
 	static String strMonth = "Month";
-	
+	static String strDataType="Data Type";
+	static String strSave="Save";
+	static String strSavePrompt="Please select a file name to save data.";
 }

@@ -11,6 +11,8 @@ import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -39,6 +41,7 @@ public class AlokaPanel {
 	static TrendView trend;
 	static SpectrumView spectrum;
 	static ReprotView report;
+	
 	static void MessageBox(String strTitle,String strMsg)
 	{
 		MessageBox box = new MessageBox(shell);
@@ -142,9 +145,11 @@ public class AlokaPanel {
 	}
 	
 	public static void main(String[] args) {
+		
 		File root = new File("root");
 		if (!root.exists())
 					root.mkdir();
+		
 		d = new Display();
 		
 		shell =new Shell(d,SWT.MIN);
@@ -157,10 +162,26 @@ public class AlokaPanel {
 		layout.numColumns = 2;
 
 		shell.setLayout(layout);
+		
 
 		Composite tool = new Composite(shell,SWT.NONE);
 		Composite Logo = new Composite(shell,SWT.NONE);
 
+		Logo.addKeyListener(new KeyListener() {
+			public void keyReleased(KeyEvent arg0) {
+			
+			}
+			
+			public void keyPressed(KeyEvent arg0) {
+				//System.out.println(arg0.toString());
+				int bit = SWT.CTRL|SWT.ALT;
+				if ((arg0.keyCode=='c') && ((arg0.stateMask & bit) > 0))
+				{
+					Setup();
+				}
+				
+			}
+		});
 		Composite Meters = new Composite(shell,SWT.BORDER);
 		GridData gridData = new GridData(SWT.FILL,SWT.FILL,true,false);
 		gridData.heightHint = 36;
@@ -188,55 +209,16 @@ public class AlokaPanel {
 		Image imgSpectrum = new Image(d,"com/bitcomm/resource/spectrum.png");
 		Image imgClose = new Image(d,"com/bitcomm/resource/power_off.png");
 		Image imgBackup = new Image(d,"com/bitcomm/resource/backup.png");
+		Image imgSetupDis = new Image(d,"com/bitcomm/resource/xray.png");
 
-		itemSetup.setText(ConstData.strConfig);
+		//itemSetup.setText(ConstData.strConfig);
 		itemSetup.setImage(imgSetup);
-		
+		itemSetup.setDisabledImage(imgSetupDis);
+		itemSetup.setEnabled(false);
 
 		itemSetup.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
-
-				PreferenceManager manager= new PreferenceManager();
-				PreferenceStore store = new PreferenceStore("config.ini");
-				
-				try{
-					store.load();
-				}
-				catch(IOException eio)
-				{
-					MessageBox("Error",eio.getMessage());
-					eio.printStackTrace();
-				}
-				
-				PreferenceNode node1= new PreferenceNode("System",ConstData.strSysSetup,null,SetupPage.class.getName());
-				manager.addToRoot(node1);
-				int nNum = store.getInt("StationNum");
-				
-				if (nNum==0) nNum = 4;
-				PreferenceNode[] node = new PreferenceNode[nNum];
-				for (int i =0;i< nNum;i++)
-				{
-					node[i] = new PreferenceNode("System.Station"+String.valueOf(i+1),
-							ConstData.strStation+" "+String.valueOf(i+1),
-							null,
-							SetupStationPage.class.getName());
-					manager.addToRoot(node[i]);
-				}
-				
-				PreferenceDialog dlg = new PreferenceDialog(shell,manager);
-				
-				try
-				{
-					store.load();
-					dlg.setPreferenceStore(store);
-					dlg.open();
-					store.save();
-					
-				}
-				catch(IOException ex){
-					MessageBox("Warning",ex.getMessage());
-					ex.printStackTrace();
-				}
+				Setup();
 			}
 			public void widgetDefaultSelected(SelectionEvent e){
 			}
@@ -277,6 +259,7 @@ public class AlokaPanel {
 					return;
 				}
 				Shell s = new Shell(shell);
+				s.setSize(600,shell.getSize().y);
 				shell.setCursor(d.getSystemCursor(SWT.CURSOR_WAIT));
 				report=new ReprotView(meter,s,SWT.BORDER);
 				s.setLayout(new FillLayout());
@@ -400,6 +383,7 @@ public class AlokaPanel {
 				if (meter[i].dataTask.nInterval==0) meter[i].dataTask.nInterval=600;
 				
 				meter[i].dataTask.start();
+				meter[i].showOffLine();
 			}
 		}
 
@@ -445,6 +429,52 @@ public class AlokaPanel {
 		imgReport.dispose();
 		imgSpectrum.dispose();
 		imgClose.dispose();
+		imgSetupDis.dispose();
+		
+	}
+	
+	static void Setup()
+	{
+		PreferenceManager manager= new PreferenceManager();
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+		}
+		
+		PreferenceNode node1= new PreferenceNode("System",ConstData.strSysSetup,null,SetupPage.class.getName());
+		manager.addToRoot(node1);
+		int nNum = store.getInt("StationNum");
+		
+		if (nNum==0) nNum = 4;
+		PreferenceNode[] node = new PreferenceNode[nNum];
+		for (int i =0;i< nNum;i++)
+		{
+			node[i] = new PreferenceNode("System.Station"+String.valueOf(i+1),
+					ConstData.strStation+" "+String.valueOf(i+1),
+					null,
+					SetupStationPage.class.getName());
+			manager.addToRoot(node[i]);
+		}
+		
+		PreferenceDialog dlg = new PreferenceDialog(shell,manager);
+		
+		try
+		{
+			store.load();
+			dlg.setPreferenceStore(store);
+			dlg.open();
+			store.save();
+		}
+		catch(IOException ex){
+			MessageBox("Warning",ex.getMessage());
+			ex.printStackTrace();
+		}
 		
 	}
 }

@@ -87,6 +87,44 @@ public class BackupView extends Composite implements Listener {
 		console = new Text(this, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI
 				| SWT.WRAP | SWT.V_SCROLL);
 		console.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		getShell().addListener(SWT.Close, new Listener() {
+			
+			public void handleEvent(Event event) {
+				
+				SaveSetting();
+				AlokaPanel.backup = null;
+			}
+		});
+		GetSetting();
+	}
+	void SaveSetting()
+	{
+		AlokaPanel.SaveSetting("BackupSelect", list.getSelectionIndex());
+		AlokaPanel.SaveSetting("BackupFrom", textFrom.getText());
+		AlokaPanel.SaveSetting("BackupTo", textTo.getText());
+		AlokaPanel.SaveSetting("BackupHour", hour.getSelection());
+		AlokaPanel.SaveSetting("BackupMinute", minute.getSelection());
+		AlokaPanel.SaveSetting("BackupPeriod", butPeriod.getSelection());
+		AlokaPanel.SaveSetting("BackupType",chkData.getSelection());
+	}
+	
+	void GetSetting()
+	{
+		list.setSelection(AlokaPanel.GetSettingInt("BackupSelect"));
+		textFrom.setText(AlokaPanel.GetSettingString("BackupFrom"));
+		textTo.setText(AlokaPanel.GetSettingString("BackupTo")); 
+		hour.setSelection(AlokaPanel.GetSettingInt("BackupHour"));
+		minute.setSelection(AlokaPanel.GetSettingInt("BackupMinute"));
+		butPeriod.setSelection(AlokaPanel.GetSettingBool("BackupPeriod"));
+		if (butPeriod.getSelection())
+		{
+			calTo.setEnabled(true);
+			textTo.setEnabled(true);
+			labelTo.setEnabled(true);
+		}
+		butDate.setSelection(!butPeriod.getSelection());
+		chkData.setSelection(AlokaPanel.GetSettingBool("BackupType"));
+		chkSpec.setSelection(!chkData.getSelection());
 	}
 
 	private void initOptionBar() {
