@@ -37,7 +37,8 @@ public class RepeatingButton extends Button {
     public static final int DEFAULT_REPEAT_DELAY = 50;          // Milliseconds
     private int initialRepeatDelay = DEFAULT_INITIAL_REPEAT_DELAY;
     private int repeatDelay = DEFAULT_REPEAT_DELAY;
-    private ArrayList selectionListeners = new ArrayList(3);
+    @SuppressWarnings("unchecked")
+	private ArrayList selectionListeners = new ArrayList(3);
     private Repeater repeater;
 
     /**
@@ -72,7 +73,8 @@ public class RepeatingButton extends Button {
         });
     }
 
-    public void addSelectionListener(SelectionListener listener) {
+    @SuppressWarnings("unchecked")
+	public void addSelectionListener(SelectionListener listener) {
         selectionListeners.add(listener);
     }
 
@@ -108,7 +110,8 @@ public class RepeatingButton extends Button {
         this.repeatDelay = repeatDelay;
     }
 
-    private void buttonPressed(int stateMask, int time) {
+    @SuppressWarnings("unchecked")
+	private void buttonPressed(int stateMask, int time) {
         SelectionListener[] listeners = new SelectionListener[selectionListeners.size()];
         selectionListeners.toArray(listeners);
         for (int i = 0; i < listeners.length; i++) {

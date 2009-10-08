@@ -22,21 +22,12 @@
  */
 package org.vafada.swtcalendar;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
-
-import java.text.DateFormatSymbols;
-import java.util.Calendar;
-import java.util.Locale;
+import java.util.Calendar;import java.util.Locale;import org.eclipse.swt.SWT;import org.eclipse.swt.events.SelectionListener;import org.eclipse.swt.graphics.Font;import org.eclipse.swt.layout.FillLayout;import org.eclipse.swt.widgets.Combo;import org.eclipse.swt.widgets.Composite;
 
 public class SWTMonthChooser extends Composite {
-    private SWTDayChooser dayChooser;
+    @SuppressWarnings("unused")	private SWTDayChooser dayChooser;
     private Combo comboBox;
-    private Locale locale;
+    @SuppressWarnings("unused")	private Locale locale;
 
     public SWTMonthChooser(Composite parent) {
         super(parent, SWT.NONE);

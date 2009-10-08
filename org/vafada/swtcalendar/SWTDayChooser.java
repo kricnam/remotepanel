@@ -22,21 +22,34 @@
  */
 package org.vafada.swtcalendar;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
-
-import java.text.DateFormatSymbols;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Widget;
 
 public class SWTDayChooser extends Composite
         implements MouseListener, FocusListener, TraverseListener, KeyListener {
@@ -64,10 +77,12 @@ public class SWTDayChooser extends Composite
     private Calendar calendar;
     private Calendar today;
     private Locale locale;
-    private List listeners;
+    @SuppressWarnings("unchecked")
+	private List listeners;
     private int style;
 
-    public SWTDayChooser(Composite parent, int style) {
+    @SuppressWarnings("unchecked")
+	public SWTDayChooser(Composite parent, int style) {
         super(parent, style & ~RED_WEEKEND);
         this.style = style;
         listeners = new ArrayList(3);
@@ -149,7 +164,7 @@ public class SWTDayChooser extends Composite
         int firstDayOfWeek = calendar.getFirstDayOfWeek();
         //DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(locale);
         //String[] dayNames = dateFormatSymbols.getShortWeekdays();
-        String[] dayNames = {"1","2","3","4","5","6","日"};
+        String[] dayNames = {"日","1","2","3","4","5","6"};
         int minLength = Integer.MAX_VALUE;
         for (int i = 0; i < dayNames.length; i++) {
             int len = dayNames[i].length();
@@ -435,7 +450,8 @@ public class SWTDayChooser extends Composite
         return false;
     }
 
-    public void addSWTCalendarListener(SWTCalendarListener listener) {
+    @SuppressWarnings("unchecked")
+	public void addSWTCalendarListener(SWTCalendarListener listener) {
         this.listeners.add(listener);
     }
 
@@ -443,7 +459,8 @@ public class SWTDayChooser extends Composite
         this.listeners.remove(listener);
     }
 
-    private void dateChanged() {
+    @SuppressWarnings("unchecked")
+	private void dateChanged() {
         if (!listeners.isEmpty()) {
             SWTCalendarListener[] listenersArray = new SWTCalendarListener[listeners.size()];
             listeners.toArray(listenersArray);
@@ -522,7 +539,8 @@ public class SWTDayChooser extends Composite
             label.setText(text);
         }
 
-        public String getText() {
+        @SuppressWarnings("unused")
+		public String getText() {
             return label.getText();
         }
 
