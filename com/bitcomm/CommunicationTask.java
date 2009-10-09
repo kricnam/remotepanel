@@ -117,13 +117,15 @@ public class CommunicationTask extends Thread {
 					{
 						e.printStackTrace();
 						SetCommunicationError();
-						PromptErr(e.getMessage());
+						
+						if (nError==0) PromptErr(e.getMessage());
+						nError++;
 						sleep(5000);
 						SetConnecting();
 						continue;
 					}
 				}
-
+				nError=0;
 				if (nSleepCount%20==0)
 				{
 

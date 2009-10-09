@@ -69,6 +69,8 @@ public class SpectrumView extends Composite implements Listener {
 	Button butLog;
 	Button butNext;
 	Button butPrev;
+	private Spinner scaleMin;
+	private Spinner scaleMax;
 
 	public SpectrumView(Composite parent, int style) {
 		super(parent, style);
@@ -133,7 +135,8 @@ public class SpectrumView extends Composite implements Listener {
 		AlokaPanel.SaveSetting("SpectrumMinute", minute.getSelection());
 		AlokaPanel.SaveSetting("SpectrumPeriod", butPeriod.getSelection());
 		AlokaPanel.SaveSetting("SpectrumLog", butLog.getSelection());
-		
+		AlokaPanel.SaveSetting("SpectrumYScaleMin", scaleMin.getSelection());
+		AlokaPanel.SaveSetting("SpectrumYScaleMax", scaleMax.getSelection());
 	}
 	
 	void GetSetting()
@@ -153,7 +156,8 @@ public class SpectrumView extends Composite implements Listener {
 		butDate.setSelection(!butPeriod.getSelection());
 		butLog.setSelection(AlokaPanel.GetSettingBool("SpectrumLog"));
 		graph3d.logScale=butLog.getSelection();
-		
+		scaleMin.setSelection(AlokaPanel.GetSettingInt("SpectrumYScaleMin"));
+		scaleMax.setSelection(AlokaPanel.GetSettingInt("SpectrumYScaleMax"));
 	}
 
 	private void initOptionBar(){
@@ -234,9 +238,36 @@ public class SpectrumView extends Composite implements Listener {
 		minute.setMaximum(59);
 		minute.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
+		Group scale = new Group(optionBar,SWT.NONE);
+		scale.setLayout(new GridLayout(5,false));
+		scale.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		scale.setText("Y scale");
+		Label sMin = new Label(scale, SWT.NONE);
+		sMin.setText("Min");
+		scaleMin = new Spinner(scale, SWT.NONE);
+		scaleMin.setMaximum(1000000000);
+		scaleMin.setPageIncrement(1000);
+		scaleMin.setDigits(2);
+		Label sMax = new Label(scale, SWT.NONE);
+		sMax.setText("Max");
+		scaleMax = new Spinner(scale, SWT.NONE);
+		scaleMax.setMaximum(1000000000);
+		scaleMin.setPageIncrement(1000);
+		Button butApply = new Button(scale, SWT.PUSH);
+		butApply.setText("Apply");
+		butApply.addSelectionListener(new SelectionListener() {
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				SetGraphScale();
+			}
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+		});
+		
 		Composite com = new Composite(optionBar, SWT.BORDER);
-		com.setLayout(new GridLayout(5,true));
-		com.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true,2,2));
+		com.setLayout(new GridLayout(4,true));
+		com.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true,1,2));
 		Button butStart = new Button(com, SWT.PUSH);
 		butStart.setText(ConstData.strStart);
 		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
@@ -286,7 +317,7 @@ public class SpectrumView extends Composite implements Listener {
 				
 			}
 		});
-		
+		Group grpNav = new Group(com, SWT.NONE);
 		Button butZoom = new Button(com, SWT.PUSH);
 		butZoom.setText("Zoom");
 		butZoom.addSelectionListener(new SelectionListener() {
@@ -308,12 +339,12 @@ public class SpectrumView extends Composite implements Listener {
 			}
 		});
 
-		Group grpNav = new Group(com, SWT.NONE);
+		
 		butNext =new Button(grpNav, SWT.ARROW|SWT.UP);
 		butPrev =new Button(grpNav, SWT.ARROW|SWT.DOWN);
 		grpNav.setText("Cursor");
 		grpNav.setLayout(new GridLayout(2, true));
-		grpNav.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		grpNav.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false,1,2));
 		butNext.addSelectionListener(new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -391,6 +422,19 @@ public class SpectrumView extends Composite implements Listener {
 		calTo.addListener(SWT.Selection, this);
 
 	}
+	protected void SetGraphScale() {
+		if (graph3d==null) return;
+		if (scaleMin.getSelection()/100 >= scaleMax.getSelection())
+		{
+			AlokaPanel.MessageBox("Error", "Min value shall not greater or equal to Max value!");
+			return;
+		}
+		graph3d.nScaleMax = scaleMax.getSelection();
+		graph3d.nScaleMin = scaleMin.getSelection()/100.0;
+		graph3d.nMaxData = graph3d.nScaleMax; 
+		graph3d.redraw(); 
+	}
+
 	void PrintGraph()
 	{
 		PrintDialog dlg = new PrintDialog(getShell(),SWT.NONE);

@@ -198,16 +198,17 @@ public class ChartGraph extends Canvas {
 		
 		gc.setForeground(gray);
 		gc.setLineStyle(SWT.LINE_DOT);
-		gc.drawString("Does Rate[nGy/h]",x+10,y+10,true);
+		Point pt= gc.stringExtent("Does Rate[nGy/h]");
+		gc.drawString("Does Rate[nGy/h]",x+pt.y,y+pt.y,true);
 		if (logScale)
 		{
-			Point pt = gc.stringExtent("-LOG-");
+			pt = gc.stringExtent("-LOG-");
 			gc.drawString("-LOG-",x+width/2-pt.x/2,y+10,true);
 			drawLogAxisY(gc, x, y, width, height);
 		}
 		else
 		{
-			Point pt = gc.stringExtent("-LIN-");
+			pt = gc.stringExtent("-LIN-");
 			gc.drawString("-LIN-",x+width/2-pt.x/2,y+10,true);
 			drawAxisY(gc, x, y, width, height);
 		}
@@ -215,9 +216,10 @@ public class ChartGraph extends Canvas {
 		//X axis
 		if (MaxCount< 12) nXMarkNum = MaxCount;
 		else if (MaxCount<120) nXMarkNum = MaxCount/(MaxCount/12);
-		double avg = MaxCount / nXMarkNum;
+		double avg = (double)MaxCount / nXMarkNum;
 		int ys;
-		Point pt;
+		
+		int intv = (width-2*Margin)/nXMarkNum;
 		for (int i=0;i<nXMarkNum+1;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
@@ -227,13 +229,17 @@ public class ChartGraph extends Canvas {
 					
 			{
 				if ( (int)(i* avg) < MaxCount && strScaleX[(int)(i* avg)]!=null)
-					gc.drawText(strScaleX[(int)(i* avg)],x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
+				{
+					pt = gc.stringExtent(strScaleX[(int)Math.round(i* avg)]);
+					if ((pt.x/2) > intv && i%2==1) continue;
+					gc.drawText(strScaleX[(int)Math.round(i* avg)],x+Margin+ys-pt.x/4 , y+height-Margin+pt.y,true);
+				}
 				else
 					gc.drawText("",x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
 			}
 			else
 			{
-				gc.drawString(String.valueOf(i*avg*xScaleRate),x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
+				gc.drawString(String.valueOf((int)i*avg*xScaleRate),x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
 			}
 		}
 		gc.drawString("Time",x+width-Margin/2 , y+height-Margin,true);
@@ -262,7 +268,7 @@ public class ChartGraph extends Canvas {
 		if (count==0)
 		{
 			count=1;
-			div = (int)( (Math.floor(nScaleMax)-Math.ceil(nScaleMin))/2);
+			div = 1;
 		}
 			
 		int ys;
@@ -273,6 +279,7 @@ public class ChartGraph extends Canvas {
 			
 			if (nScaleMin%div > 0) ceil+=div;
 			ys = height - (int)Math.round((YOffset + ceil - nScaleMin)/yRate) -Margin;
+			if (y+ys < Margin) continue;
 			gc.drawLine((int)x+Margin,y+ys,x+width-Margin,y+ys);
 			
 			DecimalFormat   df   =new   java.text.DecimalFormat("#");  
@@ -293,6 +300,7 @@ public class ChartGraph extends Canvas {
 		{
 			double ceil = Math.ceil(nScaleLogMin+i);
 			ys = height - (int)Math.round(( ceil-nScaleLogMin)/yLogRate) -Margin;
+			if (y+ys < Margin) continue;
 			gc.drawLine((int)Margin+x,y+ys,x+width-Margin,y+ys);
 			
 			DecimalFormat   df;
@@ -323,11 +331,24 @@ public class ChartGraph extends Canvas {
 		for (int n=0;n < Data.length; n++)
 		{
 			int []p = new int[Data[n].length];
+			
+			
+				
 			if (logScale)
 			{
 				for (int i = 0; i < Data[0].length;i++)
 				{
 					//p[i] = height - (int)Math.round(( YLogOffset+Math.log10(Data[n][i])-nScaleLogMin)/ yLogRate) -Margin;
+					if (Data[n][i]>nScaleMax)
+					{
+						p[i]= Margin;
+						continue;
+					}
+					if (Data[n][i]<nScaleMin)
+					{
+						p[i]= height - Margin;
+						continue;
+					}
 					p[i] = height - (int)Math.round(( Math.log10(Data[n][i])-nScaleLogMin)/ yLogRate) -Margin;
 				}
 			}
@@ -335,6 +356,16 @@ public class ChartGraph extends Canvas {
 			{
 				for (int i = 0; i < Data[0].length;i++)
 				{
+					if (Data[n][i]>nScaleMax)
+					{
+						p[i]= Margin;
+						continue;
+					}
+					if (Data[n][i]<nScaleMin)
+					{
+						p[i]= height - Margin;
+						continue;
+					}
 					//p[i] = height - (int)Math.round(( YOffset+Data[n][i]-nScaleMin)/ yRate) -Margin;
 					p[i] = height - (int)Math.round(( Data[n][i]-nScaleMin)/ yRate) -Margin;
 				}

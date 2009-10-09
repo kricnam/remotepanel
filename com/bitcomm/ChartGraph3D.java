@@ -169,11 +169,11 @@ public class ChartGraph3D extends Canvas {
 	{
 		if (nScaleMax == nScaleMin)
 		{
-			nScaleMax = ((int)Math.ceil(nMaxData)/1000 + 1)*1000;
+			nScaleMax = ((int)Math.ceil(nMaxData/1000))*1000;
 			nScaleMin = Math.floor(nMinData);
 		}
 		nScaleLogMax = Math.log10(nScaleMax);
-		nScaleLogMin = (nScaleMin==0)?0:Math.log10(nScaleMin);
+		nScaleLogMin = (nScaleMin==0)?-2:Math.log10(nScaleMin);
 
 		double nRange = nScaleMax - nScaleMin;
 		double nLogRange = nScaleLogMax - nScaleLogMin;
@@ -218,7 +218,7 @@ public class ChartGraph3D extends Canvas {
 		gc.setForeground(gray);
 		gc.setLineStyle(SWT.LINE_DOT);
 		
-		double avg = (nScaleMax-nScaleMin)/10;
+		double avg ;
 		int ys;
 		if (logScale)
 		{
@@ -236,43 +236,81 @@ public class ChartGraph3D extends Canvas {
 			ys = (int)Math.round((i*avg)*xRate);
 			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
 			
-			gc.drawString(String.valueOf((int)(i*avg*xScaleRate)),x+Margin+ys-20 , y+height-Margin,true);
+			if (i>0)
+				gc.drawString(String.valueOf((int)(i*avg*xScaleRate)),x+Margin+ys-20 , y+height-Margin,true);
 		}
 	}
 	public void drawAxisY(GC gc, int x, int y, int width, int height) 
 	{
-		double avg = (nScaleMax-nScaleMin)/10;
+		int count =(int)( Math.floor(nScaleMax)-Math.ceil(nScaleMin));
+		
+		double div = Math.pow(10, Math.floor(Math.log10(count)-1));
+		while (count>10)
+		{
+			count =(int)( (Math.floor(nScaleMax)-Math.ceil(nScaleMin))/div);
+			if (count > 10)	div+=div;
+		}
+		if (count * div < 100)
+		{
+			div =10;
+			count = (int)( (Math.floor(nScaleMax)-Math.ceil(nScaleMin))/div);
+		}
+		if (count==0)
+		{
+			count=1;
+			div = 1;
+		}
+
 		int ys;
 		//Y axis
-		for (int i=0;i<11;i++)
+		for (int i=0;i<count+1;i++)
 		{
-			ys = height - (int)Math.round((YOffset + nScaleMin + i*avg)/yRate) -Margin;
+			double ceil = (((int)nScaleMin/(int)div)+i)*(int)div;
+			if (nScaleMin%div > 0) ceil+=div;
+			
+			ys = height - (int)Math.round((YOffset + ceil - nScaleMin)/yRate) -Margin;
+			if (y+ys < Margin) continue;
 			gc.drawLine((int)x+Margin,y+ys,x+width-Margin,y+ys);
 			
 			DecimalFormat   df   =new   java.text.DecimalFormat("#");  
-			String strValue  = df.format(nScaleMin+i*avg);
+			String strValue  = df.format(ceil);
 			Point pt=gc.stringExtent(strValue);
-			if (i>0) gc.drawString(strValue, x+Margin-pt.x, y+ys,true);
+			gc.drawString(strValue, x+Margin-pt.x, y+ys-pt.y/2,true);
 		}
 	}
 	
 	public void drawLogAxisY(GC gc, int x, int y, int width, int height) 
 	{
-		double avg = (nScaleLogMax-nScaleLogMin)/10;
+		int nLogScaleCount = (int)Math.floor(nScaleLogMax) - (int)Math.ceil(nScaleLogMin)+1; 
+
 		int ys;
 		//Y axis
-		//System.out.println(String.valueOf(nScaleLogMax));
-		//System.out.println(String.valueOf(nScaleLogMin));
-		//System.out.println(String.valueOf(avg));
-		for (int i=0;i<11;i++)
+		Point pt;
+		for (int i=0;i<nLogScaleCount;i++)
 		{
-			ys = height - (int)Math.round((YLogOffset + nScaleLogMin + i*avg)/yLogRate) -Margin;
+			double ceil = Math.ceil(nScaleLogMin+i);
+			ys = height - (int)Math.round(( ceil-nScaleLogMin)/yLogRate) -Margin;
+			if (y+ys < Margin) continue;
 			gc.drawLine((int)Margin+x,y+ys,x+width-Margin,y+ys);
 			
-			DecimalFormat   df   =new   java.text.DecimalFormat("#");  
-			String strValue  = df.format(Math.pow(10, nScaleLogMin+i*avg));
-			Point pt=gc.stringExtent(strValue);
-			if (i>0) gc.drawString(strValue, Margin+x-pt.x, y+ys,true);
+			DecimalFormat   df;
+			if (ceil >= 1) df= new   java.text.DecimalFormat("#");
+			else df = new java.text.DecimalFormat("#0.0#");
+			String strValue  = df.format(Math.pow(10, ceil));
+			pt=gc.stringExtent(strValue);
+			gc.drawString(strValue, Margin+x-pt.x, y+ys-pt.y/2,true);
+			df = null;
+		}
+		if (nLogScaleCount<2)
+		{
+			DecimalFormat   df;
+			df= new   java.text.DecimalFormat("#");
+			String strValue  = df.format(nScaleMax);
+			pt=gc.stringExtent(strValue);
+			gc.drawString(strValue, Margin+x-pt.x, y+Margin-pt.y/2,true);
+			strValue  = df.format(nScaleMin);
+			pt=gc.stringExtent(strValue);
+			gc.drawString(strValue, Margin+x-pt.x, y+height-Margin-pt.y/2,true);
 		}
 	}
 	
@@ -502,24 +540,46 @@ public class ChartGraph3D extends Canvas {
 		int []p = new int[sdata.length];
 		if (logScale) {
 			for (int i = 0; i < sdata.length; i++) {
-				p[i] = height
-						- (int) Math.round((YLogOffset + Math
-								.log10(sdata[i]))
-								/ yLogRate) - Margin ;
+				if (Math.log10(sdata[i])<nScaleLogMin)
+				{
+					p[i]=height- Margin;
+				}
+				else if (Math.log10(sdata[i])>nScaleLogMax)
+				{
+					p[i]= Margin;
+				}
+				else
+				{
+					p[i] = height
+						- (int) Math.round(( Math.log10(sdata[i])-nScaleLogMin)/ yLogRate) 
+						- Margin ;
+				}
 			}
 		} else {
 			for (int i = 0; i < sdata.length; i++) {
-				p[i] = height
-						- (int) Math.round((YOffset + sdata[i])
-								/ yRate) - Margin;
+				if (sdata[i]<nScaleMin)
+				{
+					p[i]=height- Margin;
+				}
+				else if (sdata[i]>nScaleMax)
+				{
+					p[i]= Margin;
+				}
+				else
+				{
+					p[i] = height
+						- (int) Math.round((sdata[i]-nScaleMin)/ yRate)
+						- Margin;
+				}
 			}
 		}
 		gc.setLineStyle(SWT.LINE_SOLID);
 
 		for (int i = 0; i < sdata.length - 1; i++)
 			gc.drawLine((int) (Margin + x + (int) (i * xRate)) ,
-					p[i]  +y, Margin + x + (int) ((i + 1) * xRate)
-							, p[i + 1]  +y); //+ deltY + deltX
+					p[i]  +y, 
+					Margin + x + (int) ((i + 1) * xRate), 
+					p[i + 1]  +y); //+ deltY + deltX
 
 
 	}
