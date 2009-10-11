@@ -145,7 +145,6 @@ public class AlokaPanel {
 	}
 	
 	public static void main(String[] args) {
-		
 		File root = new File("root");
 		if (!root.exists())
 					root.mkdir();

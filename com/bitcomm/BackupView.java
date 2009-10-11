@@ -148,7 +148,7 @@ public class BackupView extends Composite implements Listener {
 		butPeriod.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true,
 				false));
 
-		Group grpStation = new Group(optionBar, SWT.BORDER);
+		Group grpStation = new Group(optionBar, SWT.NONE);
 		grpStation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
 				1, 4));
 		grpStation.setLayout(new RowLayout(SWT.VERTICAL));

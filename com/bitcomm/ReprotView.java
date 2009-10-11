@@ -767,7 +767,7 @@ public class ReprotView extends Composite implements Listener {
 			for (i=0;i < file.dataArray.size();i++) 
 			{
 				data = file.dataArray.get(i);
-				if (data != null) {
+				if (data != null && data.isValideData()) {
 					//System.out.println(String.valueOf(j) + ":" + data.CSVString());
 					if (values == null)
 						values = new double[24* 60 / data.cPT];
@@ -852,7 +852,7 @@ public class ReprotView extends Composite implements Listener {
 		nowhour = 0;
 		while (j < file.dataArray.size()) {
 			DoesRateData data = file.dataArray.get(j);
-			if (data != null) {
+			if (data != null && data.isValideData()) {
 				//System.out.println(String.valueOf(j) + ":" + data.CSVString());
 				if (values == null)
 					values = new double[60 / data.cPT];

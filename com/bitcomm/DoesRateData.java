@@ -149,4 +149,15 @@ public class DoesRateData extends MeasureData{
 		else
 			return nSSDrate /10.0 * Math.pow(1000,cSSDUnit-1);
 	}
+	
+	boolean isValideData()
+	{
+		if ((nStatus & 0x01101C1E) > 0)
+		{
+			//System.out.println(String.format("%X",nStatus));
+			//System.out.println(String.format("%X",nStatus&0x01161C1E));
+			return false;
+		}
+		return true;
+	}
 }
