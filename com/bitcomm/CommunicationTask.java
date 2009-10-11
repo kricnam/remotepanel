@@ -57,6 +57,7 @@ public class CommunicationTask extends Thread {
 
 	void SetCommunicationError()
 	{
+
 		face.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 	

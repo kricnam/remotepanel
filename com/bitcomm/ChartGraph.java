@@ -55,7 +55,7 @@ public class ChartGraph extends Canvas {
 		YOffset = 0;
 		MaxCount = 0;
 		xScaleRate=1;
-		nXMarkNum = 0;
+		nXMarkNum = 12;
 		nYMarkNum = 0;
 		pos = 0;
 		logScale = false;
@@ -216,6 +216,7 @@ public class ChartGraph extends Canvas {
 		//X axis
 		if (MaxCount< 12) nXMarkNum = MaxCount;
 		else if (MaxCount<120) nXMarkNum = MaxCount/(MaxCount/12);
+		//if (nXMarkNum==0) nXMarkNum=2;
 		double avg = (double)MaxCount / nXMarkNum;
 		int ys;
 		
@@ -228,7 +229,7 @@ public class ChartGraph extends Canvas {
 			if (strScaleX!=null)
 					
 			{
-				if ( (int)(i* avg) < MaxCount && strScaleX[(int)(i* avg)]!=null)
+				if ( (int)(i* avg) < MaxCount && strScaleX[(int)Math.round(i* avg)]!=null)
 				{
 					pt = gc.stringExtent(strScaleX[(int)Math.round(i* avg)]);
 					if ((pt.x/2) > intv && i%2==1) continue;

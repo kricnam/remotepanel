@@ -4,6 +4,8 @@ package com.bitcomm;
 import java.text.DecimalFormat;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -13,6 +15,14 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 public class ChartGraph3D extends Canvas {
+	class scale {
+		public scale(int count2, double div2) {
+			count=count2;
+			div = div2;
+		}
+		int  count;
+		double div;
+	};
 	double [][]Data;
 	String []Index;
 	double nMaxData;
@@ -20,11 +30,11 @@ public class ChartGraph3D extends Canvas {
 	double yRate;
 	double xRate;
 	double yLogRate;
-	double YLogOffset;
+	//double YLogOffset;
 	double nScaleLogMax;
 	double nScaleLogMin;
 	
-	double YOffset;
+	//double YOffset;
 	double Xmin;
 	double Xmax;
 	int Margin;
@@ -41,6 +51,10 @@ public class ChartGraph3D extends Canvas {
 	double degree;
 	boolean UpDateSelect;
 	boolean bSwitch;
+	boolean bMutilty;
+	int HCursor1;
+	int HCursor2;
+	boolean HCursor1Active;
 	public ChartGraph3D(Composite parent, int style) {
 		// TODO 自动生成构造函数存根
 		super(parent, style|SWT.DOUBLE_BUFFERED|SWT.NO_BACKGROUND);
@@ -54,7 +68,7 @@ public class ChartGraph3D extends Canvas {
 		nMinData = nMaxData;
 		nScaleMax = 0;
 		nScaleMin = nScaleMax;
-		YOffset = 0;
+		//YOffset = 0;
 		MaxCount = 0;
 		xScaleRate=1;
 		nXMarkNum = 0;
@@ -64,7 +78,43 @@ public class ChartGraph3D extends Canvas {
 		pos = 0;
 		UpDateSelect =false;
 		bSwitch = false;
+		bMutilty = false;
+		HCursor1 = 0;
+		HCursor2 = 999;
+		HCursor1Active = true;
+		addMouseListener(new MouseListener() {
+			
+			public void mouseUp(MouseEvent arg0) {
+			}
+			public void mouseDown(MouseEvent arg0) {
+				   if (!bMutilty) return;
+				   int posM = (int)Math.round((arg0.x - Margin)/xRate);
+				   if (Math.abs(HCursor1-posM)<3)
+				   {
+					   HCursor1Active = true;
+					   SpectrumView a=(SpectrumView) getData();
+					   a.butLeft.setSelection(true);
+					   a.butRight.setSelection(false);
+				   }
+				   else if (Math.abs(HCursor2-posM)<3)
+				   {
+					   HCursor1Active = false;
+					   SpectrumView a=(SpectrumView) getData();
+					   a.butLeft.setSelection(false);
+					   a.butRight.setSelection(true);
+				   }
+			}
+			public void mouseDoubleClick(MouseEvent arg0) {
+				if (!bMutilty) return;
+				if (HCursor1Active)
+					HCursor1 = (int)Math.round((arg0.x - Margin)/xRate);
+				else
+					HCursor2 = (int)Math.round((arg0.x - Margin)/xRate);
+				redraw();
+			}
+		});
 	}
+	
 	void paintControl(PaintEvent e) {
 		GC gc = e.gc;
 		setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
@@ -83,7 +133,7 @@ public class ChartGraph3D extends Canvas {
 		
 		drawBackground(gc, 0, 0, size.x, size.y);
 		
-		if (Data!=null)	drawData(gc, 0, 0,size.x, size.y);
+		drawData(gc, 0, 0,size.x, size.y);
 	}
 	
 	void UpdateSelection()
@@ -109,12 +159,15 @@ public class ChartGraph3D extends Canvas {
 		nScaleMin = nScaleMax;
 	}
 	
-	void setAutoTransform()
+	void setAutoTransform(boolean bResetScale)
 	{
 		nMaxData = 0;
 		nMinData = nMaxData;
-		nScaleMax = 0;
-		nScaleMin = nScaleMax;
+		if (bResetScale)
+		{
+			nScaleMax = 0;
+			nScaleMin = nScaleMax;
+		}
 		MaxCount = 0;
 	
 	}
@@ -122,16 +175,18 @@ public class ChartGraph3D extends Canvas {
 	/* （非 Javadoc）
 	 * @see org.eclipse.swt.widgets.Canvas#drawBackground(org.eclipse.swt.graphics.GC, int, int, int, int)
 	 */
-	@Override
+	
 	public void drawBackground(GC gc, int x, int y, int width, int height) {
 		
 		super.drawBackground(gc, x, y, width, height);
-		if (Data!=null && Data.length>1&& bSwitch) 
+		if (Data==null) return;
+		if (Data.length>1&& bSwitch && bMutilty) 
 		{
 				drawAxis(gc, x, y, width, height);
 				return;
 		}
-		if (Data!=null && Data.length>1) drawAxis3D(gc, x, y, width, height);
+		
+		if (Data.length>1 && !bSwitch) drawAxis3D(gc, x, y, width, height);
 		else drawAxis(gc, x, y, width, height);
 	}
 
@@ -159,8 +214,8 @@ public class ChartGraph3D extends Canvas {
 				for(int i=0 ; i< Data[j].length;i++)
 					nMinData = Math.min(nMinData , Data[j][i]);
 			
-		nDepthStep = height / 4 /(Data.length+2);
-		if (nDepthStep==0) nDepthStep=1;
+		nDepthStep = height / 2 /(Data.length+2);
+		if (nDepthStep<2) nDepthStep=2;
 		SetTransform(x,y,width,height);
 
 	}
@@ -183,7 +238,7 @@ public class ChartGraph3D extends Canvas {
 				MaxCount = Math.max(MaxCount, Data[j].length);
 		}
 		
-		if (Data.length>1 && !bSwitch)
+		if (Data.length>1 && !bSwitch )
 		{
 			yRate = nRange  / (height-2*Margin -Math.abs((Data.length+2)*nDepthStep*Math.sin(degree)));
 			yLogRate = nLogRange / (height-2*Margin-Math.abs((Data.length+2)*nDepthStep*Math.sin(degree)));
@@ -194,10 +249,10 @@ public class ChartGraph3D extends Canvas {
 			yLogRate = nLogRange / (height-2*Margin);
 		}
 		
-		if (nScaleMin < 0)
-			YOffset =  -nScaleMin ;
-		else 
-			YOffset = 0;
+		//if (nScaleMin < 0)
+		//	YOffset =  -nScaleMin ;
+		//else 
+		//	YOffset = 0;
 		
 		if (Data.length>1 && !bSwitch)
 			xRate = (double) (width-2*Margin - Math.abs((Data.length+2) * nDepthStep*Math.cos(degree)))/MaxCount;
@@ -231,16 +286,25 @@ public class ChartGraph3D extends Canvas {
 		//X axis
 		avg = MaxCount / nXMarkNum;
 		//System.out.println(nXMarkNum);
+		Point pt;
+		String strT;
 		for (int i=0;i<nXMarkNum+1;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
 			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
 			
+			strT = String.valueOf((int)(i*avg*xScaleRate));
+			pt = gc.stringExtent(strT);
 			if (i>0)
-				gc.drawString(String.valueOf((int)(i*avg*xScaleRate)),x+Margin+ys-20 , y+height-Margin,true);
+			{
+				int n = pt.x/(int)avg;
+				if (n>0) n=((i-1)%n)*pt.y;
+				gc.drawString(strT,x+Margin+ys-pt.x/2 , y+height-Margin+n,true);
+			}
 		}
 	}
-	public void drawAxisY(GC gc, int x, int y, int width, int height) 
+	
+	scale CalculateAxisYScale()
 	{
 		int count =(int)( Math.floor(nScaleMax)-Math.ceil(nScaleMin));
 		
@@ -260,15 +324,21 @@ public class ChartGraph3D extends Canvas {
 			count=1;
 			div = 1;
 		}
-
+		
+		return new scale(count,div);
+	}
+	
+	public void drawAxisY(GC gc, int x, int y, int width, int height) 
+	{
+		scale sc = CalculateAxisYScale();
 		int ys;
 		//Y axis
-		for (int i=0;i<count+1;i++)
+		for (int i=0;i<sc.count+1;i++)
 		{
-			double ceil = (((int)nScaleMin/(int)div)+i)*(int)div;
-			if (nScaleMin%div > 0) ceil+=div;
+			double ceil = (((int)nScaleMin/(int)sc.div)+i)*(int)sc.div;
+			if (nScaleMin%sc.div > 0) ceil+=sc.div;
 			
-			ys = height - (int)Math.round((YOffset + ceil - nScaleMin)/yRate) -Margin;
+			ys = height - (int)Math.round(( ceil - nScaleMin)/yRate) -Margin;
 			if (y+ys < Margin) continue;
 			gc.drawLine((int)x+Margin,y+ys,x+width-Margin,y+ys);
 			
@@ -278,7 +348,6 @@ public class ChartGraph3D extends Canvas {
 			gc.drawString(strValue, x+Margin-pt.x, y+ys-pt.y/2,true);
 		}
 	}
-	
 	public void drawLogAxisY(GC gc, int x, int y, int width, int height) 
 	{
 		int nLogScaleCount = (int)Math.floor(nScaleLogMax) - (int)Math.ceil(nScaleLogMin)+1; 
@@ -315,7 +384,7 @@ public class ChartGraph3D extends Canvas {
 	}
 	
 	public void drawAxis3D(GC gc, int x, int y, int width, int height) {
-		 		
+
 		double avg = (nScaleMax-nScaleMin)/10;
 		int ys;
 		int deltX = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.cos(degree)));
@@ -335,67 +404,72 @@ public class ChartGraph3D extends Canvas {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.drawPolygon(p);
 		gc.fillPolygon(p);
-		
+
 		gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 		gc.setLineStyle(SWT.LINE_DOT);
-		// draw Vertical / scale
+		// draw Vertical / - scale
+		// draw back horizon scale
 		if (logScale)
 		{
-			avg = (nScaleLogMax-nScaleLogMin)/10;
-			for (int i=1;i<11;i++)
+			int nLogScaleCount = (int)Math.floor(nScaleLogMax) 
+								- (int)Math.ceil(nScaleLogMin)+1; 
+			
+			for (int i=0;i<nLogScaleCount;i++)
 			{
-				ys = height - (int)Math.round((YLogOffset+ nScaleLogMin+i*avg/yLogRate))-Margin;
-				if (i<10) gc.drawLine((int)Margin+x,y+ys,Margin+deltX+x,y+ys-deltY);
-				
-				DecimalFormat   df   =new   java.text.DecimalFormat("#");  
-				String strValue  = df.format(Math.pow(10, nScaleLogMin+i*avg));
+				double ceil = Math.ceil(nScaleLogMin+i);
+				ys = height - (int)Math.round((ceil - nScaleLogMin)/yLogRate)-Margin;
+				if (y+ys-deltY < Margin) continue; 
+				gc.drawLine((int)Margin+x,y+ys,Margin+deltX+x,y+ys-deltY);
+				gc.drawLine((int)Margin+deltX+x,y+ys-deltY,x+width-Margin,y+ys-deltY);
+
+				DecimalFormat   df;
+				if (ceil >= 1) df= new   java.text.DecimalFormat("#");
+				else df = new java.text.DecimalFormat("#0.0#");
+				String strValue  = df.format(Math.pow(10, ceil));
 				Point pt=gc.stringExtent(strValue);
-				gc.drawString(strValue, Margin-pt.x-3+x, ys+y,true);
+				gc.drawString(strValue, Margin-pt.x-3+x, ys+y-pt.y/2,true);
 			}	
 		}
 		else
 		{
-		for (int i=1;i<11;i++)
-		{
-			ys = height - (int)Math.round((YOffset+ nScaleMin+i*avg/yRate))-Margin;
-			if (i<10) gc.drawLine((int)Margin+x,y+ys,Margin+deltX+x,y+ys-deltY);
-			
-			DecimalFormat   df   =new   java.text.DecimalFormat("#");  
-			String strValue  = df.format(nScaleMin+i*avg);
-			Point pt=gc.stringExtent(strValue);
-			gc.drawString(strValue, Margin-pt.x-3+x, ys+y,true);
+			scale sc = CalculateAxisYScale();
+			System.out.println("div="+String.valueOf(sc.div)+",count="+String.valueOf(sc.count));
+			for (int i=0;i<sc.count+1;i++)
+			{
+				double ceil = (((int)nScaleMin/(int)sc.div)+i)*(int)sc.div;
+				if (nScaleMin%sc.div > 0) ceil+=sc.div;
+				
+				ys = height - (int)Math.round((ceil - nScaleMin)/yRate)-Margin;
+				if (y+ys-deltY < Margin) continue;
+				gc.drawLine((int)Margin+x,y+ys,Margin+deltX+x,y+ys-deltY);
+				gc.drawLine((int)Margin+deltX+x,y+ys-deltY,x+width-Margin,y+ys-deltY);
+				DecimalFormat   df   =new   java.text.DecimalFormat("#");  
+				String strValue  = df.format(ceil);
+				Point pt=gc.stringExtent(strValue);
+				gc.drawString(strValue, Margin-pt.x-3+x, ys+y-pt.y/2,true);
+			}
 		}
-		}
-		
+
 		//draw Horizon / scale
 		avg = MaxCount / nXMarkNum;
+		
+		int intv = (int)(avg*xRate);
+		int n=0;
 		for (int i=0;i<=nXMarkNum;i++)
 		{
 			ys = (int)Math.round((i*avg)*xRate);
 			gc.drawLine(x+Margin+ys,y+height-Margin,
 					x+Margin+ys+deltX,y+height-Margin-deltY);
-			gc.drawString(String.valueOf((int)(i*avg*xScaleRate)),x+Margin+ys-20 ,
-					y+height-Margin,true);
-		}
-		// draw back horizon scale
-		if (logScale)
-		{
-			avg = (nScaleLogMax-nScaleLogMin)/10;
-			for (int i=1;i<10;i++)
+			String str = String.valueOf((int)(i*avg*xScaleRate));
+			Point pt = gc.stringExtent(str);
+			if (i>0) 
 			{
-				ys = height - (int)Math.round((YLogOffset+ nScaleLogMin+i*avg)/yLogRate)-Margin;
-				gc.drawLine((int)Margin+deltX+x,y+ys-deltY,x+width-Margin,y+ys-deltY);
-			}	
+				n = pt.x/intv+1;
+				if (n>1) n=((i-1)%2)*pt.y;
+				gc.drawString(str,x+Margin+ys-pt.x/2 ,y+height-Margin+n,true);
+			}
 		}
-		else
-		{
-		avg = (nScaleMax-nScaleMin)/10;
-		for (int i=1;i<10;i++)
-		{
-			ys = height - (int)Math.round((YOffset+ nScaleMin+i*avg)/yRate)-Margin;
-			gc.drawLine((int)Margin+deltX+x,y+ys-deltY,x+width-Margin,y+ys-deltY);
-		}
-		}
+
 		// draw back vertical scale
 		avg = MaxCount / nXMarkNum;
 		for (int i=0;i<= nXMarkNum;i++)
@@ -413,19 +487,25 @@ public class ChartGraph3D extends Canvas {
 		}
 		gc.setLineStyle(SWT.LINE_SOLID);
 
-		
+
 	}
 
 	public void drawData(GC gc, int x, int y, int width, int height) {
 		if (Data==null) return;
-		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
+		
 		gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
 		
-		
+		Point pt;
+		if (bMutilty && bSwitch)
+		{
+			drawMultiData2D(gc, x, y, width, height);
+			return;
+		}
 		//draw title
+		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
 		if (Index!=null && pos < Index.length)
 		{
-			Point pt;
+			
 			if (Index[pos]!=null)
 			{
 				pt = gc.stringExtent(Index[pos]);
@@ -444,6 +524,10 @@ public class ChartGraph3D extends Canvas {
 			pt=gc.stringExtent(strT);
 			gc.drawString(strT, x+width/2-pt.x/2, y+Margin/2-pt.y);
 		}
+		pt=gc.stringExtent("Counts");
+		gc.drawString("Counts", x+Margin-pt.x, y+Margin-2*pt.y);
+		pt=gc.stringExtent("Channel");
+		gc.drawString("Channel", x+width-Margin+pt.x/6, y+height-Margin+pt.y);
 		
 		if ((bSwitch && Data.length > 1)||Data.length==1)
 		{
@@ -468,8 +552,19 @@ public class ChartGraph3D extends Canvas {
 						p[2 * (i + 1)] = (int) (Margin + x + (int) Math.round(i
 								* xRate))
 								+ deltX;
+						if (Data[j][i]<nScaleMin) 
+						{
+							p[2 * (i + 1) + 1] = height - Margin + deltY +y;
+							continue;
+						}
+						if (Data[j][i]>nScaleMax) 
+						{
+							p[2 * (i + 1) + 1] = height -(int) Math.round(( nScaleLogMax-nScaleLogMin) / yLogRate) 
+							- Margin + deltY +y;
+							continue;
+						}
 						p[2 * (i + 1) + 1] = height
-						- (int) Math.round((YLogOffset + Math.log10(Data[j][i])) / yLogRate)
+						- (int) Math.round(( Math.log10(Data[j][i])-nScaleLogMin) / yLogRate)
 						- Margin + deltY +y;
 					}
 					p[(Data[j].length + 1) * 2] = (int) (Margin + x + (int) Math
@@ -484,8 +579,19 @@ public class ChartGraph3D extends Canvas {
 						p[2 * (i + 1)] = (int) (Margin + x + (int) Math.round(i
 								* xRate))
 								+ deltX;
+						if (Data[j][i]<nScaleMin) 
+						{
+							p[2 * (i + 1) + 1] = height - Margin + deltY +y;
+							continue;
+						}
+						if (Data[j][i]>nScaleMax) 
+						{
+							p[2 * (i + 1) + 1] = height - (int) Math.round(( nScaleMax - nScaleMin) / yRate)
+							- Margin + deltY +y;
+							continue;
+						}
 						p[2 * (i + 1) + 1] = height
-						- (int) Math.round((YOffset + Data[j][i]) / yRate)
+						- (int) Math.round(( Data[j][i] - nScaleMin) / yRate)
 						- Margin + deltY + y;
 					}
 					p[(Data[j].length + 1) * 2] = (int) (Margin + x + (int) Math
@@ -512,7 +618,140 @@ public class ChartGraph3D extends Canvas {
 		}
 
 	}
+	void drawMultiData2D(GC gc,int x, int y, int width, int height)
+	{
+		gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
+		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
+		Point pt ;
+		String strT;
+		int nCur1Y=0;
+		if (logScale) strT="-LOG-";
+		else strT="-LIN-";
+		pt=gc.stringExtent(strT);
+		gc.drawString(strT, x+pt.x/2, y+Margin/2-pt.y);
+		pt=gc.stringExtent("Counts");
+		gc.drawString("Counts", x+Margin-pt.x, y+Margin-2*pt.y);
+		pt=gc.stringExtent("Channel");
+		gc.drawString("Channel", x+width-Margin+pt.x/6, y+height-Margin+pt.y);
+
+		boolean bTwoCol=true;
+		for(int i=(pos+1)%Data.length;i<Data.length;i=(i+1)%Data.length)
+		{
+			//System.out.println(i);
+			gc.setForeground(getColor(i));
+			if (Index[i]==null)
+			{
+				pt = gc.stringExtent("---");
+				gc.drawString("---", x+Margin/2, y+Margin/2-pt.y);
+			}
+			else
+			{
+				String strPri;
+				String strV;
+				int v1 = (int)Data[i][HCursor1];
+				int v2 = (int)Data[i][HCursor2];
+				if (i==pos) strPri="*";
+				else strPri=" ";
+				strV=String.format("(%d,%d),(%d,%d)",HCursor1+1, v1,HCursor2+1,v2);
+				strPri+=Index[i]+" "+strV;
+				pt = gc.stringExtent(strPri);
+				if (i==pos+1 && 2*pt.x>(width-2*Margin)) bTwoCol = false;
+				if (bTwoCol)
+				{
+					if (i<3) gc.drawString(strPri, x+Margin, y+(i+1)*pt.y);
+					else gc.drawString(strPri, x+width/2, y+(i-2)*pt.y);
+				}
+				else
+					gc.drawString(strPri, x+Margin, y+(i+1)*pt.y);
+			}
+
+			
+
+			int []p = new int[Data[i].length];
+			if (logScale) {
+				for (int n = 0; n < Data[i].length; n++) {
+					if (Math.log10(Data[i][n])<nScaleLogMin)
+					{
+						p[n]=height- Margin;
+					}
+					else if (Math.log10(Data[i][n])>nScaleLogMax)
+					{
+						p[n]= Margin;
+					}
+					else
+					{
+						p[n] = height
+						- (int) Math.round(( Math.log10(Data[i][n])-nScaleLogMin)/ yLogRate) 
+						- Margin ;
+					}
+					if (n==HCursor1) nCur1Y=Math.min(nCur1Y, p[n]);
+				}
+			} else {
+				for (int n = 0; n < Data[i].length; n++) {
+					if (Data[i][n]<nScaleMin)
+					{
+						p[n]=height- Margin;
+					}
+					else if (Data[i][n]>nScaleMax)
+					{
+						p[n]= Margin;
+					}
+					else
+					{
+						p[n] = height
+						- (int) Math.round((Data[i][n]-nScaleMin)/ yRate)
+						- Margin;
+					}
+					if (n==HCursor1) nCur1Y=Math.min(nCur1Y, p[n]);
+				}
+			}
+			gc.setLineStyle(SWT.LINE_SOLID);
+			
+
+			for (int n = 0; n < Data[i].length - 1; n++)
+				gc.drawLine((int) (Margin + x + (int) (n * xRate)) ,
+						p[n]  +y, 
+						Margin + x + (int) ((n + 1) * xRate), 
+						p[n + 1]  +y); //+ deltY + deltX
+			
+			if (i==pos) 
+			{
+				gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
+				String str=String.valueOf(HCursor1+1);
+				pt = gc.stringExtent(str);
+				gc.drawLine((int)(Margin+x+HCursor1*xRate), Margin+y,
+						(int)(Margin+x+HCursor1*xRate),height+y-Margin);
+				gc.drawString(str, (int)(Margin+x+HCursor1*xRate), Margin+2+y);
+				str = String.valueOf(HCursor2+1);
+				pt = gc.stringExtent(str);
+				gc.drawLine((int)(Margin+x+HCursor2*xRate), Margin+y,
+						(int)(Margin+x+HCursor2*xRate),height+y-Margin);
+				if ( (int)(((HCursor2-HCursor1)*xRate)) < 2*pt.x && HCursor1 < HCursor2 )
+					gc.drawString(str, (int)(Margin+x+HCursor2*xRate)-pt.x+2, y+Margin+2+pt.y);
+				else
+					gc.drawString(str, (int)(Margin+x+HCursor2*xRate)-pt.x+2, y+Margin+2);
+				return;
+			}
+		}
+	}
 	
+	private Color getColor(int i) {
+		switch(i)
+		{
+		case 0:
+			return getDisplay().getSystemColor(SWT.COLOR_BLUE);
+		case 1:
+			return getDisplay().getSystemColor(SWT.COLOR_DARK_CYAN);
+		case 2:
+			return getDisplay().getSystemColor(SWT.COLOR_GREEN);
+		case 3:
+			return getDisplay().getSystemColor(SWT.COLOR_DARK_MAGENTA);
+		case 4:
+			return getDisplay().getSystemColor(SWT.COLOR_RED);
+		default:
+			return getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE);
+		}
+	}
 	void DrawSelection(GC gc, double[] sdata,int x, int y, int width, int height)
 	{
 		gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLUE));
@@ -583,5 +822,29 @@ public class ChartGraph3D extends Canvas {
 
 
 	}
+	
+	void ChangeCur(int i)
+	{
+		if (Data==null) return;
+		if (HCursor1Active)
+		{	
+		HCursor1+=i;
+		if (HCursor1 < 0)
+			HCursor1 = 999;
+		if (HCursor1 > 999)
+			HCursor1 = 0;
+		}
+		else
+		{
+			HCursor2+=i;
+			if (HCursor2 < 0)
+				HCursor2 = 999;
+			if (HCursor2 > 999)
+				HCursor2 = 0;
+		}
+		redraw();
+		
+	}
+
 
 }

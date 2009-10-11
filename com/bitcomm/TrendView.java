@@ -1,5 +1,6 @@
 package com.bitcomm;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +28,7 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -73,6 +75,7 @@ public class TrendView extends Composite implements Listener {
 	Button butStart;
 	Spinner scaleMin;
 	Spinner scaleMax;
+	private Button butLoad;
 	public TrendView(Composite parent, int style) {
 		super(parent, style);
 		display=parent.getDisplay();
@@ -200,7 +203,6 @@ public class TrendView extends Composite implements Listener {
 		optionBar.setLayout(optionLayout);
 		optionBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		
-
 		butDate = new Button(optionBar, SWT.RADIO);
 		butDate.setText(ConstData.strStartDate);
 		butDate
@@ -299,15 +301,29 @@ public class TrendView extends Composite implements Listener {
 		});
 		
 		Composite cmd = new Composite(optionBar,SWT.BORDER);
-		cmd.setLayout(new GridLayout(2,true));
+		cmd.setLayout(new GridLayout(3,true));
 		cmd.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,1,1));
+		butLoad = new Button(cmd, SWT.PUSH);
+		butLoad.setText("Load");
+		butLoad.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		butStart = new Button(cmd, SWT.PUSH);
 		butStart.setText(ConstData.strStart);
 		butStart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		butPrint = new Button(cmd, SWT.PUSH);
 		butPrint.setText(ConstData.strPrint);
 		butPrint.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
+		butLoad.addSelectionListener(new SelectionListener() {
+			
+			
+			public void widgetSelected(SelectionEvent arg0) {
+				OnLoad();
+			}
+			
+			
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
+		});
+		
 		butStart.addSelectionListener(new SelectionListener() {
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -388,6 +404,43 @@ public class TrendView extends Composite implements Listener {
 
 	}
 	
+	protected void OnLoad() {
+		FileDialog dlg = new FileDialog(getShell(),SWT.MULTI);
+		dlg.setFilterExtensions(new String[]{"*.dat"});
+		dlg.setFilterNames(new String[]{"dose rate data"});
+		dlg.setFilterPath("./root");
+		String file = dlg.open();
+		if (file!=null)
+		{
+			try {
+					DoesRateFile df = new DoesRateFile(file);
+					df.load();
+					graph.Data = new double[1][df.dataArray.size()];
+					graph.strScaleX= new String[df.dataArray.size()];
+					for(int i=0;i<df.dataArray.size();i++)
+					{
+						DoesRateData d= df.dataArray.get(i);
+						if (d!=null)
+						{
+							graph.Data[0][i]= d.getDoesRatenGy();
+							graph.strScaleX[i]= d.date.toStringShortDate()+"\r\n"+
+							d.date.toStringTime();
+						}
+						else
+						{
+							graph.Data[0][i]= 0;
+						}
+					}
+					graph.setAutoTransform();
+					graph.redraw();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+
+
 	protected void SetGraphScale() {
 		if (graph==null) return;
 		if (scaleMin.getSelection() >= scaleMax.getSelection())

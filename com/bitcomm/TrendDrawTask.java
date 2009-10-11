@@ -74,6 +74,7 @@ public class TrendDrawTask extends Thread {
 								
 				if (data!=null)
 				{
+					//data.Save();
 					DrawUI(data);
 				}
 				
