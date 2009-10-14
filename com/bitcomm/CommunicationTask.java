@@ -105,6 +105,8 @@ public class CommunicationTask extends Thread {
 				while (Pause) {
 					Paused = true;
 					sleep(1000);
+					if (face.isDisposed())
+						return;
 				};
 
 				Paused = false;
