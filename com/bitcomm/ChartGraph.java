@@ -215,7 +215,8 @@ public class ChartGraph extends Canvas {
 			
 		//X axis
 		if (MaxCount< 12) nXMarkNum = MaxCount;
-		else if (MaxCount<120) nXMarkNum = MaxCount/(MaxCount/12);
+		else if (MaxCount<120) nXMarkNum = MaxCount/(MaxCount/6);
+		if (MaxCount > 120) nXMarkNum = 12;
 		//if (nXMarkNum==0) nXMarkNum=2;
 		double avg = (double)MaxCount / nXMarkNum;
 		int ys;
