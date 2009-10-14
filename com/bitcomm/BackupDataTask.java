@@ -35,7 +35,7 @@ public class BackupDataTask extends Thread {
 				if (!UI.isDisposed())
 				{
 					UI.setCursor(UI.display.getSystemCursor(SWT.CURSOR_WAIT));
-					
+					UI.butStart.setEnabled(false);
 				}
 				
 			}
@@ -145,7 +145,7 @@ public class BackupDataTask extends Thread {
 			public void run() {
 				if (!UI.isDisposed())
 					UI.setCursor(null);
-				
+					UI.butStart.setEnabled(true);
 			}
 			
 		});

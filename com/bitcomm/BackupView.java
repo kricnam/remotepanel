@@ -69,6 +69,8 @@ public class BackupView extends Composite implements Listener {
 
 	Button chkSpec;
 
+	Button butStart;
+
 	public BackupView(Composite parent, int style, MeterView[] meter) {
 		super(parent, style);
 		initialize();
@@ -216,7 +218,7 @@ public class BackupView extends Composite implements Listener {
 		chkData.setText(ConstData.strDoesRate);
 		chkSpec.setText(ConstData.strSpetru);
 
-		Button butStart = new Button(optionBar, SWT.PUSH);
+		butStart = new Button(optionBar, SWT.PUSH);
 		butStart.setText(ConstData.strStart + " " + ConstData.strBackup);
 		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
 				2, 1));
@@ -374,6 +376,7 @@ public class BackupView extends Composite implements Listener {
 		if (chkData.getSelection()) DataType = CommunicationHistoryData.DoseRate;
 		else
 			DataType = CommunicationHistoryData.Spectrum;
+		
 		for (int i = 0; i < station.length; i++) {
 			if (list.getItem(station[i]).equals(ConstData.strUnknown))
 				continue;
