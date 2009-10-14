@@ -58,7 +58,7 @@ public class BackupDataTask extends Thread {
 			int p=0;
 			while( his.Confirmed.nCount>0)
 			{
-				
+				if (UI.isDisposed()) break;
 				his.DataRequest();
 				Print("Request...\n");
 				if (DataType == CommunicationHistoryData.DoseRate)
@@ -135,7 +135,7 @@ public class BackupDataTask extends Thread {
 		} 
 		catch (Exception e) 
 		{
-			AlokaPanel.MessageBox("Error", e.getMessage());
+			Print(e.getMessage());
 			e.printStackTrace();
 		}
 		
