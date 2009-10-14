@@ -121,8 +121,10 @@ public class CommunicationTask extends Thread {
 						
 						if (nError==0) PromptErr(e.getMessage());
 						nError++;
+						Paused = true;
 						sleep(5000);
 						SetConnecting();
+						
 						continue;
 					}
 				}
