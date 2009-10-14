@@ -404,7 +404,7 @@ public class TrendView extends Composite implements Listener {
 	}
 	
 	protected void OnLoad() {
-		FileDialog dlg = new FileDialog(getShell(),SWT.MULTI);
+		FileDialog dlg = new FileDialog(getShell(),SWT.SINGLE);
 		dlg.setFilterExtensions(new String[]{"*.dat"});
 		dlg.setFilterNames(new String[]{"dose rate data"});
 		dlg.setFilterPath("./root");
@@ -416,6 +416,7 @@ public class TrendView extends Composite implements Listener {
 					df.load();
 					graph.Data = new double[1][df.dataArray.size()];
 					graph.strScaleX= new String[df.dataArray.size()];
+					//System.out.println("data length="+String.valueOf(df.dataArray.size()));
 					for(int i=0;i<df.dataArray.size();i++)
 					{
 						DoesRateData d= df.dataArray.get(i);
@@ -433,6 +434,7 @@ public class TrendView extends Composite implements Listener {
 					graph.setAutoTransform();
 					graph.redraw();
 				} catch (IOException e) {
+					AlokaPanel.MessageBox("Error", e.getMessage());
 					e.printStackTrace();
 				}
 			}
