@@ -491,9 +491,13 @@ public class SpectrumView extends Composite implements Listener {
 						graph3d.Data[i][n]=sf.data.Channel[n];
 					
 				} catch (IOException e) {
+					AlokaPanel.MessageBox("Error", e.getMessage());
 					e.printStackTrace();
+					break;
 				} catch (ParseException e) {
+					AlokaPanel.MessageBox("Error", e.getMessage());
 					e.printStackTrace();
+					break;
 				}
 			}
 			graph3d.bMutilty = true;
