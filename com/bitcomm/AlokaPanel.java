@@ -258,7 +258,7 @@ public class AlokaPanel {
 					return;
 				}
 				Shell s = new Shell(shell);
-				s.setSize(600,shell.getSize().y);
+				s.setSize(600,shell.getClientArea().height);
 				shell.setCursor(d.getSystemCursor(SWT.CURSOR_WAIT));
 				report=new ReprotView(meter,s,SWT.BORDER);
 				s.setLayout(new FillLayout());
