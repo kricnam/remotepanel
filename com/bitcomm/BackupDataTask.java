@@ -94,10 +94,14 @@ public class BackupDataTask extends Thread {
 					err++;
 					if (err<3) 
 					{
-						Print("try again\n");
+						Print("Data error,try again.\n");
 						continue;
 					}
-					
+					else
+					{
+						AlokaPanel.MessageBox("Communication Error", "Please try to download backup datat late.");
+						break;
+					}
 				}
 				err=0;
 				p++;
@@ -123,6 +127,7 @@ public class BackupDataTask extends Thread {
 				his.Terminate();
 				done = his.GetAck();
 			}
+			
 			Print("terminate notify ack="+String.valueOf(done)+"\n");
 			Print("Done\n");
 			
@@ -130,7 +135,7 @@ public class BackupDataTask extends Thread {
 		} 
 		catch (Exception e) 
 		{
-			
+			AlokaPanel.MessageBox("Error", e.getMessage());
 			e.printStackTrace();
 		}
 		
