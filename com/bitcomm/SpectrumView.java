@@ -107,6 +107,10 @@ public class SpectrumView extends Composite implements Listener {
 				{
 					ChangePos(-1);
 				}
+
+				
+			}
+			public void keyPressed(KeyEvent arg0) {
 				if (arg0.keyCode == SWT.ARROW_LEFT)
 				{
 					graph3d.ChangeCur(-1);
@@ -116,9 +120,6 @@ public class SpectrumView extends Composite implements Listener {
 					graph3d.ChangeCur(1);
 				}
 
-				
-			}
-			public void keyPressed(KeyEvent arg0) {
 			}
 		});
 	}
@@ -481,6 +482,7 @@ public class SpectrumView extends Composite implements Listener {
 			if (num<1) return;
 			graph3d.Data = new double[num][1000];
 			graph3d.Index = new String[num];
+			graph3d.pos=0;
 			for(int i=0;i< num;i++)
 			{
 				try {

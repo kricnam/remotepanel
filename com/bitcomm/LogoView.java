@@ -1,5 +1,7 @@
 package com.bitcomm;
 
+import java.io.File;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -26,7 +28,7 @@ public class LogoView extends Canvas {
 		GC g = e.gc;
 		Point p=getSize();
 		FontData fdata = new FontData("Times", 20, SWT.NORMAL);
-		Image imgLogo = new Image(g.getDevice(),"com/bitcomm/resource/logo.png");
+		Image imgLogo = new Image(g.getDevice(),AlokaPanel.homedir+File.separator+"com/bitcomm/resource/logo.png");
 		
 		g.drawImage(imgLogo,p.x-imgLogo.getBounds().width-10,0);
 		Font font = new Font(g.getDevice(),fdata);

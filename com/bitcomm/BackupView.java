@@ -381,8 +381,13 @@ public class BackupView extends Composite implements Listener {
 			if (list.getItem(station[i]).equals(ConstData.strUnknown))
 				continue;
 			int n = station[i];
-
 			
+			if (!meter[n].isConnected())
+			{
+				AlokaPanel.MessageBox("Warning", "network not reay, please try later");
+				continue;
+			}
+
 			//while (!meter[n].isPaused());
 			BackupDataTask bk = new BackupDataTask(DataType,this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,

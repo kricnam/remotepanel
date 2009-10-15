@@ -1,6 +1,7 @@
 package com.bitcomm;
 
 public class ConstData {
+	public static final String strCancel = "Cancel";
 	static String str3Sigma = "3σ Value";
 	static String strAbnoralData = "Non-complete Data";
 	static String strAlarm = "Alarm";

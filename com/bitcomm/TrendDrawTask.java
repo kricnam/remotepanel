@@ -64,6 +64,7 @@ public class TrendDrawTask extends Thread {
 			while( his.Confirmed.nCount>0)
 			{
 				if (UI.isDisposed()) break;
+				if (UI.bCancel) break;
 				p++;
 				his.DataRequest();
 				
@@ -123,6 +124,7 @@ public class TrendDrawTask extends Thread {
 					UI.setCursor(null);
 				UI.butStart.setEnabled(true);
 				UI.butPrint.setEnabled(true);
+				UI.butLoad.setEnabled(true);
 			}
 			
 		});

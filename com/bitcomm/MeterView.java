@@ -234,5 +234,9 @@ public class MeterView extends Composite  {
 	{
 		return dataTask.Paused;
 	}
+	public boolean isConnected()
+	{
+		return meter.strLED!=ConstData.strOffline;
+	}
 
 }

@@ -74,7 +74,9 @@ public class TrendView extends Composite implements Listener {
 	Button butStart;
 	Spinner scaleMin;
 	Spinner scaleMax;
-	private Button butLoad;
+	Button butLoad;
+	private Button butCancel;
+	boolean bCancel;
 	public TrendView(Composite parent, int style) {
 		super(parent, style);
 		display=parent.getDisplay();
@@ -201,17 +203,38 @@ public class TrendView extends Composite implements Listener {
 		GridLayout optionLayout = new GridLayout(3, true);
 		optionBar.setLayout(optionLayout);
 		optionBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		
-		butDate = new Button(optionBar, SWT.RADIO);
+
+		Composite set = new Composite(optionBar, SWT.BORDER);
+		set.setLayout(new GridLayout(3,true));
+		set.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,2,2));
+		butDate = new Button(set, SWT.RADIO);
 		butDate.setText(ConstData.strStartDate);
 		butDate
 				.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true,
-						false));
+						false,1,1));
 		butDate.setSelection(true);
+		
+		Group grpTime = new Group(set, SWT.NONE);
+		grpTime.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false,1,2));
+		grpTime.setText(ConstData.strStartTime);
+		grpTime.setLayout(new GridLayout(5, false));
+		Label lblHour = new Label(grpTime,SWT.NONE);
+		lblHour.setText("HOUR");
+		hour = new Spinner(grpTime, SWT.NONE);
+		hour.setMaximum(23);
+		hour.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		Label comma = new Label(grpTime, SWT.NONE);
+		comma.setText(":");
+		Label lblMinute = new Label(grpTime,SWT.NONE);
+		lblMinute.setText("MINUTE");
+		minute = new Spinner(grpTime, SWT.NONE);
+		minute.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		minute.setMaximum(59);
+
 
 		GridData dateGrid = new GridData(SWT.END, SWT.CENTER, false, false);
 
-		butPeriod = new Button(optionBar, SWT.RADIO);
+		butPeriod = new Button(set, SWT.RADIO);
 		butPeriod.setText(ConstData.strEndDate);
 		butPeriod.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true,
 				false));
@@ -224,7 +247,8 @@ public class TrendView extends Composite implements Listener {
 		grpStation.setLayout(new GridLayout(nCol,true));
 		grpStation.setText(ConstData.strStation);
 		
-		Composite inputDate = new Composite(optionBar, SWT.NONE);
+		
+		Composite inputDate = new Composite(set, SWT.NONE);
 		inputDate.setLayout(new GridLayout(3, false));
 		inputDate.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false,
 				false));
@@ -241,7 +265,8 @@ public class TrendView extends Composite implements Listener {
 		calFrom.setLayoutData(dateGrid1);
 		calFrom.setData(textFrom);
 
-		Composite inputEnd = new Composite(optionBar, SWT.NONE);
+		
+		Composite inputEnd = new Composite(set, SWT.NONE);
 		inputEnd.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
 				false));
 		inputEnd.setLayout(new GridLayout(3, false));
@@ -260,21 +285,29 @@ public class TrendView extends Composite implements Listener {
 		textTo.setEnabled(false);
 		labelTo.setEnabled(false);
 
-		Group grpTime = new Group(optionBar, SWT.NONE);
-		grpTime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		grpTime.setText(ConstData.strStartTime);
-		grpTime.setLayout(new GridLayout(3, false));
-		hour = new Spinner(grpTime, SWT.NONE);
-		hour.setMaximum(23);
-		hour.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		Label comma = new Label(grpTime, SWT.NONE);
-		comma.setText(":");
-		minute = new Spinner(grpTime, SWT.NONE);
-		minute.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		minute.setMaximum(59);
+		Composite cmd = new Composite(set, SWT.NONE);
+		cmd.setLayout(new GridLayout(2,true));
+		cmd.setLayoutData(new GridData(SWT.CENTER,SWT.CENTER,false,false,3,1));
+		butStart = new Button(cmd, SWT.PUSH);
+		butStart.setText(ConstData.strStart);
+		butStart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		butCancel = new Button(cmd, SWT.PUSH);
+		butCancel.setText(ConstData.strCancel);
+		butCancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		butCancel.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent arg0) {
+				bCancel = true;
+			}
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				
+			}
+		});
+		
 
 		Group scale = new Group(optionBar,SWT.NONE);
-		scale.setLayout(new GridLayout(5,false));
+		scale.setLayout(new GridLayout(6,false));
 		scale.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		scale.setText("Y scale");
 		Label sMin = new Label(scale, SWT.NONE);
@@ -298,17 +331,21 @@ public class TrendView extends Composite implements Listener {
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 			}
 		});
+		butLog = new Button(scale, SWT.CHECK);
+		butLog.setText("LOG");
+		butLog.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
+				1, 1));
+
 		
-		Composite cmd = new Composite(optionBar,SWT.BORDER);
-		cmd.setLayout(new GridLayout(3,true));
-		cmd.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,1,1));
-		butLoad = new Button(cmd, SWT.PUSH);
-		butLoad.setText("Load");
+		Composite cmd1 = new Composite(optionBar,SWT.BORDER);
+		cmd1.setLayout(new GridLayout(2,true));
+		cmd1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,1,1));
+		butLoad = new Button(cmd1, SWT.PUSH);
+		butLoad.setText("File");
+		butLoad.setToolTipText("show the data's graph for a select file");
 		butLoad.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		butStart = new Button(cmd, SWT.PUSH);
-		butStart.setText(ConstData.strStart);
-		butStart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		butPrint = new Button(cmd, SWT.PUSH);
+		
+		butPrint = new Button(cmd1, SWT.PUSH);
 		butPrint.setText(ConstData.strPrint);
 		butPrint.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		butLoad.addSelectionListener(new SelectionListener() {
@@ -332,7 +369,7 @@ public class TrendView extends Composite implements Listener {
 				process();
 			}
 		});
-		
+		bCancel = false;
 		list = new Button[num];
 		for (int i=0;i< num;i++)
 		{
@@ -360,11 +397,7 @@ public class TrendView extends Composite implements Listener {
 			});
 		}
 		
-		butLog = new Button(optionBar, SWT.CHECK);
-		butLog.setText("LOG");
-		butLog.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,
-				1, 1));
-		
+
 		
 		butLog.addSelectionListener(new SelectionListener() {
 			
@@ -610,22 +643,28 @@ public class TrendView extends Composite implements Listener {
 		}
 		graph.color = new Color[station];
 		int n=0;
-		butStart.setEnabled(false);
-		butPrint.setEnabled(false);
 		for (int i = 0; i < list.length; i++) {
 			if (list[i].getText().equals(ConstData.strUnknown))
 				continue;
 			
 			//System.out.println(n);
+			if (!meter[i].isConnected())
+			{
+				AlokaPanel.MessageBox("Warning", "Network not connected, Please try late.");
+				continue;
+			}
+			
 			while (!meter[i].isPaused()) {
-				System.out.println("waiting");
+				//System.out.println("waiting");
+				if (bCancel) return;
 				try {
-					Thread.sleep(10);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					// 
 					//e.printStackTrace();
 				}
 			};
+			
 			TrendDrawTask task = new TrendDrawTask(n,station,this,
 						meter[i].ComPort, (byte) meter[i].nMachineNum, start,
 						end);
@@ -635,6 +674,11 @@ public class TrendView extends Composite implements Listener {
 			//SetGraphScale();
 			//graph.setAutoTransform();
 			task.start();
+
+			butStart.setEnabled(false);
+			butPrint.setEnabled(false);
+			butLoad.setEnabled(false);
+
 			n++;
 		}
 	}

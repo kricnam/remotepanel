@@ -41,6 +41,7 @@ public class AlokaPanel {
 	static TrendView trend;
 	static SpectrumView spectrum;
 	static ReprotView report;
+	static String homedir;
 	
 	static void MessageBox(String strTitle,String strMsg)
 	{
@@ -148,7 +149,7 @@ public class AlokaPanel {
 		File root = new File("root");
 		if (!root.exists())
 					root.mkdir();
-		
+		homedir = System.getProperty("user.dir");
 		d = new Display();
 		
 		shell =new Shell(d,SWT.MIN);
