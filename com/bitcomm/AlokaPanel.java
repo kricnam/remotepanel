@@ -15,7 +15,9 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -259,7 +261,9 @@ public class AlokaPanel {
 					return;
 				}
 				Shell s = new Shell(shell);
-				s.setSize(600,shell.getClientArea().height);
+				GC gc = new GC(s);
+				Point pt=gc.stringExtent("888");
+				s.setSize(600,pt.y*54);
 				shell.setCursor(d.getSystemCursor(SWT.CURSOR_WAIT));
 				report=new ReprotView(meter,s,SWT.BORDER);
 				s.setLayout(new FillLayout());
