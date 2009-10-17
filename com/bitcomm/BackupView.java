@@ -220,11 +220,15 @@ public class BackupView extends Composite implements Listener {
 		Group grpTime = new Group(optionBar, SWT.NONE);
 		grpTime.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		grpTime.setText(ConstData.strStartTime);
-		grpTime.setLayout(new GridLayout(3, false));
+		grpTime.setLayout(new GridLayout(5, false));
+		Label lblHour=new Label(grpTime, SWT.NONE);
+		lblHour.setText("Hour");
 		hour = new Spinner(grpTime, SWT.NONE);
 		hour.setMaximum(23);
 		Label comma = new Label(grpTime, SWT.NONE);
 		comma.setText(":");
+		Label lblmin=new Label(grpTime, SWT.NONE);
+		lblmin.setText("Minute");
 		minute = new Spinner(grpTime, SWT.NONE);
 		minute.setMaximum(59);
 

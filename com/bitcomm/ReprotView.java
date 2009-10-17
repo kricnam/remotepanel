@@ -758,7 +758,6 @@ public class ReprotView extends Composite implements Listener {
 			try {
 				file.load();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				continue;
 			}

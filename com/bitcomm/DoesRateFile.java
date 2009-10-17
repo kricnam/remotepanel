@@ -25,21 +25,6 @@ public class DoesRateFile extends File {
 		super(arg0);
 		// TODO Auto-generated constructor stub
 	}
-
-	public DoesRateFile(URI arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
-	}
-
-	public DoesRateFile(String arg0, String arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public DoesRateFile(File arg0, String arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
 	
 	public DoesRateFile(int n,DateTime date)
 	{
@@ -92,15 +77,13 @@ public class DoesRateFile extends File {
 				} 
 				catch (ParseException e) 
 				{
-					// TODO Auto-generated catch block
 					does = null;
-					//e.printStackTrace();
 				} 
 				catch (NumberFormatException ee)
 				{
 					does = null;
-					//ee.printStackTrace();
 				}
+				
 				if (does!=null)
 					index = (does.date.hour*60+does.date.minute)/does.cPT;
 				

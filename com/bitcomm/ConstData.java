@@ -52,7 +52,7 @@ public class ConstData {
 	static String strUnknown = "Unknown";
 	static String strMachineNum = "Machine Number";
 	static String strKeyServerURL = "ServerURL";
-	static String strChoseType = "Data Type Choice";
+	static String strChoseType = "Data Type :";
 	static String strInterval = "Interval(s)";
 	static String strMonth = "Month";
 	static String strDataType="Data Type";
