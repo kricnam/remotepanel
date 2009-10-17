@@ -23,8 +23,6 @@ public class BackupDataTask extends Thread {
 	@Override
 	public void run() 
 	{
-		
-		
 		CommunicationHistoryData his;
 		his = new CommunicationHistoryData(port,MachineNum,DataType);
 		his.startTime = start;
@@ -42,7 +40,7 @@ public class BackupDataTask extends Thread {
 			
 		});
 		
-		meter.Pause(true);
+		
 		int err=0;
 		try {
 			his.Confirm();
@@ -144,8 +142,11 @@ public class BackupDataTask extends Thread {
 
 			public void run() {
 				if (!UI.isDisposed())
+				{
 					UI.setCursor(null);
 					UI.butStart.setEnabled(true);
+					UI.prograss.setSelection(0);
+				}
 			}
 			
 		});

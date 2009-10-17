@@ -89,6 +89,27 @@ public class BackupView extends Composite implements Listener {
 		console = new Text(this, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI
 				| SWT.WRAP | SWT.V_SCROLL);
 		console.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		getShell().addListener(SWT.Close, new Listener() {
+			public void handleEvent(Event event) {
+				//System.out.println("close");
+				if (prograss.getSelection()==0) return;
+				MessageBox box = new MessageBox(getShell(), SWT.ICON_WARNING
+						| SWT.YES |SWT.NO);
+				box.setMessage("Do you really want to quit backup process?");
+				box.setText("QUIT");
+				
+				if (box.open() == SWT.YES)
+				{
+			          event.doit = true;
+			          getShell().dispose();
+				}
+			    else
+			          event.doit = false;
+				return;
+			}
+		});
+		
 		getShell().addListener(SWT.Close, new Listener() {
 			
 			public void handleEvent(Event event) {
@@ -388,11 +409,20 @@ public class BackupView extends Composite implements Listener {
 				continue;
 			}
 
-			//while (!meter[n].isPaused());
+			meter[n].Pause(true);
+			while (!meter[n].isPaused())
+				{
+				    try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				};
 			BackupDataTask bk = new BackupDataTask(DataType,this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
 						end);
 			bk.meter = meter[n];
+			prograss.setSelection(1);
 			bk.start();
 
 		}

@@ -366,6 +366,7 @@ public class TrendView extends Composite implements Listener {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
+				bCancel = false;
 				process();
 			}
 		});
@@ -380,7 +381,6 @@ public class TrendView extends Composite implements Listener {
 				
 				
 				public void widgetSelected(SelectionEvent arg0) {
-					// TODO Auto-generated method stub
 					if (!((Button)arg0.widget).getSelection()) return;
 					ColorDialog dlg=new ColorDialog(getShell());
 					
@@ -391,8 +391,6 @@ public class TrendView extends Composite implements Listener {
 				
 				
 				public void widgetDefaultSelected(SelectionEvent arg0) {
-					// TODO Auto-generated method stub
-					
 				}
 			});
 		}

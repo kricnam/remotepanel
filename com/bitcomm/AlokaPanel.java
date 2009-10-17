@@ -294,7 +294,9 @@ public class AlokaPanel {
 				Shell s = new Shell(shell);
 				s.setText(ConstData.strSpetru);
 				SpectrumView spec = new SpectrumView(s,SWT.BORDER);
-				s.setSize(900, 700);
+				s.setLocation(0, 16);
+				
+				s.setSize(d.getClientArea().width, d.getClientArea().height);
 				s.setLayout(new FillLayout());
 				spec.meter = meter;
 				s.open();

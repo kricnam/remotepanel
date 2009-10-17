@@ -75,13 +75,13 @@ public class TrendDrawTask extends Thread {
 								
 				if (data!=null)
 				{
-					//data.Save();
+					data.Save();
 					DrawUI(data);
 				}
 				
 				his.Confirmed.startNo++;
 				his.Confirmed.nCount--;
-			}
+			};
 			boolean done;
 			his.Terminate();
 			done = his.GetAck();
@@ -108,7 +108,6 @@ public class TrendDrawTask extends Thread {
 						MessageBox box = new MessageBox(UI.getShell(), SWT.ICON_ERROR);
 						box.setMessage(sw.toString());
 						box.setText("Communication Error");
-						
 						box.open();
 					}
 				}

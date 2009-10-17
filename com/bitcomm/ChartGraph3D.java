@@ -110,6 +110,10 @@ public class ChartGraph3D extends Canvas {
 					HCursor1 = (int)Math.round((arg0.x - Margin)/xRate);
 				else
 					HCursor2 = (int)Math.round((arg0.x - Margin)/xRate);
+				if (HCursor1>999) HCursor1 = 999;
+				if (HCursor2>999) HCursor2 = 999;
+				if (HCursor1<0) HCursor1 = 0;
+				if (HCursor2<0) HCursor2 = 0;
 				redraw();
 			}
 		});
@@ -290,7 +294,7 @@ public class ChartGraph3D extends Canvas {
 		String strT;
 		for (int i=0;i<nXMarkNum+1;i++)
 		{
-			ys = (int)Math.round((i*avg)*xRate);
+			ys = (int)Math.round((i*avg-1)*xRate);
 			gc.drawLine(x+Margin+ys,y+Margin,x+Margin+ys,y+height-Margin);
 			
 			strT = String.valueOf((int)(i*avg*xScaleRate));
@@ -719,8 +723,8 @@ public class ChartGraph3D extends Canvas {
 				gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
 				String str=String.valueOf(HCursor1+1);
 				pt = gc.stringExtent(str);
-				gc.drawLine((int)(Margin+x+HCursor1*xRate), Margin+y,
-						(int)(Margin+x+HCursor1*xRate),height+y-Margin);
+				gc.drawLine((int)(Margin+x+Math.round(HCursor1*xRate)), Margin+y,
+						(int)(Margin+x+Math.round(HCursor1*xRate)),height+y-Margin);
 				gc.drawString(str, (int)(Margin+x+HCursor1*xRate), Margin+2+y);
 				str = String.valueOf(HCursor2+1);
 				pt = gc.stringExtent(str);
@@ -843,7 +847,6 @@ public class ChartGraph3D extends Canvas {
 				HCursor2 = 0;
 		}
 		redraw();
-		
 	}
 
 
