@@ -1,6 +1,8 @@
 package com.bitcomm;
 
+import java.io.IOException;
 import java.net.SocketException;
+import java.util.Calendar;
 
 import com.bitcomm.Command.CommandType;
 
@@ -18,6 +20,7 @@ public class CommunicationTask extends Thread {
 	boolean Paused;
 	int nError;
 	int nInterval;
+	long nReserveTime;
 
 	CommunicationTask(MeterView face, CommunicationPort port) {
 		this.face = face;
@@ -73,7 +76,7 @@ public class CommunicationTask extends Thread {
 			public void run() {
 	
 				if (!face.isDisposed())
-					face.showConnect();
+					face.showConnecting();
 			}
 		});
 	}
@@ -91,8 +94,11 @@ public class CommunicationTask extends Thread {
 	}
 	public void run() {
 
-		int nSleepCount = 0;
-
+		Calendar calDoesTime = Calendar.getInstance();
+		Calendar calHCTime = Calendar.getInstance();
+		Calendar calNow ;
+		calDoesTime.set(1900, 0,1);
+		calHCTime.set(1900,0,1);
 		Command cmd = new Command(Command.CommandType.CurrentData);
 		DataPacket cmdPacket = new DataPacket((byte) face.nMachineNum, cmd
 				.ByteStream());
@@ -100,132 +106,243 @@ public class CommunicationTask extends Thread {
 			face.data = new DoesRateData();
 
 		while (!Stop && !face.isDisposed()) {
-
-			try {
-				while (Pause) {
-					Paused = true;
+			//wait other task ok
+			while (Pause) {
+				Paused = true;
+				try {
+					System.out.println("sleep for pause");
 					sleep(1000);
-					if (face.isDisposed())
-						return;
-				};
-
-				Paused = false;
-
-				if (!port.IsConnected()) 
-				{
-					try {
-						port.Connect();
-					} 
-					catch (Exception e) 
-					{
-						e.printStackTrace();
-						SetCommunicationError();
-						
-						if (nError==0) PromptErr(e.getMessage());
-						nError++;
-						Paused = true;
-						sleep(5000);
-						SetConnecting();
-						
-						continue;
-					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				nError=0;
-				if (nSleepCount%20==0)
+				if (face.isDisposed())
+					return;
+			};
+
+			Paused = false;
+			calNow = Calendar.getInstance();
+			if (!port.IsConnected()) 
+			{
+				try 
 				{
+					System.out.println("connecting...");
+					port.Connect();
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+					SetCommunicationError();
 
+					if (nError==0) PromptErr(e.getMessage());
+					nError++;
+					Paused = true;
 					try {
-						HealthCheck();
-					}
-					catch (SocketException se)
-					{
-						try {
-							System.out.println("health check fail ,close.");
-							port.Close();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						SetCommunicationError();
+						System.out.println("sleep for re-connect");
 						sleep(5000);
-						continue;
-					}
-					catch (Exception e1) {
-
+					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
+					
+					SetConnecting();
+					continue;
 				}
+			}
+			
+			nError=0;
+			
+			if (calNow.getTimeInMillis()-calHCTime.getTimeInMillis() > 20000)
+			{
+				calHCTime.setTimeInMillis(calNow.getTimeInMillis());
 
-				if (nSleepCount%nInterval==0)
+				try 
 				{
-
-					try {
-						port.Send(cmdPacket.ByteStream());
-					}
-					catch(SocketException se)
-					{
-						try {
-							port.Close();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						continue;
-					}
-					catch (Exception e) 
-					{
-						e.printStackTrace();
-						if (port.socket.isClosed())
-							continue;
-					}
-
-					try {
-						DataPacket packet = port.RecvPacket();
-						if (packet == null) {
-							nError++;
-							continue;
-						}
-
-						if (packet.bValid
-								&& !face.isDisposed()
-								&& packet.getPacketType() == Command.CommandType.CurrentData) {
-							nError = 0;
-
-							face.data.parse(packet.ByteStream());
-
-							face.data.Save();
-							face.getDisplay().asyncExec(new Runnable() {
-								public void run() {
-									if (!face.isDisposed())
-										face.setValue();
-								}
-							});
-
-						}
-
-					} 
-					catch (Exception e) {
-
-						nError++;
-						e.printStackTrace();
-						return;
-					}
+					System.out.println("health check");
+					HealthCheck();
 				}
-				Paused = true;
+				catch (SocketException se)
 				{
-					sleep(1000);
-
-					if (nSleepCount++ > nInterval)
-						nSleepCount = 0;
-					if (face.isDisposed())
-						break;
+					try {
+						System.out.println("health check fail ,close socket.");
+						port.Close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					SetCommunicationError();
+					
+					try {
+						sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					continue;
 				}
-				Paused = false;
-			} catch (InterruptedException e) {
-
-				e.printStackTrace();
-				continue;
+				catch (Exception e1) {
+					e1.printStackTrace();
+				}
 			}
 
+			if (calNow.getTimeInMillis()-calDoesTime.getTimeInMillis() >
+					nInterval*1000 || 
+					calNow.get(Calendar.MINUTE)%(nInterval /60)==0)
+			{
+				calDoesTime.setTimeInMillis(calNow.getTimeInMillis());
+				nReserveTime = calNow.getTimeInMillis() + nInterval*1000; 
+				try 
+				{
+					port.Send(cmdPacket.ByteStream());
+				}
+				catch(SocketException se)
+				{
+					try {
+						port.Close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					continue;
+				}
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+					if (port.socket.isClosed())
+						continue;
+				}
+
+				try 
+				{
+					DataPacket packet = port.RecvPacket();
+					if (packet == null) packet = port.RecvPacket();
+					if (packet == null) packet = port.RecvPacket();	
+
+					if (packet!=null && packet.bValid
+							&& !face.isDisposed()
+							&& packet.getPacketType() == Command.CommandType.CurrentData) {
+						nError = 0;
+
+						face.data.parse(packet.ByteStream());
+
+						face.data.Save();
+						if (!face.isDisposed())
+						face.getDisplay().asyncExec(new Runnable() {
+							public void run() {
+								
+									face.setValue();
+							}
+						});
+					}
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+					continue;
+				}
+				backupSpectrumData();
+			}
+			
+			Paused = true;
+			try {
+				System.out.println("sleep for next roll");
+				sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		;
+	}
+	
+	void backupSpectrumData()
+	{
+		CommunicationHistoryData his;
+		his = new CommunicationHistoryData(port,(byte)face.nMachineNum,CommunicationHistoryData.Spectrum);
+		long nlastTime = AlokaPanel.GetSettingLong("LastSpectrumDate");
+		Calendar cal=Calendar.getInstance();
+		his.endTime.setTime(cal);
+		cal.setTimeInMillis(nlastTime);
+		his.startTime.setTime(cal);
+		
+		int err=0;
+		do{
+			try {
+				his.Confirm();
+				his.ConfirmAnswer();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if (his.Confirmed==null)
+			{
+				err++;
+				if (err>3)
+				{
+					break;
+				}
+				try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				continue;
+			}
+		}while(false);
+		
+		if (his.Confirmed!=null)
+		{
+			SpectrumData dataS=null;
+			int i = 0;
+			while( his.Confirmed.nCount>0)
+			{
+				i++;
+				try {
+					his.DataRequest();
+					dataS = his.DataAnswerSpectrum();
+					if (dataS==null) dataS = his.DataAnswerSpectrum();
+					if (dataS==null) dataS = his.DataAnswerSpectrum();
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+				}
+				
+				if (dataS!=null)
+				{
+					try {
+						dataS.Save();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				else
+				{
+					err++;
+					if (err<3) 
+					{
+						continue;
+					}
+					else
+					{
+						break;
+					}
+				}
+				err=0;
+				his.Confirmed.startNo++;
+				his.Confirmed.nCount--;
+				if (i>2) break;
+			};
+			boolean done;
+			try {
+				his.Terminate();
+				done = his.GetAck();
+				if (!done)
+				{
+					his.Terminate();
+					done = his.GetAck();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				done=false;
+			}
+		}	
 	}
 }

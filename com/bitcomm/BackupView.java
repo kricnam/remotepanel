@@ -71,10 +71,15 @@ public class BackupView extends Composite implements Listener {
 
 	Button butStart;
 
+	Label lblMsg;
+
+	Button butCancel;
+	boolean bCancel;
 	public BackupView(Composite parent, int style, MeterView[] meter) {
 		super(parent, style);
 		initialize();
 		this.meter = meter;
+		bCancel = false;
 	}
 
 	private void initialize() {
@@ -93,31 +98,30 @@ public class BackupView extends Composite implements Listener {
 		getShell().addListener(SWT.Close, new Listener() {
 			public void handleEvent(Event event) {
 				//System.out.println("close");
-				if (prograss.getSelection()==0) return;
-				MessageBox box = new MessageBox(getShell(), SWT.ICON_WARNING
-						| SWT.YES |SWT.NO);
-				box.setMessage("Do you really want to quit backup process?");
-				box.setText("QUIT");
-				
-				if (box.open() == SWT.YES)
+				if (prograss.getSelection()>0) 
 				{
-			          event.doit = true;
-			          getShell().dispose();
+					MessageBox box = new MessageBox(getShell(), SWT.ICON_WARNING
+							| SWT.YES |SWT.NO);
+					box.setMessage("Do you really want to quit backup process?");
+					box.setText("QUIT");
+
+					if (box.open() == SWT.YES)
+					{
+						event.doit = true;
+					}
+					else
+					{
+						event.doit = false;
+						return;
+					}
 				}
-			    else
-			          event.doit = false;
+				SaveSetting();
+				AlokaPanel.backup = null;
+
 				return;
 			}
 		});
-		
-		getShell().addListener(SWT.Close, new Listener() {
-			
-			public void handleEvent(Event event) {
-				
-				SaveSetting();
-				AlokaPanel.backup = null;
-			}
-		});
+
 		GetSetting();
 	}
 	void SaveSetting()
@@ -177,7 +181,7 @@ public class BackupView extends Composite implements Listener {
 		grpStation.setLayout(new RowLayout(SWT.VERTICAL));
 		grpStation.setText(ConstData.strStation);
 		list = new List(grpStation, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
-		list.setLayoutData(new RowData(220,120));
+		list.setLayoutData(new RowData(220,90));
 		
 
 
@@ -242,11 +246,19 @@ public class BackupView extends Composite implements Listener {
 		chkData.setSelection(true);
 		chkData.setText(ConstData.strDoesRate);
 		chkSpec.setText(ConstData.strSpetru);
-
-		butStart = new Button(optionBar, SWT.PUSH);
+		
+		lblMsg = new Label(optionBar,SWT.NONE);
+		lblMsg.setLayoutData(new GridData(SWT.FILL,SWT.CENTER,true,false));
+		
+		Composite cmd = new Composite(optionBar, SWT.BORDER);
+		cmd.setLayout(new GridLayout(2,true));
+		cmd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		butStart = new Button(cmd, SWT.PUSH);
 		butStart.setText(ConstData.strStart + " " + ConstData.strBackup);
-		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
-				2, 1));
+		butStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		butCancel = new Button(cmd, SWT.PUSH);
+		butCancel.setText(ConstData.strCancel);
+		butCancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		butStart.addSelectionListener(new SelectionListener() {
 
@@ -257,6 +269,18 @@ public class BackupView extends Composite implements Listener {
 				processBackup();
 			}
 
+		});
+		
+		butCancel.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				bCancel = true;
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+			}
 		});
 
 		PreferenceStore store = new PreferenceStore("./config.ini");
@@ -337,6 +361,7 @@ public class BackupView extends Composite implements Listener {
 		DateTime end;
 		Date startDate = null;
 		Date endDate = null;
+		bCancel = false;
 		try {
 			startDate = formatter.parse(textFrom.getText());
 		} catch (ParseException e) {

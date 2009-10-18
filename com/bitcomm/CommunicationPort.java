@@ -154,11 +154,11 @@ public class CommunicationPort {
 					} 
 					else if (packet.start  > 3)
 					{
-						for (int i=0;i< pos;i++)
+						for (int i=0;i< pos - packet.start + 1;i++)
 						{
-							buffer[i]=buffer[packet.start-3 +i];
+							buffer[i]=buffer[packet.start +i];
 						}
-						pos = pos - packet.start + 3;
+						pos = pos - packet.start + 1;
 					}
 					packet = null;
 				}

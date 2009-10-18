@@ -108,7 +108,7 @@ public class TrendDrawTask extends Thread {
 						break;
 					if (UI.bCancel) break;
 					try {
-						sleep(500);
+						sleep(300);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

@@ -1,5 +1,9 @@
 package com.bitcomm;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Formatter;
+
 import org.eclipse.swt.SWT;
 
 public class BackupDataTask extends Thread {
@@ -40,53 +44,142 @@ public class BackupDataTask extends Thread {
 			
 		});
 		
-		
 		int err=0;
-		try {
-			his.Confirm();
-			Print("Confirm data...\n");
-			his.ConfirmAnswer();
-			Print("Confirm answered.\n");
-			DoesRateData data=null;
-			SpectrumData dataS=null;
+		
+		do{
+			try {
+				Print("Confirm data...\n");
+				his.Confirm();
+				Print("Confirm answered.\n");
+				his.ConfirmAnswer();
+			} catch (Exception e) {
+				Print(e.getMessage());
+				e.printStackTrace();
+			}
+			
 			if (his.Confirmed==null)
-				Print("Error read comfirm data.\n");
+			{
+				err++;
+				Print("Error read comfirm data.");
+				if (err>3)
+				{
+					Print("Please try to download late.\n");
+					break;
+				}
+				Print("will try again...\n");
+				try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				continue;
+			}
+		}while(false);
+		
+		if (his.Confirmed!=null)
+		{
 			final int sum=his.Confirmed.nCount;
 			Print("Total "+String.valueOf(sum)+" records will be read.\n");
 			int p=0;
+			DoesRateData data=null;
+			SpectrumData dataS=null;
+			Calendar calNow = Calendar.getInstance();
+			Calendar calLast = Calendar.getInstance();
+			
+			int total = his.Confirmed.nCount;
+			String strLeft ="";
 			while( his.Confirmed.nCount>0)
 			{
+				if (UI.bCancel) break;
 				if (UI.isDisposed()) break;
-				his.DataRequest();
-				Print("Request...\n");
-				if (DataType == CommunicationHistoryData.DoseRate)
+				if (calNow.getTimeInMillis()>meter.getReserveTime())
 				{
-					data = his.DataAnswerDoseRate();
-					if (data==null) his.DataAnswerDoseRate();
-					if (data==null) his.DataAnswerDoseRate();
-					if (data==null) his.DataAnswerDoseRate();
+					meter.Pause(false);
+					while(meter.isPaused())
+					{
+						try {
+							sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					};
+					while(!meter.isPaused())
+					{
+						try {
+							sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					};
+					meter.Pause(true);
 				}
-				else
+					
+				if (calNow.after(calLast))
 				{
-					dataS = his.DataAnswerSpectrum();
-					if (dataS==null) dataS = his.DataAnswerSpectrum();
-					if (dataS==null) dataS = his.DataAnswerSpectrum();
-					if (dataS==null) dataS = his.DataAnswerSpectrum();
+					long mili = calNow.getTimeInMillis() - calLast.getTimeInMillis();
+					mili = (mili / (total - his.Confirmed.nCount)) * his.Confirmed.nCount;
+					mili = mili /1000;
+					StringBuilder sb = new StringBuilder();
+					Formatter formatter = new Formatter(sb);
+					formatter.format("need time %d:%02d\n", mili/60,mili%60);
+					strLeft = sb.toString();
+					
+ 				}
+				setMsg(String.valueOf(his.Confirmed.nCount)+" left." + strLeft);
+				try {
+					Print("Request...\n");
+					his.DataRequest();
+					if (DataType == CommunicationHistoryData.DoseRate)
+					{
+						data = his.DataAnswerDoseRate();
+						if (data==null) his.DataAnswerDoseRate();
+						if (data==null) his.DataAnswerDoseRate();
+					}
+					else
+					{
+						dataS = his.DataAnswerSpectrum();
+						if (dataS==null) dataS = his.DataAnswerSpectrum();
+						if (dataS==null) dataS = his.DataAnswerSpectrum();
+					}
+
+				} 
+				catch (Exception e) 
+				{
+					Print(e.getMessage());
+					e.printStackTrace();
 				}
 				
 				Print("Request answered\n");
-				
 				if (data!=null)
 				{
-					data.Save();
-					Print(data.CSVString()+"\n");
+					try {
+						data.Save();
+						Print(data.CSVString()+"\n");
+					} catch (IOException e) {
+						Print(e.getMessage()+"\n");
+						e.printStackTrace();
+					} catch (Exception e) {
+						Print(e.getMessage()+"\n");
+						e.printStackTrace();
+					}
 				}
 				
 				if (dataS!=null)
 				{
-					Print("Save Data No."+String.valueOf(dataS.DataNum)+"\n");
-					dataS.Save();
+					Print("Save Data No."+String.valueOf(dataS.DataNum)+
+							" for "+ dataS.dateEnd.toStringDate()+ " " +
+							dataS.dateEnd.toStringTime()+"\n");
+					try {
+						dataS.Save();
+					} catch (IOException e) {
+						Print(e.getMessage()+"\n");
+						e.printStackTrace();
+					} catch (Exception e) {
+						Print(e.getMessage()+"\n");
+						e.printStackTrace();
+					}
 				}
+				
 				if (data==null && dataS==null)
 				{
 					err++;
@@ -97,46 +190,45 @@ public class BackupDataTask extends Thread {
 					}
 					else
 					{
-						AlokaPanel.MessageBox("Communication Error", "Please try to download backup datat late.");
+						Print("Communication Error, Please try to download backup data late.\n");
 						break;
 					}
 				}
+				
 				err=0;
 				p++;
 				final int q = p;
 				if (!UI.isDisposed())
 				{
-				UI.display.asyncExec(new Runnable(){
-				public void run() {
-					UI.prograss.setSelection(q*100/sum);
-					}
-				});
+					UI.display.asyncExec(new Runnable(){
+						public void run() {
+							UI.prograss.setSelection(q*100/sum);
+						}
+					});
 				}
 				
 				his.Confirmed.startNo++;
 				his.Confirmed.nCount--;
-				
-			}
+				calNow = Calendar.getInstance();
+			};
+			setMsg("");
 			boolean done;
-			his.Terminate();
-			done = his.GetAck();
-			if (!done)
-			{
+			try {
 				his.Terminate();
 				done = his.GetAck();
+				if (!done)
+				{
+					his.Terminate();
+					done = his.GetAck();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				done=false;
 			}
-			
 			Print("terminate notify ack="+String.valueOf(done)+"\n");
 			Print("Done\n");
-			
+		}	
 
-		} 
-		catch (Exception e) 
-		{
-			Print(e.getMessage());
-			e.printStackTrace();
-		}
-		
 		if (!UI.isDisposed())
 			UI.getDisplay().asyncExec(new Runnable(){
 
@@ -150,6 +242,7 @@ public class BackupDataTask extends Thread {
 			}
 			
 		});
+		
 		meter.Pause(false);
 	}
 	
@@ -158,12 +251,30 @@ public class BackupDataTask extends Thread {
 		final String strTmp;
 		strTmp = str;
 		if (UI.isDisposed()) return;
+		if (strTmp==null) return;
 		UI.getDisplay().asyncExec(new Runnable(){
 
 			public void run() {
 				if (!UI.isDisposed())
 				{
-					UI.console.append(strTmp);
+					
+						UI.console.append(strTmp);
+				}
+			}
+		});
+	}
+	
+	void setMsg(String str)
+	{
+		final String strTmp;
+		strTmp = str;
+		if (UI.isDisposed()) return;
+		if (strTmp==null) return;
+		UI.getDisplay().asyncExec(new Runnable(){
+			public void run() {
+				if (!UI.isDisposed())
+				{
+						UI.lblMsg.setText(strTmp);
 				}
 			}
 		});

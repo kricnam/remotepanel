@@ -236,7 +236,11 @@ public class SpectrumFile extends File {
 		fout.write(sb.toString());
 		formatter.close();
 		fout.close();
-
+		Calendar calNow = Data.dateEnd.getTime();
+		long nLast = AlokaPanel.GetSettingLong("LastSpectrumDate");
+		if (calNow.getTimeInMillis() > nLast)
+		{
+			AlokaPanel.SaveSetting("LastSpectrumDate", calNow.getTimeInMillis());
+		}
 	}
-
 }

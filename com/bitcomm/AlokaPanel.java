@@ -85,6 +85,21 @@ public class AlokaPanel {
 		}
 	}
 	
+	static void SaveSetting(String key, long Value)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			store.setValue(key, Value);
+			store.save();
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+		}
+	}
 	static void SaveSetting(String key, boolean Value)
 	{
 		PreferenceStore store = new PreferenceStore("config.ini");
@@ -107,6 +122,22 @@ public class AlokaPanel {
 		try{
 			store.load();
 			return store.getInt(key);
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+			return 0;
+		}
+	}
+	
+	static long GetSettingLong(String key)
+	{
+		PreferenceStore store = new PreferenceStore("config.ini");
+		
+		try{
+			store.load();
+			return store.getLong(key);
 		}
 		catch(IOException eio)
 		{

@@ -722,10 +722,20 @@ public class SpectrumView extends Composite implements Listener {
 				graph3d.Index[0]=file.getName().substring(0, file.getName().length()-4)
 				+" "+file.data.dateEnd.toStringDate()						
 			+ " "+file.data.dateEnd.toStringTime();
-			} catch (IOException e) {
+			}
+			catch (FileNotFoundException ef)
+			{
+				AlokaPanel.MessageBox("Error", ef.getMessage()+ "\n"
+						+"Please download data first.");
+				
+			}
+			catch (IOException e) 
+			{
 				AlokaPanel.MessageBox("Error", e.getMessage());
 				//e.printStackTrace();
-			} catch (ParseException e) {
+			} 
+			catch (ParseException e) 
+			{
 				e.printStackTrace();
 			}
 		}
@@ -738,11 +748,19 @@ public class SpectrumView extends Composite implements Listener {
 			//System.out.println(end.getTime().toString());
 			long nfile = end.getTime().getTimeInMillis()-cal.getTimeInMillis();
 			
-			nfile = nfile/60000 /PT ;
+			nfile = nfile/60000 /PT;
+			int nlim=graph3d.getParent().getParent().getClientArea().height/4 - 2;
+			if (nlim < nfile)
+			{
+				AlokaPanel.MessageBox("Info", "Selected data is more than expected to display, only the first "+
+						String.valueOf(nlim)+" will be displayed.");
+				nfile = nlim;
+			}
+				
 			graph3d.Data = null;
 			graph3d.Data = new double[(int)nfile][1000];
 			graph3d.Index = new String[(int)nfile];
-			//System.out.println("Total files:"+String.valueOf(nfile));
+			System.out.println("Total files:"+String.valueOf(nfile));
 			boolean bIgnor = false;
 			for (int t=0;t<nfile;t++)
 			{

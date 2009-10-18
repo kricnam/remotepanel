@@ -48,14 +48,25 @@ public class MeterView extends Composite  {
 	{
 		meter.rgbLED = rgbRed;
 		meter.strLED = ConstData.strOffline;
+		meter.rgbAlarm = rgbOff;
+		meter.rgbBatty = rgbOff;
+		meter.rgbComm = rgbOff;
+		meter.rgbGPS = rgbOff;
+		meter.rgbDetector = rgbOff;
+		meter.rgbMoni = rgbOff;
 		meter.redraw();
 	}
 	
-	void showConnect()
+	void showConnecting()
 	{
 		meter.rgbLED = rgbGreen;
-		meter.strLED = ConstData.strOffline;
+		meter.strLED = "Connecting";
 		meter.redraw();
+	}
+	
+	long getReserveTime()
+	{
+		return dataTask.nReserveTime;
 	}
 	
 	public void setValue()
