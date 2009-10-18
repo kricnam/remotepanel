@@ -125,6 +125,7 @@ public class CommunicationTask extends Thread {
 			{
 				try 
 				{
+					SetConnecting();
 					System.out.println("connecting...");
 					port.Connect();
 				} 
@@ -143,7 +144,7 @@ public class CommunicationTask extends Thread {
 						e1.printStackTrace();
 					}
 					
-					SetConnecting();
+					SetCommunicationError();
 					continue;
 				}
 			}
@@ -291,11 +292,11 @@ public class CommunicationTask extends Thread {
 			int i = 0;
 			while( his.Confirmed.nCount>0)
 			{
+				if (Stop || face.isDisposed()) break;
 				i++;
 				try {
 					his.DataRequest();
 					dataS = his.DataAnswerSpectrum();
-					if (dataS==null) dataS = his.DataAnswerSpectrum();
 					if (dataS==null) dataS = his.DataAnswerSpectrum();
 				} 
 				catch (Exception e) 
@@ -315,15 +316,7 @@ public class CommunicationTask extends Thread {
 				}
 				else
 				{
-					err++;
-					if (err<3) 
-					{
-						continue;
-					}
-					else
-					{
 						break;
-					}
 				}
 				err=0;
 				his.Confirmed.startNo++;

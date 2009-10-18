@@ -434,7 +434,7 @@ public class BackupView extends Composite implements Listener {
 			
 			if (!meter[n].isConnected())
 			{
-				AlokaPanel.MessageBox("Warning", "network not reay, please try later");
+				AlokaPanel.MessageBox("Warning", "network not ready, please try later");
 				continue;
 			}
 

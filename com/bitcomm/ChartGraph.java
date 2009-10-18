@@ -199,7 +199,7 @@ public class ChartGraph extends Canvas {
 		gc.setForeground(gray);
 		gc.setLineStyle(SWT.LINE_DOT);
 		Point pt= gc.stringExtent("Does Rate[nGy/h]");
-		gc.drawString("Does Rate[nGy/h]",x+pt.y,y+pt.y,true);
+		gc.drawString("Does Rate(nGy/h)",x+pt.y,y+pt.y,true);
 		if (logScale)
 		{
 			pt = gc.stringExtent("-LOG-");
@@ -244,7 +244,7 @@ public class ChartGraph extends Canvas {
 				gc.drawString(String.valueOf((int)i*avg*xScaleRate),x+Margin+ys-pt.x , y+height-Margin+pt.y,true);
 			}
 		}
-		gc.drawString("Time",x+width-Margin/2 , y+height-Margin,true);
+		gc.drawString("Time",x+width-Margin+pt.x , y+height-Margin,true);
 		Color black= getDisplay().getSystemColor(SWT.COLOR_BLACK);
 		gc.setForeground(black);
 		gc.setLineStyle(SWT.LINE_SOLID);

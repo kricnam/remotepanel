@@ -77,6 +77,7 @@ public class TrendView extends Composite implements Listener {
 	Button butLoad;
 	private Button butCancel;
 	boolean bCancel;
+	Label lblPrompt;
 	public TrendView(Composite parent, int style) {
 		super(parent, style);
 		display=parent.getDisplay();
@@ -219,14 +220,14 @@ public class TrendView extends Composite implements Listener {
 		grpTime.setText(ConstData.strStartTime);
 		grpTime.setLayout(new GridLayout(5, false));
 		Label lblHour = new Label(grpTime,SWT.NONE);
-		lblHour.setText("HOUR");
+		lblHour.setText("Hour");
 		hour = new Spinner(grpTime, SWT.NONE);
 		hour.setMaximum(23);
 		hour.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		Label comma = new Label(grpTime, SWT.NONE);
 		comma.setText(":");
 		Label lblMinute = new Label(grpTime,SWT.NONE);
-		lblMinute.setText("MINUTE");
+		lblMinute.setText("Minute");
 		minute = new Spinner(grpTime, SWT.NONE);
 		minute.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		minute.setMaximum(59);
@@ -285,9 +286,11 @@ public class TrendView extends Composite implements Listener {
 		textTo.setEnabled(false);
 		labelTo.setEnabled(false);
 
+		lblPrompt = new Label(set,SWT.BORDER);
+		lblPrompt.setLayoutData(new GridData(SWT.FILL,SWT.CENTER,true,false,2,1));
 		Composite cmd = new Composite(set, SWT.NONE);
 		cmd.setLayout(new GridLayout(2,true));
-		cmd.setLayoutData(new GridData(SWT.CENTER,SWT.CENTER,false,false,3,1));
+		cmd.setLayoutData(new GridData(SWT.CENTER,SWT.CENTER,false,false,1,1));
 		butStart = new Button(cmd, SWT.PUSH);
 		butStart.setText(ConstData.strStart);
 		butStart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -648,8 +651,8 @@ public class TrendView extends Composite implements Listener {
 			//System.out.println(n);
 			if (!meter[i].isConnected())
 			{
-				AlokaPanel.MessageBox("Warning", "Network not connected, Please try late.");
-				continue;
+				AlokaPanel.MessageBox("Warning", "Network not connected");
+				//continue;
 			}
 	
 			TrendDrawTask task = new TrendDrawTask(n,station,this,

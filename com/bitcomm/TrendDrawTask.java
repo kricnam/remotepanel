@@ -72,6 +72,7 @@ public class TrendDrawTask extends Thread {
 			localFile = new DoesRateFile(MachineNum,dataStart);
 			if (!localFile.exists())
 			{
+				setPrompt("Local data is not avilable,will read from remote...");
 				int n=ReadRemoteData(MachineNum,dataStart,1,PT);
 				sum-=n;
 				dataStart.addMinute(n*PT);
@@ -87,25 +88,59 @@ public class TrendDrawTask extends Thread {
 				}
 				if (UI.bCancel) break;
 				
+				if ((dataStart.hour*60 + dataStart.minute)/PT >= localFile.dataArray.size())
+				{
+					data = ReadRemoteData(MachineNum, dataStart);
+					if (data!=null) 
+					{
+						setPrompt("Remote "+data.date.toStringDate()+" "
+								+data.date.toStringTime()+":"+String.valueOf(data.getDoesRatenGy()));
+						DrawUI(data);
+					}
+					else
+					{
+						setPrompt(dataStart.toStringDate()
+								+" "+dataStart.toStringTime()+ " unavailable");
+						UI.graph.setData(0, Index, dataStart.toStringShortDate()
+								+"\r\n"+dataStart.toStringTime());
+					}
+					dataStart.addMinute(PT);
+					sum--;
+				}
+				
 				for (int i = (dataStart.hour*60 + dataStart.minute)/PT; 
 					i < localFile.dataArray.size() ;i++)
 				{
 					if (UI.bCancel) break;
 					data = localFile.dataArray.get(i);
 					if (data==null)
+					{
 						data = ReadRemoteData(MachineNum, dataStart);
+						if (data!=null) setPrompt("Remote "+data.date.toStringDate()+" "
+								+data.date.toStringTime()+":"+String.valueOf(data.getDoesRatenGy()));
+					}
+					else
+					{
+						setPrompt("Local "+data.date.toStringDate()+" "
+								+data.date.toStringTime()+":"+String.valueOf(data.getDoesRatenGy()));
+					}
 					
 					if (data!=null)
 						DrawUI(data);
 					else
 					{
+						setPrompt(dataStart.toStringDate()
+								+" "+dataStart.toStringTime()+ " unavailable");
 						UI.graph.setData(0, Index, dataStart.toStringShortDate()
 								+"\r\n"+dataStart.toStringTime());
 					}
 					dataStart.addMinute(PT);
 					sum--;
 					if (dataStart.getTime().after(end.getTime()))
+					{
+						sum=0;
 						break;
+					}
 					if (UI.bCancel) break;
 					try {
 						sleep(300);
@@ -126,6 +161,19 @@ public class TrendDrawTask extends Thread {
 				UI.butStart.setEnabled(true);
 				UI.butPrint.setEnabled(true);
 				UI.butLoad.setEnabled(true);
+				UI.lblPrompt.setText("");
+			}
+		});
+	}
+	
+	void setPrompt(String str)
+	{
+		if (UI.isDisposed()) return;
+		final String strT = str;
+		UI.getDisplay().asyncExec(new Runnable(){
+
+			public void run() {
+					UI.lblPrompt.setText(strT);
 			}
 		});
 	}
@@ -155,6 +203,7 @@ public class TrendDrawTask extends Thread {
 
 	DoesRateData ReadRemoteData(int nMachine,DateTime date)
 	{
+		setPrompt("Read from remote...");
 		CommunicationHistoryData his;
 		his = new CommunicationHistoryData(port,MachineNum,CommunicationHistoryData.DoseRate);
 		his.startTime = date;
@@ -168,6 +217,7 @@ public class TrendDrawTask extends Thread {
 		{
 			try 
 			{
+				
 				his.Confirm();
 				his.ConfirmAnswer();
 				if( his.Confirmed.nCount>0)
@@ -261,7 +311,6 @@ public class TrendDrawTask extends Thread {
 								}
 							}
 						});
-
 					break;
 				}
 			}
@@ -327,6 +376,7 @@ public class TrendDrawTask extends Thread {
 	
 	int ReadRemoteData(int nMachine,DateTime dateStart,int nday,int PT)
 	{
+		setPrompt("Read from remote...");
 		CommunicationHistoryData his;
 		his = new CommunicationHistoryData(port,MachineNum,CommunicationHistoryData.DoseRate);
 		his.startTime = dateStart;
@@ -353,6 +403,7 @@ public class TrendDrawTask extends Thread {
 		do
 		{
 			if (UI.bCancel) break;
+			
 			try 
 			{
 				his.Confirm();
@@ -404,6 +455,8 @@ public class TrendDrawTask extends Thread {
 
 					if (data!=null)
 					{
+						setPrompt("Remote "+data.date.toStringDate()+" "
+								+data.date.toStringTime()+":"+String.valueOf(data.getDoesRatenGy()));
 						data.Save();
 						DrawUI(data);
 						if (UI.bCancel) break;
@@ -455,13 +508,28 @@ public class TrendDrawTask extends Thread {
 	}
 	void waitMeterPause()
 	{
+		String str="Commmunication Port busy, waiting";
+		int i = 0;
 		while(!meter.isPaused())
 		{
+			switch(i++%3)
+			{
+			case 0:
+				setPrompt(str+ ".");
+				break;
+			case 1:
+				setPrompt(str+ "..");
+				break;
+			case 2:
+				setPrompt(str+ "...");
+				break;
+			}
+			
 			try {
-				sleep(100);
+				sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
+		};
 	}
 }
