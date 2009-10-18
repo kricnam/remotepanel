@@ -651,18 +651,7 @@ public class TrendView extends Composite implements Listener {
 				AlokaPanel.MessageBox("Warning", "Network not connected, Please try late.");
 				continue;
 			}
-			
-			while (!meter[i].isPaused()) {
-				//System.out.println("waiting");
-				if (bCancel) return;
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// 
-					//e.printStackTrace();
-				}
-			};
-			
+	
 			TrendDrawTask task = new TrendDrawTask(n,station,this,
 						meter[i].ComPort, (byte) meter[i].nMachineNum, start,
 						end);

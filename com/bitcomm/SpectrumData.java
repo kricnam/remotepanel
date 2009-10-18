@@ -66,4 +66,25 @@ public class SpectrumData extends MeasureData{
 		SpectrumFile file = new SpectrumFile(this);
 		file.Save(this);
 	}
+	
+	String statusString()
+	{
+		if ((nStatus & 0x00000080) > 0 )
+			return "Mentenance";
+		if ((nStatus & 0x00000001) > 0 )
+			return "MachineTrouble";
+		if ((nStatus & 0x00000008) > 0 )
+			return "PreampTrouble";
+		if ((nStatus & 0x00000004) > 0 )
+			return "MachineTrouble";
+		if ((nStatus & (1 << 4 | 1 << 11 | 1 << 12|1 << 13)) > 0 )
+			return "PreampTrouble";
+		if ((nStatus & (1 << 16 | 1 << 17 | 1 << 18)) > 0 )
+			return "ComErr";
+		if ((nStatus & (1 << 8 | 1 << 9 | 1 << 10)) > 0 )
+			return "Alarm";
+		if ((nStatus & (1 << 19)) > 0 )
+			return "Other";
+		return "Normal";
+	}
 }

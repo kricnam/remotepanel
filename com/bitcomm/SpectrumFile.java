@@ -217,11 +217,11 @@ public class SpectrumFile extends File {
 				Data.dateEnd.day,
 				Data.dateEnd.hour,Data.dateEnd.minute,Data.nCollectTime,Data.Time);
 		sb.append("CalibA=5.0\r\nCalibB=0.0\r\n");
-		formatter.format("Dose=%s\r\nStateCode=%d\r\nHV=%s\r\nTemp=%s\r\n"+
+		formatter.format("Dose=%s\r\nStateCode=%s\r\nHV=%s\r\nTemp=%s\r\n"+
 				"LV=%s\r\nGPSDate=%04d%02d%d %02d:%02d\r\nN=%03d%02d%02d\r\n"+
 				"E=%03d%02d%02d\r\nH=%d\r\nSAT=%d\r\n"+
 				"GEOD=%d\r\nFOM=%d\r\n[Spectrum]\r\n",
-				String.valueOf(Data.nNaIData/10.0),Data.nStatus,String.valueOf(Data.nHVVolt/10.0),String.valueOf(Data.nThermoral/10.0),
+				String.valueOf(Data.nNaIData/10.0),Data.statusString(),String.valueOf(Data.nHVVolt/10.0),String.valueOf(Data.nThermoral/10.0),
 				String.valueOf(Data.nBattVoltage/10.0),Data.dateGPS.year,
 				Data.dateGPS.month,Data.dateGPS.day,Data.dateGPS.hour,Data.dateGPS.minute,
 				Data.gps.laDegree,Data.gps.laMinute,Data.gps.laSecond10/10,

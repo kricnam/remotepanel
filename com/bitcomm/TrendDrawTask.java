@@ -59,9 +59,9 @@ public class TrendDrawTask extends Thread {
 		}
 		cal.setTimeInMillis(time*60000*PT);
 		dataStart.setTime(cal);
-		System.out.println(dataStart.CSVString());
-		System.out.println(String.valueOf(nDataNum));
-		System.out.println(String.valueOf(PT));
+		//System.out.println(dataStart.CSVString());
+		//System.out.println(String.valueOf(nDataNum));
+		//System.out.println(String.valueOf(PT));
 		UI.graph.Data = new double[total][nDataNum];
 		UI.graph.strScaleX = new String[nDataNum];
 		UI.graph.ResetData();
@@ -138,7 +138,7 @@ public class TrendDrawTask extends Thread {
 		if (UI.bCancel) return;
 		if (data==null) return;
 		val = data.getDoesRatenGy();
-		System.out.println(data.date.CSVString());
+		//System.out.println(data.date.CSVString());
 		strT = data.date.toStringShortDate()+"\r\n"+data.date.toStringTime();
 		UI.getDisplay().asyncExec(new Runnable(){
 
