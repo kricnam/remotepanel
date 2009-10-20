@@ -19,6 +19,7 @@ public class CommunicationTask extends Thread {
 	boolean Pause;
 	boolean Paused;
 	int nError;
+	int nHC_err;
 	int nInterval;
 	long nReserveTime;
 
@@ -30,6 +31,7 @@ public class CommunicationTask extends Thread {
 		Paused = false;
 		nError = 0;
 		nInterval = 600;
+		nHC_err = 0;
 	}
 
 	void HealthCheck() throws Exception {
@@ -53,14 +55,19 @@ public class CommunicationTask extends Thread {
 						face.setValue();
 				}
 			});
+			nHC_err=0;
 		}
 		else
-			SetCommunicationError();
+		{
+			nHC_err++;
+			System.out.println("Health Check return error");
+			if (nHC_err>3) SetCommunicationError();
+		}
 	}
 
 	void SetCommunicationError()
 	{
-
+		if (face.isDisposed()) return;
 		face.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 	
@@ -72,6 +79,7 @@ public class CommunicationTask extends Thread {
 	
 	void SetConnecting()
 	{
+		if (face.isDisposed()) return;
 		face.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 	
@@ -83,6 +91,7 @@ public class CommunicationTask extends Thread {
 	
 	void PromptErr(String strMsg1)
 	{
+		if (face.isDisposed()) return;
 		final String strMsg = strMsg1;
 		face.getDisplay().asyncExec(new Runnable() {
 			public void run() {
@@ -106,7 +115,7 @@ public class CommunicationTask extends Thread {
 			face.data = new DoesRateData();
 
 		while (!Stop && !face.isDisposed()) {
-			//wait other task ok
+			//wait other task is ready
 			while (Pause) {
 				Paused = true;
 				try {
@@ -184,11 +193,16 @@ public class CommunicationTask extends Thread {
 			}
 
 			if (calNow.getTimeInMillis()-calDoesTime.getTimeInMillis() >
-					nInterval*1000 || 
-					calNow.get(Calendar.MINUTE)%(nInterval /60)==0)
+					nInterval*1000)
 			{
+				if (calNow.get(Calendar.MINUTE)%(nInterval/60)>0)
+				{
+					calNow.set(Calendar.MINUTE, calNow.get(Calendar.MINUTE)/(nInterval/60)*(nInterval/60));
+					System.out.println("set time to"+ String.valueOf(calNow.get(Calendar.MINUTE)));
+				}
 				calDoesTime.setTimeInMillis(calNow.getTimeInMillis());
-				nReserveTime = calNow.getTimeInMillis() + nInterval*1000; 
+				nReserveTime = calNow.getTimeInMillis() + nInterval*1000;
+				System.out.println("resever time "+ String.valueOf(nReserveTime));
 				try 
 				{
 					port.Send(cmdPacket.ByteStream());
@@ -253,6 +267,8 @@ public class CommunicationTask extends Thread {
 	
 	void backupSpectrumData()
 	{
+		if (AlokaPanel.backup!=null) return;
+		System.out.println("backup spectrum data");
 		CommunicationHistoryData his;
 		his = new CommunicationHistoryData(port,(byte)face.nMachineNum,CommunicationHistoryData.Spectrum);
 		long nlastTime = AlokaPanel.GetSettingLong("LastSpectrumDate");
@@ -261,7 +277,6 @@ public class CommunicationTask extends Thread {
 		cal.setTimeInMillis(nlastTime);
 		his.startTime.setTime(cal);
 		
-		int err=0;
 		do{
 			try {
 				his.Confirm();
@@ -270,20 +285,6 @@ public class CommunicationTask extends Thread {
 				e.printStackTrace();
 			}
 			
-			if (his.Confirmed==null)
-			{
-				err++;
-				if (err>3)
-				{
-					break;
-				}
-				try {
-					sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				continue;
-			}
 		}while(false);
 		
 		if (his.Confirmed!=null)
@@ -308,6 +309,7 @@ public class CommunicationTask extends Thread {
 				{
 					try {
 						dataS.Save();
+						System.out.println("spectrum data saved");
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (Exception e) {
@@ -318,10 +320,9 @@ public class CommunicationTask extends Thread {
 				{
 						break;
 				}
-				err=0;
 				his.Confirmed.startNo++;
 				his.Confirmed.nCount--;
-				if (i>2) break;
+				if (i>1) break;
 			};
 			boolean done;
 			try {

@@ -439,13 +439,21 @@ public class BackupView extends Composite implements Listener {
 			}
 
 			meter[n].Pause(true);
+			int ii=0;
 			while (!meter[n].isPaused())
 				{
+				   String strMsg = "Communication port busy, waiting";
+				   for(int m=0;m < ii%3+1;m++)
+				   {
+					   strMsg+=".";
+				   }
+				   lblMsg.setText(strMsg);
 				    try {
-						Thread.sleep(100);
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					ii++;
 				};
 			BackupDataTask bk = new BackupDataTask(DataType,this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,

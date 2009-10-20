@@ -66,7 +66,7 @@ public class BackupDataTask extends Thread {
 					Print("Please try to download late.\n");
 					break;
 				}
-				Print("will try again...\n");
+				Print("try again...\n");
 				try {
 					sleep(1000);
 				} catch (InterruptedException e) {
@@ -125,7 +125,7 @@ public class BackupDataTask extends Thread {
 					strLeft = sb.toString();
 					
  				}
-				setMsg(String.valueOf(his.Confirmed.nCount)+" left." + strLeft);
+				setMsg(String.valueOf(his.Confirmed.nCount)+" records left." + strLeft);
 				try {
 					Print("Request...\n");
 					his.DataRequest();
