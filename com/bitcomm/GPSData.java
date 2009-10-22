@@ -14,12 +14,12 @@ public class GPSData extends MeasureData {
 	byte nGeoSys;
 	GPSData(byte[]Data, int start)
 	{
-		lgDegree = Data[start];
-		lgMinute = Data[start+1];
-		lgSecond10 = (short)ToChar(Data, start+2);
-		laDegree = Data[start+4];
-		laMinute = Data[start+5];
-		laSecond10 = (short)ToChar(Data,start+6);
+		laDegree = Data[start];
+		laMinute = Data[start+1];
+		laSecond10 = (short)ToChar(Data, start+2);
+		lgDegree = Data[start+4];
+		lgMinute = Data[start+5];
+		lgSecond10 = (short)ToChar(Data,start+6);
 		nAltitude = (short)ToChar(Data,start+8);
 		nSatlite = Data[start+10];
 		nGeoSys = Data[start+11];
@@ -53,7 +53,7 @@ public class GPSData extends MeasureData {
 	{
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb);
-		formatter.format("%02d%02d%03d,%03d%02d%03d,%d,%d,%d", laDegree,laMinute,lgSecond10,
+		formatter.format("%02d%02d%03d,%03d%02d%03d,%d,%d,%d", laDegree,laMinute,laSecond10,
 				lgDegree,lgMinute,lgSecond10,nAltitude,nSatlite,nGeoSys);
 		return sb.toString();
 	}
