@@ -38,6 +38,12 @@ public class CommunicationTask extends Thread {
 		HealthCheckRequest hc = new HealthCheckRequest();
 		hc.nStatus = 0;
 		//hc.nStatus = face.data.nStatus;
+		if (nHC_err > 6)
+		{
+			SetConnecting();
+		    nHC_err=0;
+		}
+		
 		DataPacket pk = new DataPacket((byte) face.nMachineNum, hc.ByteStream());
 		port.Send(pk.ByteStream());
 
@@ -47,6 +53,7 @@ public class CommunicationTask extends Thread {
 			HealthCheckAnswer answer = new HealthCheckAnswer(packet
 					.ByteStream());
 			face.data.nStatus = answer.nStatus;
+			face.statusDate.setTime(answer.date.getTime());
 			//System.out.println(String.format("%X", face.data.nStatus));
 			//System.out.println(answer.date.CSVString());
 			face.getDisplay().asyncExec(new Runnable() {
@@ -127,7 +134,7 @@ public class CommunicationTask extends Thread {
 				if (face.isDisposed())
 					return;
 			};
-
+			
 			Paused = false;
 			calNow = Calendar.getInstance();
 			if (!port.IsConnected()) 
@@ -141,25 +148,25 @@ public class CommunicationTask extends Thread {
 				catch (Exception e) 
 				{
 					e.printStackTrace();
-					SetCommunicationError();
-
 					if (nError==0) PromptErr(e.getMessage());
 					nError++;
 					Paused = true;
 					try {
 						System.out.println("sleep for re-connect");
-						sleep(5000);
+						sleep(2000);
+						SetCommunicationError();
+						sleep(3000);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
 					
-					SetCommunicationError();
+					
 					continue;
 				}
 			}
 			
 			nError=0;
-			
+			if (face.data.cPT > 0) nInterval = Math.min(nInterval, face.data.cPT*60);
 			if (calNow.getTimeInMillis()-calHCTime.getTimeInMillis() > 20000)
 			{
 				calHCTime.setTimeInMillis(calNow.getTimeInMillis());
@@ -198,11 +205,10 @@ public class CommunicationTask extends Thread {
 				if (calNow.get(Calendar.MINUTE)%(nInterval/60)>0)
 				{
 					calNow.set(Calendar.MINUTE, calNow.get(Calendar.MINUTE)/(nInterval/60)*(nInterval/60));
-					System.out.println("set time to"+ String.valueOf(calNow.get(Calendar.MINUTE)));
 				}
-				calDoesTime.setTimeInMillis(calNow.getTimeInMillis());
+				
 				nReserveTime = calNow.getTimeInMillis() + nInterval*1000;
-				System.out.println("resever time "+ String.valueOf(nReserveTime));
+				
 				try 
 				{
 					port.Send(cmdPacket.ByteStream());
@@ -212,6 +218,17 @@ public class CommunicationTask extends Thread {
 					try {
 						port.Close();
 					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					continue;
+				}
+				catch (IOException ee)
+				{
+					ee.printStackTrace();
+					try {
+						port.Close();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					continue;
@@ -237,21 +254,30 @@ public class CommunicationTask extends Thread {
 						face.data.parse(packet.ByteStream());
 
 						face.data.Save();
+						
+						calNow.setTimeInMillis(face.data.date.getTime().getTimeInMillis());
+						face.statusDate.setTime(calNow);
+						nReserveTime = calNow.getTimeInMillis() + nInterval*1000;
+						calDoesTime.setTimeInMillis(face.data.date.getTime().getTimeInMillis());
+						
 						if (!face.isDisposed())
-						face.getDisplay().asyncExec(new Runnable() {
-							public void run() {
+						{	
+							
+							face.getDisplay().asyncExec(new Runnable() {
+								public void run() {
 								
 									face.setValue();
-							}
-						});
+								}
+							});
+							backupSpectrumData();
+						}
 					}
 				} 
 				catch (Exception e) 
 				{
 					e.printStackTrace();
-					continue;
 				}
-				backupSpectrumData();
+				
 			}
 			
 			Paused = true;

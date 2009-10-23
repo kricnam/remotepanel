@@ -273,12 +273,12 @@ public class BackupView extends Composite implements Listener {
 		
 		butCancel.addSelectionListener(new SelectionListener() {
 			
-			@Override
+			
 			public void widgetSelected(SelectionEvent arg0) {
 				bCancel = true;
 			}
 			
-			@Override
+			
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 			}
 		});

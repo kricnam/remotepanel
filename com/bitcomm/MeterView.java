@@ -15,6 +15,7 @@ public class MeterView extends Composite  {
 	int nMachineNum;
 	Label label;
 	DoesRateData data;
+	DateTime statusDate;
 	CommunicationTask dataTask;
 	CommunicationPort ComPort;
 	final static RGB rgbGreen = new RGB(150,250,150);
@@ -42,12 +43,13 @@ public class MeterView extends Composite  {
 		meter.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 		ComPort = new CommunicationPort();
 		dataTask = new CommunicationTask(this,ComPort);
+		statusDate =  new DateTime();
 	}
 	
 	void showOffLine()
 	{
 		meter.rgbLED = rgbRed;
-		meter.strLED = ConstData.strOffline;
+		meter.strLED = ConstData.strOffline + " " +statusDate.toStringTime();;
 		meter.rgbAlarm = rgbOff;
 		meter.rgbBatty = rgbOff;
 		meter.rgbComm = rgbOff;
@@ -78,13 +80,15 @@ public class MeterView extends Composite  {
 			if ((data.nStatus & 0x10000000) > 0 )
 			{
 				meter.rgbLED = rgbRed;
-				meter.strLED = ConstData.strNoConnect;
+				meter.strLED = ConstData.strNoConnect 
+				+ " " + statusDate.toStringTime();
 			}
 				
 			if ((data.nStatus & 0x00000001) > 0 )
 			{	
 				meter.rgbLED = rgbYellow;
-				meter.strLED = ConstData.strAbnoralData;
+				meter.strLED = ConstData.strAbnoralData+ " "+
+				statusDate.toStringTime();;
 			}
 		}
 		else
@@ -92,12 +96,12 @@ public class MeterView extends Composite  {
 			if (ComPort.IsConnected())
 			{
 				meter.rgbLED = rgbGreen;
-				meter.strLED = ConstData.strNormal;
+				meter.strLED = ConstData.strNormal + " " +statusDate.toStringTime();
 			}
 			else
 			{
 				meter.rgbLED = rgbRed;
-				meter.strLED = ConstData.strOffline;				
+				meter.strLED = ConstData.strOffline + " " + statusDate.toStringTime();				
 			}
 		}
 		

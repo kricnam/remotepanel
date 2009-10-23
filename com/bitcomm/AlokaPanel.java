@@ -196,7 +196,6 @@ public class AlokaPanel {
 
 		shell.setLayout(layout);
 		
-
 		Composite tool = new Composite(shell,SWT.NONE);
 		Composite Logo = new Composite(shell,SWT.NONE);
 
@@ -267,7 +266,7 @@ public class AlokaPanel {
 				}
 				if (backup!=null)
 					return;
-				Shell s = new Shell(shell);
+				Shell s = new Shell(shell,SWT.RESIZE);
 				s.setLayout(new FillLayout());
 				trend=new TrendView(s,SWT.BORDER);
 				trend.meter = meter;

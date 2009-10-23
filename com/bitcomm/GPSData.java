@@ -26,16 +26,15 @@ public class GPSData extends MeasureData {
 	}
 	GPSData(String N,String E,String H,String SAT, String GEOD)
 	{
-		laDegree = (byte) Integer.parseInt(N.substring(0, 1));
-		laMinute = (byte) Integer.parseInt(N.substring(2, 3));
-		laSecond10 = (short)(Integer.parseInt(N.substring(4, 6)));
-		lgDegree = (byte)(Integer.parseInt(E.substring(0, 2)));
-		lgMinute = (byte) Integer.parseInt(E.substring(3, 4));
-		lgSecond10 = (short)(Integer.parseInt(E.substring(5, 7)));
+		laDegree = (byte) Integer.parseInt(N.substring(0, 2));
+		laMinute = (byte) Integer.parseInt(N.substring(2, 4));
+		laSecond10 = (short)(Integer.parseInt(N.substring(4)));
+		lgDegree = (byte)(Integer.parseInt(E.substring(0, 3)));
+		lgMinute = (byte) Integer.parseInt(E.substring(3, 5));
+		lgSecond10 = (short)(Integer.parseInt(E.substring(5)));
 		nAltitude = (short)(Integer.parseInt(H));
 		nSatlite = (byte)(Integer.parseInt(SAT));
 		nGeoSys = (byte)(Integer.parseInt(GEOD));
-
 	}
 	
 	public GPSData() {
