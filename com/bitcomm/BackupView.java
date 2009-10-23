@@ -432,7 +432,7 @@ public class BackupView extends Composite implements Listener {
 				continue;
 			int n = station[i];
 			
-			if (!meter[n].isConnected())
+			if (!meter[n].isConnected() )
 			{
 				AlokaPanel.MessageBox("Warning", "network not ready, please try later");
 				continue;
@@ -441,7 +441,7 @@ public class BackupView extends Composite implements Listener {
 			meter[n].Pause(true);
 			int ii=0;
 			while (!meter[n].isPaused())
-				{
+			{
 				   String strMsg = "Communication port busy, waiting";
 				   for(int m=0;m < ii%3+1;m++)
 				   {
@@ -454,7 +454,7 @@ public class BackupView extends Composite implements Listener {
 						e.printStackTrace();
 					}
 					ii++;
-				};
+			};
 			BackupDataTask bk = new BackupDataTask(DataType,this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
 						end);

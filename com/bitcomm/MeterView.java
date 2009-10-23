@@ -251,7 +251,7 @@ public class MeterView extends Composite  {
 	}
 	public boolean isConnected()
 	{
-		return meter.strLED!=ConstData.strOffline;
+		return meter.strLED==ConstData.strNormal;
 	}
 
 }

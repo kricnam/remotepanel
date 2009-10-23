@@ -38,7 +38,7 @@ public class CommunicationTask extends Thread {
 		HealthCheckRequest hc = new HealthCheckRequest();
 		hc.nStatus = 0;
 		//hc.nStatus = face.data.nStatus;
-		if (nHC_err > 6)
+		if (nHC_err > 4)
 		{
 			SetConnecting();
 		    nHC_err=0;

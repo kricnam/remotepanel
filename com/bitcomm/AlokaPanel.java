@@ -266,7 +266,7 @@ public class AlokaPanel {
 				}
 				if (backup!=null)
 					return;
-				Shell s = new Shell(shell,SWT.RESIZE);
+				Shell s = new Shell(shell,SWT.RESIZE|SWT.DIALOG_TRIM);
 				s.setLayout(new FillLayout());
 				trend=new TrendView(s,SWT.BORDER);
 				trend.meter = meter;
