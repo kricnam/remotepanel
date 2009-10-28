@@ -50,8 +50,9 @@ public class BackupDataTask extends Thread {
 			try {
 				Print("Confirm data...\n");
 				his.Confirm();
-				Print("Confirm answered.\n");
+				
 				his.ConfirmAnswer();
+				
 			} catch (Exception e) {
 				Print(e.getMessage());
 				e.printStackTrace();
@@ -61,7 +62,7 @@ public class BackupDataTask extends Thread {
 			{
 				err++;
 				Print("Error read comfirm data.");
-				if (err>3)
+				if (err>2)
 				{
 					Print("Please try to download late.\n");
 					break;
@@ -74,7 +75,10 @@ public class BackupDataTask extends Thread {
 				}
 				continue;
 			}
-		}while(false);
+			Print("Confirm answered.\n");
+			setMsg("");
+			break;
+		}while(true);
 		
 		if (his.Confirmed!=null)
 		{

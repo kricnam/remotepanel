@@ -455,6 +455,7 @@ public class BackupView extends Composite implements Listener {
 					}
 					ii++;
 			};
+			lblMsg.setText("");
 			BackupDataTask bk = new BackupDataTask(DataType,this,
 						meter[n].ComPort, (byte) meter[n].nMachineNum, start,
 						end);
