@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry including="com/bitcomm/*.java|org/vafada/swtcalendar/*.java" kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/opt/eclipse/plugins/org.eclipse.equinox.common_3.5.0.v20090520-1800.jar"/>
+	<classpathentry kind="lib" path="/opt/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_64_3.5.0.v3550b.jar"/>
+	<classpathentry kind="lib" path="/opt/eclipse/plugins/org.eclipse.jface_3.5.0.I20090525-2000.jar"/>
+	<classpathentry kind="lib" path="/opt/eclipse/plugins/org.eclipse.core.commands_3.5.0.I20090525-2000.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
