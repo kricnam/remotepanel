@@ -118,6 +118,14 @@ public class CommunicationTask extends Thread {
 		Command cmd = new Command(Command.CommandType.CurrentData);
 		DataPacket cmdPacket = new DataPacket((byte) face.nMachineNum, cmd
 				.ByteStream());
+		
+		byte[] a = cmdPacket.ByteStream();
+		for(int i=0;i<a.length;i++)
+		{
+			System.out.printf("%x ", a[i]);
+		}
+		System.out.println();
+		
 		if (face.data == null)
 			face.data = new DoesRateData();
 
