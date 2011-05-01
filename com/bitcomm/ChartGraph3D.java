@@ -528,10 +528,14 @@ public class ChartGraph3D extends Canvas {
 			pt=gc.stringExtent(strT);
 			gc.drawString(strT, x+width/2-pt.x/2, y+Margin/2-pt.y);
 		}
+		
+		int dX = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.cos(degree)));
+		int dY = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.sin(degree)));
+		
 		pt=gc.stringExtent("Counts");
-		gc.drawString("Counts", x+Margin-pt.x, y+Margin-2*pt.y);
+		gc.drawString("Counts", x+Margin-pt.x, y+dX+Margin-2*pt.y);
 		pt=gc.stringExtent("Channel");
-		gc.drawString("Channel", x+width-Margin+pt.x/6, y+height-Margin+pt.y);
+		gc.drawString("Channel", x+width-dY- Margin +pt.x/6, y+height-Margin+pt.y);
 		
 		if ((bSwitch && Data.length > 1)||Data.length==1)
 		{

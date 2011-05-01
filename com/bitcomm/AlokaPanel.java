@@ -185,7 +185,7 @@ public class AlokaPanel {
 		homedir = System.getProperty("user.dir");
 		d = new Display();
 		
-		shell =new Shell(d,SWT.MIN);
+		shell =new Shell(d);//,SWT.MIN|SWT.MAX);
 		shell.setText(ConstData.strName);
 		Image imgShell = new Image(d,"com/bitcomm/resource/burn.png");
 		shell.setImage(imgShell);

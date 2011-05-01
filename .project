@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>alokaview</name>
+	<name>remotepanel</name>
 	<comment></comment>
 	<projects>
+		<project>org.eclipse.swt</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -12,8 +13,6 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.eclipse.jem.beaninfo.BeanInfoNature</nature>
 	</natures>
 </projectDescription>
