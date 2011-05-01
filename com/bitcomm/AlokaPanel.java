@@ -199,7 +199,7 @@ public class AlokaPanel {
 		Composite tool = new Composite(shell,SWT.NONE);
 		Composite Logo = new Composite(shell,SWT.NONE);
 
-		Logo.addKeyListener(new KeyListener() {
+		tool.addKeyListener(new KeyListener() {
 			public void keyReleased(KeyEvent arg0) {
 			
 			}
