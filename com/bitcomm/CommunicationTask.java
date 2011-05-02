@@ -295,8 +295,8 @@ public class CommunicationTask extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
-		;
+		};
+		System.out.println("stoped");
 	}
 	
 	void backupSpectrumData()

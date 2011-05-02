@@ -179,6 +179,10 @@ public class AlokaPanel {
 	}
 	
 	public static void main(String[] args) {
+		
+		TCPServer server=new TCPServer();
+		new Thread(server).start();
+		
 		File root = new File("root");
 		if (!root.exists())
 					root.mkdir();
@@ -458,6 +462,8 @@ public class AlokaPanel {
 			}
 		}
 
+		server.stop();
+		
 		meter[0].dataTask.Stop = true;
 
 		imgSetup.dispose();
