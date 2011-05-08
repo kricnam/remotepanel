@@ -1,19 +1,19 @@
 /*
- * EM770WModem.cpp
+ * EM669Modem.cpp
  *
  *  Created on: 2011-2-21
  *      Author: mxx
  */
 
-#include "EM770WModem.h"
+#include "EM660Modem.h"
 #include "TraceLog.h"
 
-EM770WModem::EM770WModem() {
-	m_szType = "HUAWEI EM770W";
+EM660Modem::EM660Modem() {
+	m_szType = "HUAWEI EM660";
 	m_szDefaultPort = "/dev/ttyUSB2";
 }
 
-EM770WModem::~EM770WModem() {
+EM660Modem::~EM660Modem() {
 	// TODO Auto-generated destructor stub
 }
 

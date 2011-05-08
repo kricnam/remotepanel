@@ -11,10 +11,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 /* MODEM_H_ */
-//The modem implementation based on EM770W module
+//The modem implementation based on EM660 module
 //other module define the difference in derived class
-#include "EM770WModem.h"
-#include "MU203Modem.h"
+#include "EM660Modem.h"
 
 #ifdef TEST_MODEM
 #include "pdu.h"
@@ -124,10 +123,8 @@ Modem* Modem::CreateInstance(const char* szName) {
 			if (strCache.find("OK") != string::npos) {
 				TRACE("Found OK!");
 				com.Close();
-				if (strCache.find("EM770") != string::npos) {
-					return (Modem*) new EM770WModem;
-				}else if(strCache.find("MU203") != string::npos){
-					return (Modem*) new MU203Modem;
+				if (strCache.find("EM660") != string::npos) {
+					return (Modem*) new EM660Modem;
 				}
 			}
 			if (strCache.find("ERROR:") != string::npos) {
@@ -256,6 +253,7 @@ string Modem::chopLine(const char* szLine) {
 
 bool Modem::Init(void) {
 	if (port.IsOpen()) {
+		DEBUG("Set Echo off");
 		port.Write("ATE0\r\n");
 		if (!WaitATResponse("OK", 10))
 			return false;
@@ -273,9 +271,9 @@ bool Modem::Dial(const char* szNo, time_t& start, time_t& end) {
 	INFO("Calling %s",szNo);
 	m_strLastError.clear();
 	if (port.IsOpen()) {
-		string strAT = "ATD";
+		string strAT = "AT+CDV";
 		strAT += szNo;
-		strAT += ";\r\n";
+		strAT += "\r\n";
 		if (port.Write(strAT.c_str(), strAT.size()) < 0) {
 			INFO("Dialing %s command failed",strAT.c_str());
 			return false;
@@ -556,7 +554,7 @@ bool Modem::SetSMSIndicate(bool enable) {
 	if (port.IsOpen()) {
 		char szAT[48] = { 0 };
 		if (enable)
-			sprintf(szAT, "AT+CNMI=2,1,0,2,1\r\n");
+			sprintf(szAT, "AT+CNMI=1,1,0,1,1\r\n");
 		else
 			sprintf(szAT, "AT+CNMI=1,1,0,1,1\r\n");
 
@@ -575,7 +573,8 @@ bool Modem::SetSMSIndicate(bool enable) {
 
 bool Modem::SetSMSFormatPDU(void) {
 	if (port.IsOpen()) {
-		if (port.Write("AT+CMGF=0\r\n") < 0) {
+		DEBUG("AT+CMGF=1");
+		if (port.Write("AT+CMGF=1\r\n") < 0) {
 			INFO("failed");
 			return false;
 		}
@@ -608,7 +607,8 @@ bool Modem::IndicateSMessage(string& strInd, string& mem, int& id) {
 bool Modem::ReadSMSPDU(int id, int& stat, int& len, string& pdu) {
 	if (port.IsOpen()) {
 		char szAT[48] = { 0 };
-		sprintf(szAT, "AT+CMGR=%d\r\n", id);
+		sprintf(szAT, "AT^HCMGR=%d\r\n", id);
+		DEBUG(szAT);
 		if (port.Write(szAT) < 0) {
 			INFO("%s failed",szAT);
 			return false;
@@ -616,10 +616,23 @@ bool Modem::ReadSMSPDU(int id, int& stat, int& len, string& pdu) {
 
 		if (WaitATResponse("OK", 10) > 0) {
 			string tmp;
-			tmp = chopLine("CMGR");
-			sscanf(tmp.c_str(), "CMGR:%d,,%d", &stat, &len);
-			pdu = chopLine();
+			tmp = chopLine("^HCMGR");
+			int y,m,d,h,mm,ss,format,type,prt,prv,lang,caller1,caller2;
+
+//<CR><LF>^HCMGR: <callerID>, <year>,	<month>, <day>, <hour>, <minute>, <second>,<lang>,<format>, <length>, <prt>, <prv>,<type>
+//<CR><LF><msg><CTRL+Z>
+//<CR><LF>OK
+//<CR><LF>
+			sscanf(tmp.c_str(), "^HCMGR:%6d%6d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+					&caller1,&caller2,&y,&m,&d,&h,&mm,&ss,&lang,&format,&len,&prt,&prv,&stat);
+
+			sprintf(szAT,"%d%d",caller1,caller2);
+			m_strCaller = szAT;
+			pdu = chopLine().substr(0,len);;
+			DEBUG("len=%d",len);
+
 			strCache.clear();
+
 			return true;
 		}
 	}
@@ -627,3 +640,54 @@ bool Modem::ReadSMSPDU(int id, int& stat, int& len, string& pdu) {
 
 }
 
+bool Modem::DeleteSMS(int id)
+{
+	if (port.IsOpen()) {
+		char szAT[48] = { 0 };
+		sprintf(szAT, "AT+CMGD=%d\r\n",id);
+		DEBUG(szAT);
+		if (port.Write(szAT) < 0) {
+			INFO("%s failed",szAT);
+			return false;
+		}
+
+		if (WaitATResponse("OK", 10) > 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Modem::DeleteSMSAll(void)
+{
+	if (port.IsOpen())
+	{
+		char szAT[48] = { 0 };
+		sprintf(szAT, "AT+CMGD=?\r\n");
+		DEBUG(szAT);
+		if (port.Write(szAT) < 0) {
+			INFO("%s failed",szAT);
+			return false;
+		}
+
+		if (WaitATResponse("OK", 10) > 0)
+		{
+			string tmp;
+			char szBuf[2048]={0};
+			tmp = chopLine("+CMGD");
+			sscanf(tmp.c_str(), "+CMGD:(%s)", szBuf);
+			DEBUG(szBuf);
+			strtok(szBuf,",");
+			char* pID;
+			while(pID=strtok(NULL,","))
+			{
+				int i = atoi(pID);
+				DeleteSMS(i);
+			};
+
+			return true;
+		}
+	}
+	return false;
+}

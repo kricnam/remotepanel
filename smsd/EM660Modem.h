@@ -1,20 +1,20 @@
 /*
- * EM770WModem.h
+ * EM660Modem.h
  *
  *  Created on: 2011-2-21
  *      Author: mxx
  */
 
-#ifndef EM770WMODEM_H_
-#define EM770WMODEM_H_
+#ifndef EM660Modem_H_
+#define EM660Modem_H_
 
 #include "Modem.h"
 
-class EM770WModem: public virtual Modem {
+class EM660Modem: public virtual Modem {
 public:
-	EM770WModem();
-	virtual ~EM770WModem();
+	EM660Modem();
+	virtual ~EM660Modem();
 
 };
 
-#endif /* EM770WMODEM_H_ */
+#endif /* EM660Modem_H_ */

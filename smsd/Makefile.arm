@@ -1,0 +1,15 @@
+CXXFLAGS =	-O2 -g -Wall -fmessage-length=0 -lpthread 
+CXX = /usr/local/arm/4.3.2/bin/arm-none-linux-gnueabi-g++ 
+SMSD_OBJS =	Modem.o SerialPort.o TraceLog.o pdu.o \
+		EM660Modem.o  smsd.o
+LIBS =   -lutil
+
+SMSD_TARGET =	smsd
+
+$(SMSD_TARGET):	$(SMSD_OBJS)
+	$(CXX) $(LIBS) $(CXXFLAGS) -o $(SMSD_TARGET) $(SMSD_OBJS)
+
+all:	$(SMSD_TARGET)
+
+clean:
+	rm -f *.o $(SMSD_TARGET)

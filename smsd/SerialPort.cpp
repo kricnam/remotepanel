@@ -58,7 +58,7 @@ int SerialPort::Open(const char* szDev)
 	if (strDevName != szDev)
 		strDevName = szDev;
 	TRACE("%s!%s!",szDev, strDevName.c_str());
-	system("ls /dev/ttyUSB*");
+
 	handle = open(strDevName.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (handle < 0)
 	{

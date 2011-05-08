@@ -1,7 +1,7 @@
 CXXFLAGS =	-O2 -g -Wall -fmessage-length=0 -lpthread
 
-SMSD_OBJS =	Modem.o SerialPort.o TraceLog.o  \
-		EM660Modem.o Process.o smsd.o
+SMSD_OBJS =	Modem.o SerialPort.o TraceLog.o pdu.o \
+		EM660Modem.o  smsd.o
 LIBS = -lutil
 
 SMSD_TARGET =	smsd

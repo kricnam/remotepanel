@@ -128,6 +128,8 @@ public:
 	virtual bool SetSMSFormatPDU(void);
 	virtual bool ActivePDP(int cid,int& nDelay);
 	virtual bool ReadSMSPDU(int id,int& stat, int& len,string& pdu);
+	virtual bool DeleteSMS(int id);
+	virtual bool DeleteSMSAll(void);
 	virtual bool IndicateDialing(string& strInd,int& id,int& type);
 	virtual bool IndicateNetConnected(string& strInd,int& id);
 	virtual bool IndicateOffHook(string& strInd,int& id,int& type);
@@ -140,8 +142,8 @@ public:
 	virtual string WaitIndication(time_t& start,int timeout);
 	virtual void CSQ2DBm(int& rssi);
 	const char* m_szType;
+	string m_strCaller;
 protected:
-
 	virtual string chopLine(const char* szLine=NULL);
 
 	string strCache;
