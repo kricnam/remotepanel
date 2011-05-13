@@ -2,11 +2,17 @@ CXXFLAGS =	-O2 -g -Wall -fmessage-length=0 -lpthread
 
 SMSD_OBJS =	Modem.o SerialPort.o TraceLog.o pdu.o \
 		EM660Modem.o  smsd.o
+COMD_OBJS =	Modem.o SerialPort.o TraceLog.o pdu.o \
+		TCPPort.o  comd.o
 LIBS = -lutil
 
 SMSD_TARGET =	smsd
+COMD_TARGET =   comd
 
 $(SMSD_TARGET):	$(SMSD_OBJS)
+	$(CXX) $(CXXFLAGS) -o $(SMSD_TARGET) $(SMSD_OBJS) $(LIBS)
+
+$(COMD_TARGET):	$(COMD_OBJS)
 	$(CXX) $(CXXFLAGS) -o $(SMSD_TARGET) $(SMSD_OBJS) $(LIBS)
 
 all:	$(SMSD_TARGET)
