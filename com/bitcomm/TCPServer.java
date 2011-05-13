@@ -48,6 +48,7 @@ public class TCPServer implements Runnable {
 		} catch (IOException ex) {
 			Logger.getLogger(TCPServer.class.getName()).log(Level.SEVERE, null,
 					ex);
+			ex.printStackTrace();
 		}
 	}
 
@@ -70,16 +71,18 @@ public class TCPServer implements Runnable {
 						SelectionKey key = (SelectionKey) it.next();
 						it.remove();
 						if (!key.isValid())
+						{
 							continue;
+						}
 						if (key.isAcceptable()) {
 							System.out.println("isAcceptable");
 							getConn(key);
 						} else if (key.isReadable()) {
-							System.out.println("isReadable");
+							//System.out.println("isReadable");
 							readMsg(key);
 						} else if (key.isValid() && key.isWritable()) {
 							if (writeMsg != null) {
-								System.out.println("isWritable");
+								//System.out.println("isWritable");
 								writeMsg(key);
 							}
 						}
@@ -89,13 +92,14 @@ public class TCPServer implements Runnable {
 
 				}
 				Thread.yield();
-				System.out.println("+++++");
+				//System.out.println("+++++");
 			}
 			System.out.println("service shut down");
 		} 
 		catch (IOException ex) {
 			Logger.getLogger(TCPServer.class.getName()).log(Level.SEVERE, null,
 					ex);
+			ex.printStackTrace();
 		}
 	}
 
@@ -114,7 +118,15 @@ public class TCPServer implements Runnable {
 		StringBuffer sb = new StringBuffer();
 
 		SocketChannel sc = (SocketChannel) key.channel();
-		System.out.print(sc.socket().getRemoteSocketAddress() + " ");
+		if (!sc.socket().isConnected())
+		{
+			key.cancel();
+			sc.close();
+			sc.socket().close();
+			return;
+		}
+		
+		//System.out.print(sc.socket().getRemoteSocketAddress() + " ");
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
 		buffer.clear();
 		int len = 0;
@@ -125,6 +137,9 @@ public class TCPServer implements Runnable {
 		}
 		if (sb.length() > 0)
 			System.out.println("get from client:" + sb.toString());
+		else
+			return;
+		
 		if (sb.toString().trim().toLowerCase().equals("quit")) {
 			sc.write(ByteBuffer.wrap("BYE".getBytes()));
 			System.out.println("client is closed "
@@ -136,13 +151,15 @@ public class TCPServer implements Runnable {
 		} 
 		else 
 		{
-			String toMsg = sc.socket().getRemoteSocketAddress() + " said:"
-					+ sb.toString() ;
+			String toMsg = sc.socket().getRemoteSocketAddress() + "-88 said:"
+					+ sb.toString();
 			System.out.println(toMsg);
 			toMsg = sb.toString();
 			Iterator it = key.selector().keys().iterator();
-			while (it.hasNext()) {
+			while (it.hasNext()) 
+			{
 				SelectionKey skey = (SelectionKey) it.next();
+				if (!skey.isValid()) continue;
 				if (skey != key && skey != ssckey) {
 					MyWriter myWriter = new MyWriter(skey, toMsg);
 					exec.execute(myWriter);

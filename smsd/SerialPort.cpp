@@ -82,7 +82,7 @@ void SerialPort::SetCom(void)
 	/* set new port settings for canonical input processing */
 	newtio.c_cflag = 0;
 	newtio.c_cflag &= ~(CSIZE | PARENB);
-	newtio.c_cflag |= B115200 | CS8 | CLOCAL | CREAD;
+	newtio.c_cflag |= B19200 | CS8 | CLOCAL | CREAD;
 
 	newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG | IEXTEN);
 
