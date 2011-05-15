@@ -62,7 +62,8 @@ public class TCPServer implements Runnable {
 	public void execute() {
 
 		try {
-			while (running) {
+			while (running) 
+			{
 				int num = selector.select();
 				if (num > 0)
 				{
@@ -79,11 +80,27 @@ public class TCPServer implements Runnable {
 							getConn(key);
 						} else if (key.isReadable()) {
 							//System.out.println("isReadable");
-							readMsg(key);
+							try
+							{
+								readMsg(key);
+							}
+							catch(IOException ex)
+							{
+								ex.printStackTrace();
+								key.cancel();								
+							}
 						} else if (key.isValid() && key.isWritable()) {
 							if (writeMsg != null) {
 								//System.out.println("isWritable");
-								writeMsg(key);
+								try
+								{
+									writeMsg(key);
+								}
+								catch(IOException ex)
+								{
+									ex.printStackTrace();
+									key.cancel();								
+								}
 							}
 						}
 						else
@@ -108,6 +125,8 @@ public class TCPServer implements Runnable {
 		SocketChannel sc = ssc.accept();
 		sc.configureBlocking(false);
 		sc.register(selector, SelectionKey.OP_READ);
+		sc.socket().setSoTimeout(30);
+		sc.socket().setKeepAlive(true);
 		// sc.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
 		System.out.println("build connection :"
 				+ sc.socket().getRemoteSocketAddress());
@@ -151,7 +170,7 @@ public class TCPServer implements Runnable {
 		} 
 		else 
 		{
-			String toMsg = sc.socket().getRemoteSocketAddress() + "-88 said:"
+			String toMsg = sc.socket().getRemoteSocketAddress() + " said:"
 					+ sb.toString();
 			System.out.println(toMsg);
 			toMsg = sb.toString();
@@ -196,13 +215,23 @@ public class TCPServer implements Runnable {
 
 		public void run() {
 			try {
+				
 				SocketChannel client = (SocketChannel) key.channel();
-				client.write(ByteBuffer.wrap(msg.getBytes()));
+				System.out.println("send to "+ client.socket().getRemoteSocketAddress().toString());
+				if (key.isValid())
+					client.write(ByteBuffer.wrap(msg.getBytes()));
+				else
+				{
+					client.close();
+					client.socket().close();
+				}
 				Thread.yield();
 			} catch (IOException ex) {
 				ex.printStackTrace();
 				Logger.getLogger(MyWriter.class.getName()).log(Level.SEVERE,
 						null, ex);
+				key.cancel();
+				
 			}
 		}
 	}

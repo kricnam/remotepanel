@@ -29,6 +29,7 @@ public:
 	virtual bool IsOpen();
 	const char* GetPort(void);
 	virtual void SetTimeOut(int usec);
+	int GetHandle(void) {return handle;};
 protected:
 	int handle;
 	int timeout;

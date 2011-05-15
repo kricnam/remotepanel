@@ -18,4 +18,4 @@ $(COMD_TARGET):	$(COMD_OBJS)
 all:	$(SMSD_TARGET)  $(COMD_TARGET)
 
 clean:
-	rm -f *.o $(SMSD_TARGET)
+	rm -f *.o $(SMSD_TARGET) $(COMD_TARGET)
