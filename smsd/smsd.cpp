@@ -7,10 +7,11 @@
 #include <string>
 #include <unistd.h>
 #include "pdu.h"
+#include "Config.h"
 // Constructors/Destructors
 //  
 using namespace std;
-
+using namespace bitcomm;
 void print_useage(const char* sz) {
 	fprintf(
 			stderr,
@@ -82,7 +83,7 @@ int Run(const char* szDev, int timeout)
 		ind = modem.WaitIndication(now, timeout);
 		if (modem.IndicateRing(ind))
 		{
-			system("killall pppd");	sleep(5);system("pppd call cdma");
+			system("killall pppd");	sleep(5);system("pppd call cdma &");
 		}
 
 		int id;
@@ -96,6 +97,16 @@ int Run(const char* szDev, int timeout)
 				INFO("Get %6d %d,[%d]%s",stat,len,strpdu.size(),strpdu.c_str());
 				INFO("Caller %s",modem.m_strCaller.c_str());
 				modem.DeleteSMSAll();
+				string::size_type n = strpdu.find("SVR:");
+				if (n!=string::npos)
+				{
+					string svr;
+					svr = strpdu.substr(n+4,strpdu.size()-n-4);
+					Config conf("./agnet.conf");
+					conf.LoadAll();
+					conf.strServerName = svr;
+					conf.SaveAll();
+				}
 			}
 		}
 	}

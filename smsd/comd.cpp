@@ -3,6 +3,7 @@
 #include "SerialPort.h"
 #include "TCPPort.h"
 #include "TraceLog.h"
+#include "Config.h"
 using namespace bitcomm;
 #undef max
 #define max(x,y) ((x) > (y) ? (x) : (y))
@@ -11,6 +12,7 @@ using namespace bitcomm;
 int main(int argc,char** argv)
 {
 	SETTRACELEVEL(0);
+	Config conf("./agent.conf");
 	TCPPort tcp;
 	SerialPort com;
     fd_set read_set,write_set;
@@ -22,7 +24,9 @@ int main(int argc,char** argv)
 
 
     if (argc>1) strServer = argv[2];
-    else strServer = "192.168.1.2";
+    else strServer = conf.GetServerName();
+
+    if (strServer.empty()) strServer="192.168.1.2";
 
     int max_handle=0;
 
@@ -36,6 +40,14 @@ int main(int argc,char** argv)
 		FD_ZERO(&write_set);
 		tv.tv_sec =30;
 		tv.tv_usec = 0;
+
+		string strTmp  = conf.GetServerName();
+		if (!strTmp.empty() && strTmp!=strServer)
+		{
+			tcp.Close();
+			strServer = strTmp;
+		}
+
 		if (!tcp.IsOpen())
 		{
 			if (tcp.Open(strServer.c_str(),9998)==0)
@@ -44,7 +56,10 @@ int main(int argc,char** argv)
 			}
 			else
 			{
+				INFO("restart pppd service");
+				system("killall pppd");
 				sleep(5);
+				system("pppd call cdma &");
 				continue;
 			}
 		}
