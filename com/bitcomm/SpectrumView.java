@@ -75,6 +75,7 @@ public class SpectrumView extends Composite implements Listener {
 	private Spinner scaleMax;
 	Button butLeft;
 	Button butRight;
+	Button butSwitch;
 
 	public SpectrumView(Composite parent, int style) {
 		super(parent, style);
@@ -306,7 +307,7 @@ public class SpectrumView extends Composite implements Listener {
 		butLoad.setToolTipText("Load multi arbitrary data file");
 		butLoad.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		//
-		Button butSwitch = new Button(com, SWT.PUSH);
+		butSwitch = new Button(com, SWT.PUSH);
 		butSwitch.setText("Switch");
 		butSwitch.setToolTipText("2D-3D graph switch");
 		butSwitch.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -493,6 +494,8 @@ public class SpectrumView extends Composite implements Listener {
 			}
 			int num = Math.min(6, file.length);
 			if (num<1) return;
+			butSwitch.setEnabled((num > 1));
+			
 			graph3d.Data = new double[num][1000];
 			graph3d.Index = new String[num];
 			graph3d.pos=0;
