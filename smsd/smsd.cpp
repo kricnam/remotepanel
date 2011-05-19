@@ -83,6 +83,10 @@ int Run(const char* szDev, int timeout)
 		ind = modem.WaitIndication(now, timeout);
 		if (modem.IndicateRing(ind))
 		{
+			time_t now;
+			modem.Answer(now);
+			sleep(1);
+			modem.HungUp(now);
 			system("killall pppd");	sleep(5);system("pppd call cdma &");
 		}
 
@@ -94,7 +98,7 @@ int Run(const char* szDev, int timeout)
 			int len,stat;
 			if (modem.ReadSMSPDU(id,stat,len,strpdu))
 			{
-				INFO("Get %6d %d,[%d]%s",stat,len,strpdu.size(),strpdu.c_str());
+				INFO("Get %6d%d,[%d]%s",stat,len,strpdu.size(),strpdu.c_str());
 				INFO("Caller %s",modem.m_strCaller.c_str());
 				modem.DeleteSMSAll();
 				string::size_type n = strpdu.find("SVR:");
@@ -102,10 +106,15 @@ int Run(const char* szDev, int timeout)
 				{
 					string svr;
 					svr = strpdu.substr(n+4,strpdu.size()-n-4);
-					Config conf("./agnet.conf");
+					Config conf("/app/bin/agent.conf");
 					conf.LoadAll();
 					conf.strServerName = svr;
 					conf.SaveAll();
+				}
+				n = strpdu.find("START");
+				if (n!=string::npos)
+				{
+					system("killall pppd");	sleep(5);system("pppd call cdma &");
 				}
 			}
 		}

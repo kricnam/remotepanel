@@ -12,7 +12,7 @@ using namespace bitcomm;
 int main(int argc,char** argv)
 {
 	SETTRACELEVEL(0);
-	Config conf("./agent.conf");
+	Config conf("/app/bin/agent.conf");
 	TCPPort tcp;
 	SerialPort com;
     fd_set read_set,write_set;
@@ -23,7 +23,7 @@ int main(int argc,char** argv)
     string strServer;
 
 
-    if (argc>1) strServer = argv[2];
+    if (argc>2) strServer = argv[2];
     else strServer = conf.GetServerName();
 
     if (strServer.empty()) strServer="192.168.1.2";

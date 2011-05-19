@@ -293,7 +293,7 @@ bool Modem::Dial(const char* szNo, time_t& start, time_t& end) {
 
 bool Modem::HungUp(time_t& start) {
 	if (port.IsOpen()) {
-		string strAT = "AT+CHUP\r\n";
+		string strAT = "AT+CHV\r\n";
 		if (port.Write(strAT.c_str(), strAT.size()) < 0) {
 			INFO("%s failed",strAT.c_str());
 			return false;
@@ -616,7 +616,7 @@ bool Modem::ReadSMSPDU(int id, int& stat, int& len, string& pdu) {
 
 		if (WaitATResponse("OK", 10) > 0) {
 			string tmp;
-			tmp = chopLine("^HCMGR");
+			tmp = chopLine("^HCMGR:");
 			int y,m,d,h,mm,ss,format,type,prt,prv,lang,caller1,caller2;
 
 //<CR><LF>^HCMGR: <callerID>, <year>,	<month>, <day>, <hour>, <minute>, <second>,<lang>,<format>, <length>, <prt>, <prv>,<type>
@@ -680,7 +680,7 @@ bool Modem::DeleteSMSAll(void)
 			DEBUG(szBuf);
 			strtok(szBuf,",");
 			char* pID;
-			while(pID=strtok(NULL,","))
+			while( (pID=strtok(NULL,",")))
 			{
 				int i = atoi(pID);
 				DeleteSMS(i);
