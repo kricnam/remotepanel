@@ -5,12 +5,15 @@ package com.bitcomm;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -236,6 +239,7 @@ public class AlokaPanel {
 		ToolItem itemReport = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemSpectrum = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemBackup = new ToolItem(toolbar,SWT.BORDER);
+		ToolItem itemMap = new ToolItem(toolbar,SWT.PUSH);
 		ToolItem itemClose = new ToolItem(toolbar,SWT.PUSH);
 		
 
@@ -246,6 +250,7 @@ public class AlokaPanel {
 		Image imgClose = new Image(d,"com/bitcomm/resource/power_off.png");
 		Image imgBackup = new Image(d,"com/bitcomm/resource/backup.png");
 		Image imgSetupDis = new Image(d,"com/bitcomm/resource/xray.png");
+		Image imgMap = new Image(d,"com/bitcomm/resource/map.png");
 
 		//itemSetup.setText(ConstData.strConfig);
 		itemSetup.setImage(imgSetup);
@@ -365,6 +370,15 @@ public class AlokaPanel {
 			}
 		});
 		
+		itemMap.setText("Map");
+		itemMap.setImage(imgMap);
+		itemMap.addSelectionListener(new SelectionListener(){
+			public void widgetSelected(SelectionEvent e){
+				LoadMap();
+			}
+			public void widgetDefaultSelected(SelectionEvent e){
+			}
+		});
 		
 		itemClose.setText(ConstData.strClose);
 		itemClose.setImage(imgClose);
@@ -451,7 +465,7 @@ public class AlokaPanel {
 					return;
 		      }
 		    });
-		
+
 		shell.open();
 		shell.layout();
 		while (!shell.isDisposed()){
@@ -473,6 +487,39 @@ public class AlokaPanel {
 		imgClose.dispose();
 		imgSetupDis.dispose();
 		
+	}
+	
+	static void LoadMap()
+	{
+		Shell ie = new Shell(shell);
+		Browser browser = new Browser(ie, SWT.NONE);
+		browser.setBounds(ie.getBounds());
+
+		browser.setUrl("file://" + homedir + "/map/GoogleMaps.html");
+		String ipAddress = "map.google.com";
+		MessageBox("Warning","When your network were blocked on connecting to google map server, the map will not displayed correctly.");
+
+		try {
+			InetAddress inet = InetAddress.getByName(ipAddress);
+			System.out.println("Sending Ping Request to " + ipAddress);
+
+			boolean status = inet.isReachable(5000); // Timeout = 5000 milli
+														// seconds
+
+			if (status) {
+				System.out.println("Status : Host is reachable");
+			} else {
+				MessageBox("Warning","You network seems slow or blocked on connecting to google map server.");
+				System.out.println("Status : Host is not reachable");
+			}
+		} catch (UnknownHostException e) {
+			System.err.println("Host does not exists");
+		} catch (IOException e) {
+			System.err.println("Error in reaching the Host");
+		}
+		ie.open();
+		ie.layout();
+	
 	}
 	
 	static void Setup()
