@@ -6,6 +6,9 @@ package com.bitcomm;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 import org.eclipse.jface.preference.PreferenceDialog;
@@ -496,27 +499,41 @@ public class AlokaPanel {
 		browser.setBounds(ie.getBounds());
 
 		browser.setUrl("file://" + homedir + "/map/GoogleMaps.html");
-		String ipAddress = "map.google.com";
-		MessageBox("Warning","When your network were blocked on connecting to google map server, the map will not displayed correctly.");
-
+		String ipAddress = "maps.google.com.hk";
+		
+		Socket   clientSocket;
+		
 		try {
-			InetAddress inet = InetAddress.getByName(ipAddress);
-			System.out.println("Sending Ping Request to " + ipAddress);
-
-			boolean status = inet.isReachable(5000); // Timeout = 5000 milli
-														// seconds
-
-			if (status) {
-				System.out.println("Status : Host is reachable");
-			} else {
-				MessageBox("Warning","You network seems slow or blocked on connecting to google map server.");
-				System.out.println("Status : Host is not reachable");
-			}
-		} catch (UnknownHostException e) {
-			System.err.println("Host does not exists");
-		} catch (IOException e) {
-			System.err.println("Error in reaching the Host");
+			clientSocket = new Socket();
+			SocketAddress remoteAddr=new InetSocketAddress(ipAddress,80);
+			clientSocket.connect(remoteAddr, 2000);
+			System.out.println("port opend");
+			clientSocket.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			MessageBox("Warning",
+					"You network seems slow or blocked on connecting to google map server.\nthe map can not be displayed correctly.");
 		}
+		clientSocket = null;
+		  
+//		try {
+//			InetAddress inet = InetAddress.getByName(ipAddress);
+//			System.out.println("Sending Ping Request to " + ipAddress);
+//
+//			boolean status = inet.isReachable(20000); // Timeout = 5000 milli
+//														// seconds
+//
+//			if (status) {
+//				System.out.println("Status : Host is reachable");
+//			} else {
+//				MessageBox("Warning","You network seems slow or blocked on connecting to google map server.");
+//				System.out.println("Status : Host is not reachable");
+//			}
+//		} catch (UnknownHostException e) {
+//			System.err.println("Host does not exists");
+//		} catch (IOException e) {
+//			System.err.println("Error in reaching the Host");
+//		}
 		ie.open();
 		ie.layout();
 	
