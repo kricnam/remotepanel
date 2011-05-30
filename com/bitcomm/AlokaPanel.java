@@ -3,8 +3,15 @@
  */
 package com.bitcomm;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -497,10 +504,10 @@ public class AlokaPanel {
 		Shell ie = new Shell(shell);
 		Browser browser = new Browser(ie, SWT.NONE);
 		browser.setBounds(ie.getBounds());
-
+		writeHtml();
 		browser.setUrl("file://" + homedir + "/map/GoogleMaps.html");
 		String ipAddress = "maps.google.com.hk";
-		
+				
 		Socket   clientSocket;
 		
 		try {
@@ -516,29 +523,48 @@ public class AlokaPanel {
 		}
 		clientSocket = null;
 		  
-//		try {
-//			InetAddress inet = InetAddress.getByName(ipAddress);
-//			System.out.println("Sending Ping Request to " + ipAddress);
-//
-//			boolean status = inet.isReachable(20000); // Timeout = 5000 milli
-//														// seconds
-//
-//			if (status) {
-//				System.out.println("Status : Host is reachable");
-//			} else {
-//				MessageBox("Warning","You network seems slow or blocked on connecting to google map server.");
-//				System.out.println("Status : Host is not reachable");
-//			}
-//		} catch (UnknownHostException e) {
-//			System.err.println("Host does not exists");
-//		} catch (IOException e) {
-//			System.err.println("Error in reaching the Host");
-//		}
 		ie.open();
 		ie.layout();
 	
 	}
 	
+	static void writeHtml() {
+		String s ;
+		StringBuffer sb = new StringBuffer();
+		File f = new File(homedir + "/map/GoogleMaps.html.tmplt");
+		if (f.exists()) {
+			try {
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+						new FileInputStream(f)));
+				while ((s = br.readLine()) != null) {
+					sb.append(s+"\n");
+					
+				}
+				
+				s = sb.toString();
+				
+				float lang  = (float)meter[0].data.gps.laDegree ;
+				lang = lang + meter[0].data.gps.laMinute / 60 + (meter[0].data.gps.laSecond10 / 10) / 3600;
+				s.replaceAll("$LANG$", lang.toString());
+				s.replaceAll("$LAT$", lang.toString());
+				System.out.println(meter[0].data.gps.laDegree);
+
+				FileWriter fw = new FileWriter(homedir + "/map/GoogleMaps.html");
+				
+				fw.write(s);
+				fw.flush();
+				fw.close();
+
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
+		} else {
+			return;
+		}
+	}
+
 	static void Setup()
 	{
 		PreferenceManager manager= new PreferenceManager();
