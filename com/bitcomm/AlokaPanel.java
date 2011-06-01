@@ -543,10 +543,10 @@ public class AlokaPanel {
 				
 				s = sb.toString();
 				
-				float lang  = (float)meter[0].data.gps.laDegree ;
+				Float lang  = (float)meter[0].data.gps.laDegree ;
 				lang = lang + meter[0].data.gps.laMinute / 60 + (meter[0].data.gps.laSecond10 / 10) / 3600;
-				s.replaceAll("$LANG$", lang.toString());
-				s.replaceAll("$LAT$", lang.toString());
+				s = s.replaceAll("LANGI", lang.toString());
+				s = s.replaceAll("LATI", "40.0");
 				System.out.println(meter[0].data.gps.laDegree);
 
 				FileWriter fw = new FileWriter(homedir + "/map/GoogleMaps.html");
