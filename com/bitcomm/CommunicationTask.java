@@ -108,6 +108,11 @@ public class CommunicationTask extends Thread {
 			}
 		});
 	}
+	public void wakeup()
+	{
+		notify();
+	}
+	
 	public void run() {
 
 		Calendar calDoesTime = Calendar.getInstance();

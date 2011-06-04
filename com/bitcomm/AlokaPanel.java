@@ -193,15 +193,28 @@ public class AlokaPanel {
 	
 	public static void main(String[] args) {
 		
-		TCPServer server=new TCPServer();
-		new Thread(server).start();
-		
+	
 		File root = new File("root");
 		if (!root.exists())
 					root.mkdir();
 		homedir = System.getProperty("user.dir");
+		
+		PreferenceStore store = new PreferenceStore("./config.ini");
+		try{
+			store.load();
+		}
+		catch(IOException eio)
+		{
+			MessageBox("Error",eio.getMessage());
+			eio.printStackTrace();
+			return;
+		}
+
 		d = new Display();
 		
+		TCPServer server=new TCPServer();
+		new Thread(server).start();
+
 		shell =new Shell(d);//,SWT.MIN|SWT.MAX);
 		shell.setText(ConstData.strName);
 		Image imgShell = new Image(d,"com/bitcomm/resource/burn.png");
@@ -407,16 +420,6 @@ public class AlokaPanel {
 		Meters.setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true));
 
 		GridData layoutData = new GridData(SWT.FILL,SWT.FILL,true,true);
-		PreferenceStore store = new PreferenceStore("./config.ini");
-		try{
-			store.load();
-		}
-		catch(IOException eio)
-		{
-			MessageBox("Error",eio.getMessage());
-			eio.printStackTrace();
-			return;
-		}
 		
 		int Num = store.getInt("StationNum");
 		meter = new MeterView[Num];
@@ -489,6 +492,7 @@ public class AlokaPanel {
 		server.stop();
 		
 		meter[0].dataTask.Stop = true;
+		meter[0].dataTask.interrupt();
 
 		imgSetup.dispose();
 		imgNum.dispose();
@@ -496,6 +500,7 @@ public class AlokaPanel {
 		imgSpectrum.dispose();
 		imgClose.dispose();
 		imgSetupDis.dispose();
+		imgMap.dispose();
 		
 	}
 	
@@ -543,12 +548,26 @@ public class AlokaPanel {
 				
 				s = sb.toString();
 				
-				Float lang  = (float)meter[0].data.gps.laDegree ;
-				lang = lang + meter[0].data.gps.laMinute / 60 + (meter[0].data.gps.laSecond10 / 10) / 3600;
-				s = s.replaceAll("LANGI", lang.toString());
-				s = s.replaceAll("LATI", "40.0");
-				System.out.println(meter[0].data.gps.laDegree);
-
+				Float lang  = (float)meter[0].data.gps.lgDegree ;
+				lang = lang + meter[0].data.gps.lgMinute / 60 + (meter[0].data.gps.lgSecond10 / 10) / 3600;
+				Float lati;
+				lati = (float)meter[0].data.gps.laDegree + meter[0].data.gps.laMinute / 60 +
+				                   (meter[0].data.gps.laSecond10 / 10) / 3600;;
+				if (lang<1) lang = (float)104.0466;
+				if (lati<1) lati = (float)30.648;
+ 				s = s.replaceAll("LANGI", lang.toString());
+				s = s.replaceAll("LATI", lati.toString());
+				String strText;
+				strText = "Station:" + meter[0].label.getText();
+				strText += "<br/>Dose Rate:" ;
+				
+				if (meter[0].meter.strUnit!=null)
+					strText +=  meter[0].meter.nValue + meter[0].meter.strUnit;
+				else
+					strText += "--";
+				
+				s = s.replaceAll("TEXT_LEBAL", strText);
+				
 				FileWriter fw = new FileWriter(homedir + "/map/GoogleMaps.html");
 				
 				fw.write(s);

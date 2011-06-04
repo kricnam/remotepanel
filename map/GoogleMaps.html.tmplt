@@ -30,13 +30,12 @@ body {
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <title>Map Info Window</title>
-<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="http://maps.google.com.hk/maps/api/js?sensor=false"></script>
 <script type="text/javascript">
   function initialize() {
-    var myLatlng = new google.maps.LatLng(LANGI,LATI);
+    var myLatlng = new google.maps.LatLng(LATI,LANGI);
     var myOptions = {
-      zoom: 6,
+      zoom: 10,
       center: myLatlng,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     }
@@ -44,7 +43,7 @@ body {
     var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
     var contentString = '<div id="content">'+
-        '<div id="siteNotice">'+'ABCDEF 1234567'+
+        '<div id="siteNotice">'+'TEXT_LEBAL'+
         '</div>'+
         '</div>';
         
