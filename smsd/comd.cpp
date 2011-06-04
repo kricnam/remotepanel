@@ -60,6 +60,7 @@ int main(int argc,char** argv)
 				system("killall pppd");
 				sleep(5);
 				system("pppd call cdma &");
+				sleep(10);
 				continue;
 			}
 		}
