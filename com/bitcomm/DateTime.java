@@ -67,6 +67,14 @@ public class DateTime extends MeasureData{
 		setTime(cal);
 	}
 	
+	void addHour(int Hour)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(year, month-1, day, hour, minute);
+		cal.add(Calendar.HOUR, Hour);
+		setTime(cal);
+	}	
+	
 	byte[] ByteStream()
 	{
 		byte[] out = new byte[6];

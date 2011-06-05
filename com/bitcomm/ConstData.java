@@ -58,4 +58,5 @@ public class ConstData {
 	static String strDataType="Data Type";
 	static String strSave="Save";
 	static String strSavePrompt="Please select a file name to save data.";
+	static String strTimeOffset="Time Offset(hour)";
 }

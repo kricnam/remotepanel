@@ -59,7 +59,13 @@ public class SpectrumData extends MeasureData{
 		nThermoral = 0;
 		nBattVoltage = 0;		
 	}
-
+	
+	void AdjustTime(int nOffSet)
+	{
+		dateEnd.addHour(nOffSet);
+		dateGPS.addHour(nOffSet);
+	}
+	
 	
 	void Save()throws Exception, IOException
 	{

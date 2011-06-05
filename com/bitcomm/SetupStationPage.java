@@ -29,6 +29,7 @@ public class SetupStationPage extends PreferencePage {
 			store.setValue(strBase+"_MNUM", MachineNum.getText());
 		if (Interval!=null)
 			store.setValue(strBase+"_INTERVAL", Interval.getText());
+
 		return super.performOk();
 
 	}
@@ -72,6 +73,8 @@ public class SetupStationPage extends PreferencePage {
 		Interval = new Text(comp,SWT.BORDER);
 		Interval.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		Interval.setText(prefStore.getString(strBase+"_INTERVAL"));
+		
+		
 		return comp;
 
 	}

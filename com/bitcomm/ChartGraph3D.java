@@ -437,7 +437,7 @@ public class ChartGraph3D extends Canvas {
 		else
 		{
 			scale sc = CalculateAxisYScale();
-			System.out.println("div="+String.valueOf(sc.div)+",count="+String.valueOf(sc.count));
+//			System.out.println("div="+String.valueOf(sc.div)+",count="+String.valueOf(sc.count));
 			for (int i=0;i<sc.count+1;i++)
 			{
 				double ceil = (((int)nScaleMin/(int)sc.div)+i)*(int)sc.div;

@@ -23,13 +23,18 @@ public class TCPServer implements Runnable {
 
 	SelectionKey ssckey;
 	ExecutorService exec;
+	int nPort;
 
 	public TCPServer() {
-
+		nPort = 9998;
 		running = true;
 		exec = Executors.newCachedThreadPool();
 	}
-	
+	public TCPServer(int port) {
+		nPort = port;
+		running = true;
+		exec = Executors.newCachedThreadPool();
+	}
 	public void stop()
 	{
 		running = false;
@@ -41,9 +46,10 @@ public class TCPServer implements Runnable {
 			selector = Selector.open();
 			ServerSocketChannel ssc = ServerSocketChannel.open();
 			ssc.configureBlocking(false);
-			ssc.socket().bind(new InetSocketAddress(9998));
+			ssc.socket().bind(new InetSocketAddress(nPort));
 			ssckey = ssc.register(selector, SelectionKey.OP_ACCEPT);
 			System.out.println("server is starting..." + new Date());
+			System.out.println("server listen on " + nPort);
 
 		} catch (IOException ex) {
 			Logger.getLogger(TCPServer.class.getName()).log(Level.SEVERE, null,
@@ -52,13 +58,6 @@ public class TCPServer implements Runnable {
 		}
 	}
 
-	//
-	// public static void main(String[] args){
-	// TCPServer server=new TCPServer();
-	// new Thread(server).start();
-	//
-	// }
-	
 	public void execute() {
 
 		try {

@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Text;
 public class SetupPage extends PreferencePage {
 	Text StationNum;
 	Text urlAddress;
-	
+	Text TimeOffset;
 	/* （非 Javadoc）
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
@@ -43,7 +43,11 @@ public class SetupPage extends PreferencePage {
 		urlAddress = new Text(comp,SWT.BORDER);
 		urlAddress.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		urlAddress.setText(prefStore.getString(ConstData.strKeyServerURL));
-		
+		new Label(comp,SWT.LEFT).setText(ConstData.strTimeOffset);
+		TimeOffset = new Text(comp,SWT.BORDER);
+		TimeOffset.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		TimeOffset.setText(prefStore.getString("TIMEOFFSET"));
+	
 		return comp;
 	}
 	
@@ -51,7 +55,7 @@ public class SetupPage extends PreferencePage {
 		
 		StationNum.setText("4");//(store.getDefaultString("StationNum"));
 		urlAddress.setText("localhost");//store.getDefaultString("ServerURL"));
-		
+		TimeOffset.setText("-1");
 		
 	}
 
@@ -66,7 +70,8 @@ public class SetupPage extends PreferencePage {
 			store.setValue("StationNum", StationNum.getText());
 		if (urlAddress!=null)
 			store.setValue(ConstData.strKeyServerURL, urlAddress.getText());
-		
+		if (TimeOffset!=null)
+			store.setValue("TIMEOFFSET", TimeOffset.getText());
 		return super.performOk();
 	}
 }

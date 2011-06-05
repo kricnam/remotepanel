@@ -85,7 +85,9 @@ public class CommunicationHistoryData {
 		if (packet==null) return null;
 		if (packet.getPacketType()== Command.CommandType.DoseRateHistoryDataRequest)
 		{
-			 return new DoesRateData(packet.ByteStream());
+			DoesRateData data =  new DoesRateData(packet.ByteStream());
+			data.AdjustTime(AlokaPanel.nTimeOffset);
+			return data;
 		}
 			
 		return null;
@@ -98,7 +100,9 @@ public class CommunicationHistoryData {
 		
 		if (packet.getPacketType()== Command.CommandType.SpectrumDataRequest)
 		{
-			 return new SpectrumData(packet.ByteStream());
+			SpectrumData data =  new SpectrumData(packet.ByteStream());
+			data.AdjustTime(AlokaPanel.nTimeOffset);
+			return data;
 		}
 			
 		return null;

@@ -21,6 +21,7 @@ public class CommunicationTask extends Thread {
 	int nError;
 	int nHC_err;
 	int nInterval;
+	int nTimeOffset;
 	long nReserveTime;
 
 	CommunicationTask(MeterView face, CommunicationPort port) {
@@ -31,6 +32,7 @@ public class CommunicationTask extends Thread {
 		Paused = false;
 		nError = 0;
 		nInterval = 600;
+		nTimeOffset = -1;
 		nHC_err = 0;
 	}
 
@@ -265,7 +267,7 @@ public class CommunicationTask extends Thread {
 						nError = 0;
 
 						face.data.parse(packet.ByteStream());
-
+						face.data.AdjustTime(AlokaPanel.nTimeOffset);
 						face.data.Save();
 						
 						calNow.setTimeInMillis(face.data.date.getTime().getTimeInMillis());

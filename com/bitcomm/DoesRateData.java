@@ -56,6 +56,12 @@ public class DoesRateData extends MeasureData{
 		parse(Data);
 	}
 	
+	void AdjustTime(int nOffSet)
+	{
+		date.addHour(nOffSet);
+		dateGPS.addHour(nOffSet);
+	}
+	
 	String CSVString()
 	{
 		return String.valueOf(nMachineNum)+","+

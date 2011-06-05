@@ -16,6 +16,7 @@ public class MeterView extends Composite  {
 	Label label;
 	DoesRateData data;
 	DateTime statusDate;
+	TCPServer server;
 	CommunicationTask dataTask;
 	CommunicationPort ComPort;
 	final static RGB rgbGreen = new RGB(150,250,150);

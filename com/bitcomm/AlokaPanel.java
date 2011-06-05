@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -57,6 +58,7 @@ public class AlokaPanel {
 	static SpectrumView spectrum;
 	static ReprotView report;
 	static String homedir;
+	static int nTimeOffset;
 	
 	static void MessageBox(String strTitle,String strMsg)
 	{
@@ -209,12 +211,12 @@ public class AlokaPanel {
 			eio.printStackTrace();
 			return;
 		}
-
+		nTimeOffset = store.getInt("TIMEOFFSET");
+		if (nTimeOffset > 24) nTimeOffset = 24;
+		if (nTimeOffset < -24) nTimeOffset = -24;
+//		System.out.println("timeoffset="+nTimeOffset);
 		d = new Display();
 		
-		TCPServer server=new TCPServer();
-		new Thread(server).start();
-
 		shell =new Shell(d);//,SWT.MIN|SWT.MAX);
 		shell.setText(ConstData.strName);
 		Image imgShell = new Image(d,"com/bitcomm/resource/burn.png");
@@ -279,6 +281,7 @@ public class AlokaPanel {
 		itemSetup.setImage(imgSetup);
 		itemSetup.setDisabledImage(imgSetupDis);
 		itemSetup.setEnabled(false);
+		
 
 		itemSetup.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
@@ -436,6 +439,7 @@ public class AlokaPanel {
 			meter[i].setStationName(strName);
 			if (i==0)
 			{
+				
 				meter[i].Enable(true);
 				meter[i].nMachineNum = store.getInt(
 						ConstData.strStation.replace(" ", "_")
@@ -448,6 +452,22 @@ public class AlokaPanel {
 						ConstData.strStation.replace(" ", "_")
 						+"_"+String.valueOf(i+1)+"_INTERVAL");
 				if (meter[i].dataTask.nInterval==0) meter[i].dataTask.nInterval=600;
+				
+				Inet4Address ip;
+				try {
+					ip = (Inet4Address) InetAddress.getByName(strIP);
+				
+					if (ip.isLinkLocalAddress() || ip.isLoopbackAddress())
+					{
+						System.out.println("is local");
+						meter[i].server=new TCPServer(meter[i].ComPort.nPort);
+						new Thread(meter[i].server).start();
+					}
+					
+				} catch (UnknownHostException e1) {
+					e1.printStackTrace();
+				}
+				
 				
 				meter[i].dataTask.start();
 				meter[i].showOffLine();
@@ -489,8 +509,7 @@ public class AlokaPanel {
 			}
 		}
 
-		server.stop();
-		
+		if (meter[0].server!=null) meter[0].server.stop();
 		meter[0].dataTask.Stop = true;
 		meter[0].dataTask.interrupt();
 
