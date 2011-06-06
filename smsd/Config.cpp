@@ -167,6 +167,18 @@ int Config::GetTraceLevel(void)
 	return nTraceLevel;
 }
 
+int Config::GetDataPort(void)
+{
+	char tmp[1024]={0};
+	if (GetValue(strFileName.c_str(),"DATA_PORT",tmp,1024)==0)
+	{
+		nDataPort = atoi(tmp);
+	}
+	else
+		nDataPort = 9998;
+	return nTraceLevel;
+}
+
 
 string Config::GetIP(void)
 {
@@ -188,6 +200,7 @@ void Config::LoadAll(void)
 	GetMachine();
 	GetPowerOnDelay();
 	GetTraceLevel();
+	GetDataPort();
 }
 
 void Config::SaveAll(void)
@@ -203,6 +216,7 @@ void Config::SaveAll(void)
 		print_config(fp,"MP_PORT",strMPdev.c_str(),"device file name for MP");
 		print_config(fp,"MACHINE",nMachine, "Part No. of  MP");
 		print_config(fp,"LOCAL_IP",strIP.c_str(),"public IP for satellite modem");
+		print_config(fp,"DATA_PORT",nDataPort,"TCP Port number for server");
 		fclose(fp);
 	}
 	else

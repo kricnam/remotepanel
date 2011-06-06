@@ -26,6 +26,7 @@ public:
 	int GetMachine();
 	int GetPowerOnDelay();
 	int GetTraceLevel();
+	int GetDataPort();
 	void LoadAll(void);
 	void SaveAll(void);
 
@@ -36,6 +37,7 @@ public:
 	int    nPowerOnDelay;
 	int    nMachine;
 	int    nTraceLevel;
+	int	   nDataPort;
 };
 
 }

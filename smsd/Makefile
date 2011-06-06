@@ -15,6 +15,9 @@ $(SMSD_TARGET):	$(SMSD_OBJS)
 $(COMD_TARGET):	$(COMD_OBJS)
 	$(CXX) $(CXXFLAGS) -o $(COMD_TARGET) $(COMD_OBJS) $(LIBS)
 
+config:	http_config.cpp Config.cpp TraceLog.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 all:	$(SMSD_TARGET)  $(COMD_TARGET)
 
 clean:
