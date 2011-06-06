@@ -6,12 +6,9 @@ package com.bitcomm;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -59,7 +56,7 @@ public class AlokaPanel {
 	static ReprotView report;
 	static String homedir;
 	static int nTimeOffset;
-	
+	static String strExtIp;
 	static void MessageBox(String strTitle,String strMsg)
 	{
 		MessageBox box = new MessageBox(shell);
@@ -215,6 +212,7 @@ public class AlokaPanel {
 		if (nTimeOffset > 24) nTimeOffset = 24;
 		if (nTimeOffset < -24) nTimeOffset = -24;
 //		System.out.println("timeoffset="+nTimeOffset);
+		
 		d = new Display();
 		
 		shell =new Shell(d);//,SWT.MIN|SWT.MAX);
@@ -277,11 +275,11 @@ public class AlokaPanel {
 		Image imgSetupDis = new Image(d,"com/bitcomm/resource/xray.png");
 		Image imgMap = new Image(d,"com/bitcomm/resource/map.png");
 
-		//itemSetup.setText(ConstData.strConfig);
+		
 		itemSetup.setImage(imgSetup);
 		itemSetup.setDisabledImage(imgSetupDis);
 		itemSetup.setEnabled(false);
-		
+		itemSetup.setText("Getting IP...");
 
 		itemSetup.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
@@ -468,7 +466,7 @@ public class AlokaPanel {
 					e1.printStackTrace();
 				}
 				
-				
+				meter[i].dataTask.Pause = true;
 				meter[i].dataTask.start();
 				meter[i].showOffLine();
 			}
@@ -501,9 +499,22 @@ public class AlokaPanel {
 
 		shell.open();
 		shell.layout();
+		meter[0].dataTask.Pause = false;
+		
+
+		
 		while (!shell.isDisposed()){
 			if (!d.readAndDispatch()) 
 			{
+				if (strExtIp == null || strExtIp.isEmpty()) {
+					ExternalIPFetcher fetcher = new ExternalIPFetcher(
+							"http://checkip.dyndns.org/");
+					strExtIp = fetcher.getMyExternalIpAddress();
+					fetcher = null;
+					System.out.println("Externale IP:" + strExtIp);
+					itemSetup.setText("Server IP:\n" + strExtIp);
+					toolbar.pack();
+				}
 				d.sleep();
 
 			}
