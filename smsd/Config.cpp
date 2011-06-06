@@ -127,7 +127,7 @@ string Config::GetMPdev()
 	if (GetValue(strFileName.c_str(),"MP_PORT",tmp,1024)==0)
 		strMPdev = tmp;
 	else
-		strMPdev.clear();
+		strMPdev = "/dev/ttyS2";
 	return strMPdev;
 }
 
@@ -176,7 +176,7 @@ int Config::GetDataPort(void)
 	}
 	else
 		nDataPort = 9998;
-	return nTraceLevel;
+	return nDataPort;
 }
 
 
@@ -188,7 +188,7 @@ string Config::GetIP(void)
 		strIP = tmp;
 	}
 	else
-		strIP.c_str();
+		strIP = "192.168.1.77";
 	return strIP;
 }
 

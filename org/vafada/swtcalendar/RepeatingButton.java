@@ -37,7 +37,8 @@ public class RepeatingButton extends Button {
     public static final int DEFAULT_REPEAT_DELAY = 50;          // Milliseconds
     private int initialRepeatDelay = DEFAULT_INITIAL_REPEAT_DELAY;
     private int repeatDelay = DEFAULT_REPEAT_DELAY;
-    @SuppressWarnings("unchecked")
+    
+	@SuppressWarnings("rawtypes")
 	private ArrayList selectionListeners = new ArrayList(3);
     private Repeater repeater;
 

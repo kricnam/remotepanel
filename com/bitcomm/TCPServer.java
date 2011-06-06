@@ -66,9 +66,9 @@ public class TCPServer implements Runnable {
 				int num = selector.select();
 				if (num > 0)
 				{
-					Iterator it = selector.selectedKeys().iterator();
+					Iterator<SelectionKey> it = selector.selectedKeys().iterator();
 					while (it.hasNext()) {
-						SelectionKey key = (SelectionKey) it.next();
+						SelectionKey key = it.next();
 						it.remove();
 						if (!key.isValid())
 						{
@@ -173,10 +173,10 @@ public class TCPServer implements Runnable {
 					+ sb.toString();
 			System.out.println(toMsg);
 			toMsg = sb.toString();
-			Iterator it = key.selector().keys().iterator();
+			Iterator<SelectionKey> it = key.selector().keys().iterator();
 			while (it.hasNext()) 
 			{
-				SelectionKey skey = (SelectionKey) it.next();
+				SelectionKey skey =  it.next();
 				if (!skey.isValid()) continue;
 				if (skey != key && skey != ssckey) {
 					MyWriter myWriter = new MyWriter(skey, toMsg);

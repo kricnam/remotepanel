@@ -77,15 +77,15 @@ public class SWTDayChooser extends Composite
     private Calendar calendar;
     private Calendar today;
     private Locale locale;
-    @SuppressWarnings("unchecked")
-	private List listeners;
+    
+	private List<SWTCalendarListener> listeners;
     private int style;
 
-    @SuppressWarnings("unchecked")
+    
 	public SWTDayChooser(Composite parent, int style) {
         super(parent, style & ~RED_WEEKEND);
         this.style = style;
-        listeners = new ArrayList(3);
+        listeners = new ArrayList<SWTCalendarListener>(3);
 
         setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
@@ -450,7 +450,7 @@ public class SWTDayChooser extends Composite
         return false;
     }
 
-    @SuppressWarnings("unchecked")
+    
 	public void addSWTCalendarListener(SWTCalendarListener listener) {
         this.listeners.add(listener);
     }
@@ -459,7 +459,7 @@ public class SWTDayChooser extends Composite
         this.listeners.remove(listener);
     }
 
-    @SuppressWarnings("unchecked")
+    
 	private void dateChanged() {
         if (!listeners.isEmpty()) {
             SWTCalendarListener[] listenersArray = new SWTCalendarListener[listeners.size()];
