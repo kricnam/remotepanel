@@ -54,7 +54,7 @@ body {
     var marker = new google.maps.Marker({
         position: myLatlng,
         map: map,
-        title: 'Uluru (Ayers Rock)'
+        title: 'Post Monitor'
     });
     google.maps.event.addListener(marker, 'click', function() {
       infowindow.open(map,marker);

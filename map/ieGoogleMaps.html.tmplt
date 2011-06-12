@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<title>Map Info Window</title>
+<script type="text/javascript" src="http://maps.google.com.hk/maps/api/js?sensor=false"></script>
+<script type="text/javascript">
+  function initialize() {
+    var myLatlng = new google.maps.LatLng(LATI,LANGI);
+    var myOptions = {
+      zoom: 10,
+      center: myLatlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+
+    var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+    var contentString = '<div id="content">'+
+        '<div id="siteNotice">'+'TEXT_LEBAL'+
+        '</div>'+
+        '</div>';
+        
+    var infowindow = new google.maps.InfoWindow({
+        content: contentString
+    });
+
+    var marker = new google.maps.Marker({
+        position: myLatlng,
+        map: map,
+        title: 'Post Monitor'
+    });
+    google.maps.event.addListener(marker, 'click', function() {
+      infowindow.open(map,marker);
+    });
+    infowindow.open(map,marker);
+  }
+
+</script>
+</head>
+<body onload="initialize()" style="margin:0px 0px 0px 0px">
+  <div id="map_canvas" style="height:568px;"></div>
+</body>
+</html>

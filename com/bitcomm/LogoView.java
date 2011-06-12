@@ -36,6 +36,7 @@ public class LogoView extends Canvas {
 		
 		Point pt=g.stringExtent(ConstData.strTitle);
 		g.drawText(ConstData.strTitle,p.x/2 - pt.x/2 , 0);
+
 		imgLogo.dispose();
 		font.dispose();
 	}

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="smsd/*" kind="src" path=""/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="/opt/eclipse/plugins/org.eclipse.jface_3.6.2.M20110210-1200.jar"/>
 	<classpathentry exported="true" kind="lib" path="/opt/eclipse/plugins/org.eclipse.core.commands_3.6.0.I20100512-1500.jar"/>
 	<classpathentry exported="true" kind="lib" path="/opt/eclipse/plugins/org.eclipse.equinox.common_3.6.0.v20100503.jar"/>
 	<classpathentry exported="true" kind="lib" path="/home/mxx/project/aloka/org.eclipse.swt/swt.jar"/>
-	<classpathentry kind="output" path=""/>
+	<classpathentry excluding=".classpath|.classpath.helio|.project|.project.helio|.svn/|.svn/*|META-INF/|com/.svn/|com/bitcomm/.svn/|com/bitcomm/resource/.svn/|config.ini|map/|org/.svn/|org/vafada/.svn/|org/vafada/swtcalendar/.svn/|release/|root/|smsd/|smsd/*|spectrum/" including="com/|org/" kind="src" path=""/>
+	<classpathentry kind="output" path="release"/>
 </classpath>

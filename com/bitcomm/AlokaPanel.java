@@ -3,6 +3,7 @@
  */
 package com.bitcomm;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,9 +27,11 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -54,6 +57,7 @@ public class AlokaPanel {
 	static TrendView trend;
 	static SpectrumView spectrum;
 	static ReprotView report;
+	static LogoView logoView;
 	static String homedir;
 	static int nTimeOffset;
 	static String strExtIp;
@@ -250,7 +254,7 @@ public class AlokaPanel {
 		Logo.setLayoutData(gridData);
 		tool.setLayoutData(new GridData(SWT.FILL,SWT.FILL,false,false,1,2));
 
-		LogoView logoView = new LogoView(Logo,SWT.NONE);
+		logoView = new LogoView(Logo,SWT.NONE);
 		logoView.setLayout(new FillLayout());
 		Logo.setLayout(new FillLayout());
 
@@ -272,15 +276,15 @@ public class AlokaPanel {
 		Image imgSpectrum = new Image(d,"com/bitcomm/resource/spectrum.png");
 		Image imgClose = new Image(d,"com/bitcomm/resource/power_off.png");
 		Image imgBackup = new Image(d,"com/bitcomm/resource/backup.png");
-		Image imgSetupDis = new Image(d,"com/bitcomm/resource/xray.png");
+		Image imgSetupDis = new Image(d,"com/bitcomm/resource/setup.png");
 		Image imgMap = new Image(d,"com/bitcomm/resource/map.png");
 
 		
 		itemSetup.setImage(imgSetup);
 		itemSetup.setDisabledImage(imgSetupDis);
 		itemSetup.setEnabled(false);
-		itemSetup.setText("Getting IP...");
-
+		itemSetup.setText("Getting ip...");
+		
 		itemSetup.addSelectionListener(new SelectionListener(){
 			public void widgetSelected(SelectionEvent e){
 				Setup();
@@ -506,17 +510,15 @@ public class AlokaPanel {
 		while (!shell.isDisposed()){
 			if (!d.readAndDispatch()) 
 			{
-				if (strExtIp == null || strExtIp.isEmpty()) {
-					ExternalIPFetcher fetcher = new ExternalIPFetcher(
-							"http://checkip.dyndns.org/");
-					strExtIp = fetcher.getMyExternalIpAddress();
-					fetcher = null;
-					System.out.println("Externale IP:" + strExtIp);
-					itemSetup.setText("Server IP:\n" + strExtIp);
-					toolbar.pack();
+				if (strExtIp == null) {
+					Cursor cursor = d.getSystemCursor(SWT.CURSOR_WAIT);
+					shell.setCursor(cursor);
+					GetExtIp();
+					if (strExtIp != null)
+						itemSetup.setText(strExtIp);
+					shell.setCursor(null);
 				}
 				d.sleep();
-
 			}
 		}
 
@@ -533,18 +535,38 @@ public class AlokaPanel {
 		imgMap.dispose();
 		
 	}
+
+	static void GetExtIp()
+	{
+		if (strExtIp == null || strExtIp.isEmpty()) {
+			
+			ExternalIPFetcher fetcher = new ExternalIPFetcher(
+					"http://checkip.dyndns.org/");
+			strExtIp = fetcher.getMyExternalIpAddress();
+			fetcher = null;
+			System.out.println("Externale IP:" + strExtIp);
+		}
+	}
 	
 	static void LoadMap()
 	{
 		Shell ie = new Shell(shell);
+		Cursor cursor = d.getSystemCursor(SWT.CURSOR_WAIT);
+		shell.setCursor(cursor);
+
 		Browser browser = new Browser(ie, SWT.NONE);
-		browser.setBounds(ie.getBounds());
-		writeHtml();
-		browser.setUrl("file://" + homedir + "/map/GoogleMaps.html");
+		System.out.println(browser.getBrowserType());
+		
+		Rectangle rect = d.getBounds();
+		
+		ie.setBounds(rect.x+rect.width/8,rect.y+rect.height/8,rect.width/8*6,Math.max(600,rect.height/8*6));
+		browser.setBounds(ie.getClientArea());
+		writeHtml(browser.getBrowserType());
+		
 		String ipAddress = "maps.google.com.hk";
 				
 		Socket   clientSocket;
-		
+
 		try {
 			clientSocket = new Socket();
 			SocketAddress remoteAddr=new InetSocketAddress(ipAddress,80);
@@ -553,29 +575,39 @@ public class AlokaPanel {
 			clientSocket.close();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-			MessageBox("Warning",
-					"You network seems slow or blocked on connecting to google map server.\nthe map can not be displayed correctly.");
+			MessageBox("Warning" , "You network seems slow or blocked on connecting to google map server.\nthe map may not be displayed quickly or correctly.");
 		}
 		clientSocket = null;
-		  
+		shell.setCursor(null);
+		
+		ie.setText("Google Map");
 		ie.open();
+		browser.setUrl("file://" + homedir + "/map/GoogleMaps.html");
 		ie.layout();
-	
+		ie.setCursor(d.getSystemCursor(SWT.CURSOR_WAIT));
 	}
 	
-	static void writeHtml() {
+	static void writeHtml(String strType) {
 		String s ;
+		String strTmplt;
 		StringBuffer sb = new StringBuffer();
-		File f = new File(homedir + "/map/GoogleMaps.html.tmplt");
+		if (strType.matches("ie"))
+			strTmplt = homedir + "/map/ieGoogleMaps.html.tmplt";
+		else
+			strTmplt = homedir + "/map/GoogleMaps.html.tmplt";
+		File f = new File(strTmplt);
+		
 		if (f.exists()) {
 			try {
-				BufferedReader br = new BufferedReader(new InputStreamReader(
-						new FileInputStream(f)));
+				FileInputStream st = new FileInputStream(f);
+				InputStreamReader sr = new InputStreamReader(st);
+				BufferedReader br = new BufferedReader(sr);
 				while ((s = br.readLine()) != null) {
 					sb.append(s+"\n");
 					
 				}
-				
+				st.close();
+				sr.close();
 				s = sb.toString();
 				
 				Float lang  = (float)meter[0].data.gps.lgDegree ;
@@ -603,6 +635,7 @@ public class AlokaPanel {
 				fw.write(s);
 				fw.flush();
 				fw.close();
+				
 
 			} 
 			catch (Exception e) 

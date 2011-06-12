@@ -23,7 +23,7 @@ public class ExternalIPFetcher {
 
 	public ExternalIPFetcher(String externalIpProviderUrl) {
 //		this.externalIpProviderUrl = externalIpProviderUrl;
-
+		myExternalIpAddress = null;
 		String returnedhtml = fetchExternalIpProviderHTML(externalIpProviderUrl);
 
 		parse(returnedhtml);
@@ -48,8 +48,9 @@ public class ExternalIPFetcher {
 			// 打开连接
 			URL url = new URL(externalIpProviderUrl);
 			httpConn = (HttpURLConnection) url.openConnection();
-
 			// 连接设置
+			httpConn.setConnectTimeout(20000);
+			httpConn.setReadTimeout(10000);
 			HttpURLConnection.setFollowRedirects(true);
 			httpConn.setRequestMethod("GET");
 			httpConn.setRequestProperty("User-Agent",
@@ -98,6 +99,7 @@ public class ExternalIPFetcher {
 		Pattern pattern = Pattern.compile(
 				"(\\d{1,3})[.](\\d{1,3})[.](\\d{1,3})[.](\\d{1,3})",
 				Pattern.CASE_INSENSITIVE);
+		if (html==null) return;
 		Matcher matcher = pattern.matcher(html);
 		while (matcher.find()) {
 			myExternalIpAddress = matcher.group(0);
