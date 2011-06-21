@@ -168,7 +168,10 @@ public class SpectrumView extends Composite implements Listener {
 		butDate.setSelection(!butPeriod.getSelection());
 		butLog.setSelection(AlokaPanel.GetSettingBool("SpectrumLog"));
 		graph3d.logScale=butLog.getSelection();
-		scaleMin.setSelection(AlokaPanel.GetSettingInt("SpectrumYScaleMin"));
+		if(AlokaPanel.GetSettingInt("SpectrumYScaleMin")==0)
+			scaleMin.setSelection(100);
+		else
+			scaleMin.setSelection(AlokaPanel.GetSettingInt("SpectrumYScaleMin"));
 		scaleMax.setSelection(AlokaPanel.GetSettingInt("SpectrumYScaleMax"));
 		butLeft.setSelection(AlokaPanel.GetSettingBool("SpectrumCurSelect"));
 		butRight.setSelection(!AlokaPanel.GetSettingBool("SpectrumCurSelect"));
@@ -440,7 +443,7 @@ public class SpectrumView extends Composite implements Listener {
 
 		butLoad.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent arg0) {
-				OnLoad();				
+				OnLoad();	
 			}
 			public void widgetDefaultSelected(SelectionEvent arg0) {
 				
@@ -523,6 +526,7 @@ public class SpectrumView extends Composite implements Listener {
 			graph3d.setSize(graph3d.getParent().getParent().getClientArea().width,
 					graph3d.getParent().getParent().getClientArea().height);
 			graph3d.redraw();
+			
 			graph3d.setFocus();
 		}
 	}
@@ -577,13 +581,14 @@ public class SpectrumView extends Composite implements Listener {
 		graph3d.setSize(getShell().getClientArea().width,
 				getShell().getClientArea().height);
 		sc.setContent(graph3d);
-		
+	
 		graph3d.nXMarkNum = 10;
 		graph3d.nYMarkNum = 10;
 		graph3d.setAutoTransform(true);
 		graph3d.logScale = true;
 		graph3d.bMutilty=false;
 		graph3d.bSwitch = false;
+	
 
 	}
 

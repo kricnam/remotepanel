@@ -232,7 +232,7 @@ public class ChartGraph3D extends Canvas {
 			nScaleMin = Math.floor(nMinData);
 		}
 		nScaleLogMax = Math.log10(nScaleMax);
-		nScaleLogMin = (nScaleMin==0)?-2:Math.log10(nScaleMin);
+		nScaleLogMin = (nScaleMin==0)?0:Math.log10(nScaleMin);
 
 		double nRange = nScaleMax - nScaleMin;
 		double nLogRange = nScaleLogMax - nScaleLogMin;
