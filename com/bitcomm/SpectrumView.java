@@ -54,6 +54,7 @@ public class SpectrumView extends Composite implements Listener {
 	Label labelTo;
 
 	Text textTo;
+	Label labelROI;
 
 	Button calTo;
 
@@ -119,6 +120,8 @@ public class SpectrumView extends Composite implements Listener {
 				{
 					ChangePos(-1);
 				}
+				labelROI.setText(String.valueOf(graph3d.nROI));
+				labelROI.getParent().layout();
 			}
 		});
 	}
@@ -131,9 +134,11 @@ public class SpectrumView extends Composite implements Listener {
 			graph3d.pos = graph3d.Data.length-1;
 		if (graph3d.pos > (graph3d.Data.length-1))
 			graph3d.pos = 0;
-		
+		labelROI.setText(String.valueOf(graph3d.nROI));
+		labelROI.getParent().layout();
 		graph3d.UpdateSelection();
 		graph3d.setFocus();
+		
 		
 	}
 	
@@ -302,7 +307,7 @@ public class SpectrumView extends Composite implements Listener {
 				
 		//command buttons
 		Composite com = new Composite(optionBar, SWT.NONE);
-		com.setLayout(new GridLayout(6,false));
+		com.setLayout(new GridLayout(7,false));
 		com.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true,2,1));
 
 		Button butLoad = new Button(com, SWT.PUSH);
@@ -374,10 +379,23 @@ public class SpectrumView extends Composite implements Listener {
 		butRight = new Button(cursor,SWT.RADIO);
 		butLeft.setText("Left");
 		butRight.setText("Right");
+		
+		Composite roi = new Composite(com, SWT.BORDER);
+		roi.setLayout(new GridLayout(2,true));
+		roi.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,1,1));
+		Label lblROIText = new Label(roi, SWT.NONE);
+		lblROIText.setText("ROI:");
+		labelROI = new Label(roi,SWT.BORDER);
+		labelROI.setText("0");
+		
+		
+		
 		butLeft.addSelectionListener(new SelectionListener() {
 			
 			public void widgetSelected(SelectionEvent arg0) {
 				graph3d.HCursor1Active = true;
+				labelROI.setText(String.valueOf(graph3d.nROI));
+				labelROI.getParent().layout();
 				graph3d.setFocus();
 			}
 			
@@ -388,6 +406,8 @@ public class SpectrumView extends Composite implements Listener {
 		butRight.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent arg0) {
 				graph3d.HCursor1Active = false;
+				labelROI.setText(String.valueOf(graph3d.nROI));
+				labelROI.getParent().layout();
 				graph3d.setFocus();
 			}
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -526,7 +546,8 @@ public class SpectrumView extends Composite implements Listener {
 			graph3d.setSize(graph3d.getParent().getParent().getClientArea().width,
 					graph3d.getParent().getParent().getClientArea().height);
 			graph3d.redraw();
-			
+			labelROI.setText(String.valueOf(graph3d.nROI));
+			labelROI.getParent().layout();
 			graph3d.setFocus();
 		}
 	}

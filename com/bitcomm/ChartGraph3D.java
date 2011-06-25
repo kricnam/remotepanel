@@ -54,6 +54,7 @@ public class ChartGraph3D extends Canvas {
 	boolean bMutilty;
 	int HCursor1;
 	int HCursor2;
+	int nROI;
 	boolean HCursor1Active;
 	public ChartGraph3D(Composite parent, int style) {
 		// TODO 自动生成构造函数存根
@@ -114,9 +115,26 @@ public class ChartGraph3D extends Canvas {
 				if (HCursor2>999) HCursor2 = 999;
 				if (HCursor1<0) HCursor1 = 0;
 				if (HCursor2<0) HCursor2 = 0;
+				SetROI();
 				redraw();
 			}
 		});
+	}
+	
+	void SetROI()
+	{
+		if (Data==null) return;
+		int m=HCursor1;
+		int n=HCursor2;
+		if (m>n) {m = n; n = HCursor1;}
+		int i;
+		int sum = 0;
+		for(i=m;i<=n;i++)
+		{
+			sum+=Data[pos][i];
+		}
+		nROI = sum;
+		System.out.println(nROI);
 	}
 	
 	void paintControl(PaintEvent e) {
@@ -527,6 +545,7 @@ public class ChartGraph3D extends Canvas {
 			else strT="-LIN-";
 			pt=gc.stringExtent(strT);
 			gc.drawString(strT, x+width/2-pt.x/2, y+Margin/2-pt.y);
+			gc.drawString(String.valueOf(nROI),x+width/2+pt.x/2, y+Margin/2-pt.y);
 		}
 		
 		int dX = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.cos(degree)));
@@ -850,6 +869,7 @@ public class ChartGraph3D extends Canvas {
 			if (HCursor2 > 999)
 				HCursor2 = 0;
 		}
+		SetROI();
 		redraw();
 	}
 
