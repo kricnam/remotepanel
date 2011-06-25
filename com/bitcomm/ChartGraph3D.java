@@ -13,6 +13,9 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+
+
 
 public class ChartGraph3D extends Canvas {
 	class scale {
@@ -43,7 +46,7 @@ public class ChartGraph3D extends Canvas {
 	double nScaleMin;
 	double xScaleRate;  // 
 	int nXMarkNum;
-	
+	Label lblROI;
 	int nYMarkNum;
 	int pos;
 	boolean logScale;
@@ -104,6 +107,8 @@ public class ChartGraph3D extends Canvas {
 					   a.butLeft.setSelection(false);
 					   a.butRight.setSelection(true);
 				   }
+				   SetROI();
+				   getParent().update();
 			}
 			public void mouseDoubleClick(MouseEvent arg0) {
 				if (!bMutilty) return;
@@ -116,6 +121,8 @@ public class ChartGraph3D extends Canvas {
 				if (HCursor1<0) HCursor1 = 0;
 				if (HCursor2<0) HCursor2 = 0;
 				SetROI();
+				lblROI.setText(String.valueOf(nROI));
+				lblROI.getParent().layout();
 				redraw();
 			}
 		});

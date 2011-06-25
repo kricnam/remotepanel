@@ -124,6 +124,7 @@ public class SpectrumView extends Composite implements Listener {
 				labelROI.getParent().layout();
 			}
 		});
+		graph3d.lblROI = labelROI;
 	}
 	
 	void ChangePos(int n)
@@ -138,8 +139,6 @@ public class SpectrumView extends Composite implements Listener {
 		labelROI.getParent().layout();
 		graph3d.UpdateSelection();
 		graph3d.setFocus();
-		
-		
 	}
 	
 	void SaveSetting()
@@ -381,11 +380,11 @@ public class SpectrumView extends Composite implements Listener {
 		butRight.setText("Right");
 		
 		Composite roi = new Composite(com, SWT.BORDER);
-		roi.setLayout(new GridLayout(2,true));
-		roi.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false,1,1));
+		roi.setLayout(new GridLayout(2,false));
+		roi.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,1,1));
 		Label lblROIText = new Label(roi, SWT.NONE);
 		lblROIText.setText("ROI:");
-		labelROI = new Label(roi,SWT.BORDER);
+		labelROI = new Label(roi,SWT.NONE);
 		labelROI.setText("0");
 		
 		
@@ -501,6 +500,13 @@ public class SpectrumView extends Composite implements Listener {
 		});
 		
 	}
+	@Override
+	public void update() {
+		labelROI.setText(String.valueOf(graph3d.nROI));
+		System.out.println("update");
+		super.update();
+	}
+
 	protected void OnLoad() {
 		FileDialog dlg = new FileDialog(getShell(),SWT.MULTI);
 		dlg.setFilterExtensions(new String[]{"*.spc"});
@@ -545,7 +551,10 @@ public class SpectrumView extends Composite implements Listener {
 			graph3d.bSwitch = true;
 			graph3d.setSize(graph3d.getParent().getParent().getClientArea().width,
 					graph3d.getParent().getParent().getClientArea().height);
+			graph3d.SetROI();
+			
 			graph3d.redraw();
+			
 			labelROI.setText(String.valueOf(graph3d.nROI));
 			labelROI.getParent().layout();
 			graph3d.setFocus();
