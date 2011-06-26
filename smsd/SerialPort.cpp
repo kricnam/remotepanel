@@ -57,12 +57,12 @@ int SerialPort::Open(const char* szDev)
 
 	if (strDevName != szDev)
 		strDevName = szDev;
-	TRACE("%s!%s!",szDev, strDevName.c_str());
+	TRACE("Input %s! -> %s!",szDev, strDevName.c_str());
 
 	handle = open(strDevName.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (handle < 0)
 	{
-		ERROR("SerialPort::Open!errno=%d!",errno);
+		ERROR("SerialPort::Open %s!errno=%d!",szDev,errno);
 		ERRTRACE();
 		return -1;
 	}

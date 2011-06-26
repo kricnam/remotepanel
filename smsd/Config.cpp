@@ -125,9 +125,13 @@ string Config::GetMPdev()
 {
 	char tmp[1024]={0};
 	if (GetValue(strFileName.c_str(),"MP_PORT",tmp,1024)==0)
+	{
+		TRACE("Read %s",tmp);
 		strMPdev = tmp;
+	}
 	else
 		strMPdev = "/dev/ttyS2";
+	if (strMPdev.empty()) strMPdev = "/dev/ttyS2";
 	return strMPdev;
 }
 

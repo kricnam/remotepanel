@@ -267,6 +267,11 @@ bool Modem::Init(void) {
 	return false;
 }
 
+void Modem::Reset(void)
+{
+	port.Write("AT^RESET\r\n");
+}
+
 bool Modem::Dial(const char* szNo, time_t& start, time_t& end) {
 	INFO("Calling %s",szNo);
 	m_strLastError.clear();

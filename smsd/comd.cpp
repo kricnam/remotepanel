@@ -21,10 +21,14 @@ int main(int argc,char** argv)
     int buf_in_avail, buf_in_written;
     int buf_out_avail, buf_out_written;
     string strServer;
+    string strMPPort;
 
 
     if (argc>2) strServer = argv[2];
     else strServer = conf.GetServerName();
+
+    if (argc>1) strMPPort = argv[1];
+    else strMPPort = conf.GetMPdev();
 
     if (strServer.empty()) strServer="192.168.1.2";
 
@@ -33,7 +37,7 @@ int main(int argc,char** argv)
 	buf_in_written = buf_in_avail = 0;
 	buf_out_written = buf_out_avail = 0;
 	struct timeval tv;
-
+	string strTmp;
 	while(1)
 	{
 		FD_ZERO(&read_set);
@@ -41,9 +45,10 @@ int main(int argc,char** argv)
 		tv.tv_sec =30;
 		tv.tv_usec = 0;
 
-		string strTmp  = conf.GetServerName();
+		strTmp = conf.GetServerName();
 		if (!strTmp.empty() && strTmp!=strServer)
 		{
+			INFO("Server changed %s -> %s",strServer.c_str(),strTmp.c_str());
 			tcp.Close();
 			strServer = strTmp;
 		}
@@ -56,18 +61,18 @@ int main(int argc,char** argv)
 			}
 			else
 			{
-				INFO("restart pppd service");
+				INFO("Open fail. restart pppd service");
 				system("killall pppd");
-				sleep(5);
-				system("pppd call cdma &");
 				sleep(10);
+				system("pppd call cdma &");
+				sleep(30);
 				continue;
 			}
 		}
 
 		if(!com.IsOpen())
 		{
-			if (com.Open(argv[1])==0)
+			if (com.Open(strMPPort.c_str())==0)
 				buf_in_written = buf_in_avail = 0;
 			else
 			{

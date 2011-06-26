@@ -117,6 +117,7 @@ public:
 	virtual bool Open(const char* szName);
 	virtual int WaitATResponse(const char *szWait, int timeout,bool bClear=true);
 	virtual bool Init(void);
+	virtual void Reset(void);
 	virtual bool Dial(const char* szNo,time_t& start,time_t& end);
 	virtual bool HungUp(time_t& start);
 	virtual bool Answer(time_t& start);
