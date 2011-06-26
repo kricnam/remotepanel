@@ -124,6 +124,7 @@ public class SpectrumView extends Composite implements Listener {
 				labelROI.getParent().layout();
 			}
 		});
+		graph3d.SetROI();
 		graph3d.lblROI = labelROI;
 	}
 	
@@ -135,6 +136,7 @@ public class SpectrumView extends Composite implements Listener {
 			graph3d.pos = graph3d.Data.length-1;
 		if (graph3d.pos > (graph3d.Data.length-1))
 			graph3d.pos = 0;
+		graph3d.SetROI();
 		labelROI.setText(String.valueOf(graph3d.nROI));
 		labelROI.getParent().layout();
 		graph3d.UpdateSelection();
@@ -456,6 +458,8 @@ public class SpectrumView extends Composite implements Listener {
 			public void widgetSelected(SelectionEvent e) {
 				graph3d.bSwitch=false;
 				graph3d.bMutilty=false;
+				butSwitch.setEnabled(true);
+				labelROI.setText("---");
 				process();
 			}
 		});
@@ -499,12 +503,6 @@ public class SpectrumView extends Composite implements Listener {
 
 		});
 		
-	}
-	@Override
-	public void update() {
-		labelROI.setText(String.valueOf(graph3d.nROI));
-		System.out.println("update");
-		super.update();
 	}
 
 	protected void OnLoad() {
@@ -796,6 +794,7 @@ public class SpectrumView extends Composite implements Listener {
 			}
 				
 			graph3d.Data = null;
+			graph3d.nROI = 0;
 			graph3d.Data = new double[(int)nfile][1000];
 			graph3d.Index = new String[(int)nfile];
 			System.out.println("Total files:"+String.valueOf(nfile));
@@ -841,7 +840,7 @@ public class SpectrumView extends Composite implements Listener {
 						break;
 				}
 				catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					MessageBox box = new MessageBox(getShell(), SWT.ICON_ERROR | SWT.OK);
 					box.setText("Read File Fail");
 					box.setMessage(e.getMessage());
@@ -854,7 +853,7 @@ public class SpectrumView extends Composite implements Listener {
 		graph3d.setSize(graph3d.getParent().getParent().getClientArea().width,
 				graph3d.getParent().getParent().getClientArea().height);
 		graph3d.setAutoTransform(true);
-		graph3d.bMutilty=false;
+		graph3d.bMutilty= false;
 		graph3d.bSwitch = false;
 
 		getShell().setCursor(getDisplay().getSystemCursor(SWT.CURSOR_WAIT));

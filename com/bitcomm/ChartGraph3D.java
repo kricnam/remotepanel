@@ -141,7 +141,6 @@ public class ChartGraph3D extends Canvas {
 			sum+=Data[pos][i];
 		}
 		nROI = sum;
-		System.out.println(nROI);
 	}
 	
 	void paintControl(PaintEvent e) {
@@ -552,7 +551,6 @@ public class ChartGraph3D extends Canvas {
 			else strT="-LIN-";
 			pt=gc.stringExtent(strT);
 			gc.drawString(strT, x+width/2-pt.x/2, y+Margin/2-pt.y);
-			gc.drawString(String.valueOf(nROI),x+width/2+pt.x/2, y+Margin/2-pt.y);
 		}
 		
 		int dX = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.cos(degree)));
@@ -667,6 +665,13 @@ public class ChartGraph3D extends Canvas {
 		gc.drawString("Counts", x+Margin-pt.x, y+Margin-2*pt.y);
 		pt=gc.stringExtent("Channel");
 		gc.drawString("Channel", x+width-Margin+pt.x/6, y+height-Margin+pt.y);
+
+		//Draw ROI
+		String strROI = "ROI:"+ String.valueOf(nROI);
+		pt = gc.stringExtent(strROI);
+		//gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
+		gc.setForeground(getColor(pos));
+		gc.drawString(strROI,x+width/2-(pt.x/2), y+Margin-pt.y-3);
 
 		boolean bTwoCol=true;
 		for(int i=(pos+1)%Data.length;i<Data.length;i=(i+1)%Data.length)
