@@ -373,7 +373,7 @@ public class SpectrumView extends Composite implements Listener {
 
 		Composite cursor = new Composite(com, SWT.BORDER);
 		cursor.setLayout(new GridLayout(3,false));
-		cursor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false,1,1));
+		cursor.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		Label cur = new Label(cursor, SWT.NONE);
 		cur.setText("Cursor Bar Select:");
 		butLeft = new Button(cursor,SWT.RADIO);
@@ -383,11 +383,13 @@ public class SpectrumView extends Composite implements Listener {
 		
 		Composite roi = new Composite(com, SWT.BORDER);
 		roi.setLayout(new GridLayout(2,false));
-		roi.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,1,1));
+		roi.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		Label lblROIText = new Label(roi, SWT.NONE);
-		lblROIText.setText("ROI:");
-		labelROI = new Label(roi,SWT.NONE);
+		
+		lblROIText.setText("ROI Counts:");
+		labelROI = new Label(roi,SWT.CENTER);
 		labelROI.setText("0");
+		labelROI.setAlignment(SWT.CENTER);
 		
 		
 		

@@ -679,7 +679,7 @@ public class ChartGraph3D extends Canvas {
 		gc.drawString("Channel", x+width-Margin+pt.x/6, y+height-Margin+pt.y);
 
 		//Draw ROI
-		String strROI = "ROI:"+ String.valueOf(nROI);
+		String strROI = "ROI Counts:"+ String.valueOf(nROI);
 		pt = gc.stringExtent(strROI);
 		//gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
 		gc.setForeground(getColor(pos));

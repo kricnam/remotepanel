@@ -290,7 +290,7 @@ public class AnalogMeter extends Canvas {
 		int col = 2;
 
 		
-		if (Width > Height)
+		if (Width > 2 * (Height - dataEndY))
 		{
 			led_font_size = (Height - dataEndY) / 6;
 		
