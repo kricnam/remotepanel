@@ -226,6 +226,7 @@ public class ChartGraph3D extends Canvas {
 		Margin = Math.min(Margin,Math.max((int)(width * 0.04),(int)(height * 0.04)));
 		//System.out.println("MArgin:"+String.valueOf(Margin));
 		Margin = Math.max(Margin, pt.x*2);
+		Margin = Math.max(Margin, pt.y*5);
 		//System.out.println("MArgin:"+String.valueOf(Margin));
 		
 		nMaxData = 0;
@@ -556,10 +557,21 @@ public class ChartGraph3D extends Canvas {
 		int dX = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.cos(degree)));
 		int dY = (int)Math.abs(Math.round((Data.length+2)*nDepthStep*Math.sin(degree)));
 		
-		pt=gc.stringExtent("Counts");
-		gc.drawString("Counts", x+Margin-pt.x, y+dX+Margin-2*pt.y);
-		pt=gc.stringExtent("Channel");
-		gc.drawString("Channel", x+width-dY- Margin +pt.x/6, y+height-Margin+pt.y);
+		if (!bSwitch) {
+			pt = gc.stringExtent("Counts");
+			gc.drawString("Counts", x + Margin - pt.x, y + dX + Margin - 2
+					* pt.y);
+			pt = gc.stringExtent("Channel");
+			gc.drawString("Channel", x + width - dY - Margin + pt.x / 6, y
+					+ height - Margin + pt.y);
+		} else {
+			pt = gc.stringExtent("Counts");
+			gc.drawString("Counts", x + Margin - pt.x, y + Margin - 2
+					* pt.y);
+			pt = gc.stringExtent("Channel");
+			gc.drawString("Channel", x + width - Margin + pt.x / 6, y
+					+ height - Margin + pt.y);
+		}
 		
 		if ((bSwitch && Data.length > 1)||Data.length==1)
 		{
@@ -671,7 +683,7 @@ public class ChartGraph3D extends Canvas {
 		pt = gc.stringExtent(strROI);
 		//gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_BLACK));
 		gc.setForeground(getColor(pos));
-		gc.drawString(strROI,x+width/2-(pt.x/2), y+Margin-pt.y-3);
+		gc.drawString(strROI,x+width/2-(pt.x/2), y+Margin-pt.y-2);
 
 		boolean bTwoCol=true;
 		for(int i=(pos+1)%Data.length;i<Data.length;i=(i+1)%Data.length)
