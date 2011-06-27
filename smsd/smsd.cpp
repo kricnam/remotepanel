@@ -51,11 +51,15 @@ int main(int argc, char** argv)
 		{
 			waitpid(child, NULL, 0);
 			INFO("App Working process exit,Restart after 10 second");
+			system("killall comd");
+			system("killall pppd");
+			sleep(5);
 			SerialPort port;
 			if (port.Open("/dev/ttyUSB2")==0)
 			{
 				INFO("Open CDMA Modem");
 				port.Write("AT^RESET\r\n");
+				port.Close();
 				INFO("Send reset command");
 				sleep(10);
 			}
@@ -154,16 +158,18 @@ int Run(const char* szDev, int timeout)
 				n = strpdu.find("START");
 				if (n!=string::npos)
 				{
-					system("cd /app/bin ; /app/bin/comd &");
+					//system("cd /app/bin ; /app/bin/comd &");
 					continue;
 				}
 				n = strpdu.find("STOP");
+				if (n!=string::npos)
 				{
-					system("killall comd");
-					system("killall pppd");
+					//system("killall comd");
+					//system("killall pppd");
 					continue;
 				}
 				n = strpdu.find("REBOOT");
+				if (n!=string::npos)
 				{
 					//system("reboot");
 					break;

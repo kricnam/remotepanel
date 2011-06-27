@@ -63,7 +63,7 @@ int main(int argc,char** argv)
 			{
 				INFO("Open fail. restart pppd service");
 				system("killall pppd");
-				sleep(10);
+				sleep(15);
 				system("pppd call cdma &");
 				sleep(30);
 				continue;
