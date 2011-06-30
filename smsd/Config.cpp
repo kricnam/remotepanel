@@ -191,8 +191,8 @@ string Config::GetIP(void)
 	{
 		strIP = tmp;
 	}
-	else
-		strIP = "192.168.1.77";
+
+	if (strIP.empty())	strIP = "192.168.1.77";
 	return strIP;
 }
 

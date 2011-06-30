@@ -40,6 +40,7 @@ int main(int argc,char** argv)
 	string strTmp;
 	while(1)
 	{
+		usleep(1000);
 		FD_ZERO(&read_set);
 		FD_ZERO(&write_set);
 		tv.tv_sec =30;
@@ -63,9 +64,9 @@ int main(int argc,char** argv)
 			{
 				INFO("Open fail. restart pppd service");
 				system("killall pppd");
-				sleep(15);
-				system("pppd call cdma &");
 				sleep(30);
+				system("pppd call cdma &");
+				sleep(60);
 				continue;
 			}
 		}

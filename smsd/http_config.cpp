@@ -108,7 +108,7 @@ int main() {
 	outItem("MP_PORT", conf.GetMPdev().c_str(), cDef.GetMPdev().c_str(),
 			"device file name for MP");
 	outItem("LOCAL_IP", conf.GetIP().c_str(), cDef.GetIP().c_str(),
-			"public IP for satellite modem");
+			"local I/F unit address");
 
 
 	cout << "</device_agent_config>" << endl;
@@ -150,7 +150,7 @@ void save_config(const char* szBuf)
 		print_config(fp,"POWERON_DELAY", cDef.GetPowerOnDelay(),"waiting second for MP self test");
 		print_config(fp,"LOG_LEVEL",cDef.GetTraceLevel(), "log message detail level, 0-9, 0 for more, 9 for less detail");
 		print_config(fp,"MP_PORT",cDef.GetMPdev().c_str(),"device file name for MP");
-		print_config(fp,"LOCAL_IP", cDef.GetIP().c_str(),"public IP for satellite modem");
+		print_config(fp,"LOCAL_IP", cDef.GetIP().c_str(),"local I/F unit address");
 
 		fclose(fp);
 		time_t now;
