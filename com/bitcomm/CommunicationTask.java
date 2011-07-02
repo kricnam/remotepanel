@@ -174,8 +174,6 @@ public class CommunicationTask extends Thread {
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
-					
-					
 					continue;
 				}
 			}
@@ -223,7 +221,7 @@ public class CommunicationTask extends Thread {
 				}
 				
 				nReserveTime = calNow.getTimeInMillis() + nInterval*1000;
-				
+				System.out.println("Time "+calNow.get(Calendar.MINUTE)+":" +calNow.get(Calendar.SECOND));
 				try 
 				{
 					port.Send(cmdPacket.ByteStream());

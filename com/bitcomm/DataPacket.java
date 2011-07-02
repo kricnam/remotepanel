@@ -59,6 +59,8 @@ public class DataPacket {
 		if (Is_CRC_OK(Data, start, size - 3)) {
 			Content = Arrays.copyOfRange(Data, start, end);
 		}
+		else
+			System.out.println("CRC FAIL");
 	}
 
 	byte[] ByteStream() {

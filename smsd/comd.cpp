@@ -7,8 +7,13 @@
 using namespace bitcomm;
 #undef max
 #define max(x,y) ((x) > (y) ? (x) : (y))
-#define BUF_SIZE 4096
-
+#define BUF_SIZE 6000
+void dump(const char* buf,int size)
+{
+	for(int i=0;i<size;i++)
+		printf("%u ",(unsigned)buf[i]);
+	if (size) printf("\n");
+}
 int main(int argc,char** argv)
 {
 	SETTRACELEVEL(0);
@@ -22,6 +27,7 @@ int main(int argc,char** argv)
     int buf_out_avail, buf_out_written;
     string strServer;
     string strMPPort;
+    time_t tLastRead;
 
 
     if (argc>2) strServer = argv[2];
@@ -38,6 +44,7 @@ int main(int argc,char** argv)
 	buf_out_written = buf_out_avail = 0;
 	struct timeval tv;
 	string strTmp;
+	time(&tLastRead);
 	while(1)
 	{
 		usleep(1000);
@@ -127,21 +134,27 @@ int main(int argc,char** argv)
 
         if (com.GetHandle()>0 && FD_ISSET(com.GetHandle(),&read_set))
         {
+        	time(&tLastRead);
         	ret = com.Read(com_in_buf+buf_in_avail,BUF_SIZE-buf_in_avail);
         	buf_in_avail+=ret;
         }
 
-        if(tcp.GetHandle()>0 && FD_ISSET(tcp.GetHandle(),&write_set))
+        if(tcp.GetHandle()>0 &&
+        		(FD_ISSET(tcp.GetHandle(),&write_set)  || (buf_in_avail-buf_in_written) > 0))
         {
-        	try
-        	{
-        		ret = tcp.Write(com_in_buf+buf_in_written,buf_in_avail-buf_in_written);
-        		buf_in_written+=ret;
-        	}
-        	catch(ChannelException& e)
-        	{
-        		tcp.Close();
-        	}
+        	time_t now;
+			time(&now);
+			if ((now - tLastRead) > 1)
+			{
+				try {
+					dump(com_in_buf + buf_in_written,buf_in_avail- buf_in_written);
+					ret = tcp.Write(com_in_buf + buf_in_written, buf_in_avail
+							- buf_in_written);
+					buf_in_written += ret;
+				} catch (ChannelException& e) {
+					tcp.Close();
+				}
+			}
         }
 
         if (com.GetHandle()>0 && FD_ISSET(com.GetHandle(),&write_set))
@@ -155,3 +168,5 @@ int main(int argc,char** argv)
 	}
 	return 0;
 }
+
+

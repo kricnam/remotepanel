@@ -145,16 +145,25 @@ public class TCPServer implements Runnable {
 		}
 		
 		//System.out.print(sc.socket().getRemoteSocketAddress() + " ");
-		ByteBuffer buffer = ByteBuffer.allocate(1024);
+		ByteBuffer buffer = ByteBuffer.allocate(6000);
+		ByteBuffer b2 = ByteBuffer.allocate(6000);
 		buffer.clear();
 		int len = 0;
-
+		
+		
 		while ((len = sc.read(buffer)) > 0) {
 			buffer.flip();
+			b2.put(buffer.array(),0,len);
 			sb.append(new String(buffer.array(), 0, len));
+			
 		}
-		if (sb.length() > 0)
+		
+		if (sb.length()>0)
+		{
 			System.out.println("get from client:" + sb.toString());
+			System.out.println("size " + sb.length());
+			System.out.println("buf2 size: " +b2.position());
+		}
 		else
 			return;
 		
@@ -172,14 +181,18 @@ public class TCPServer implements Runnable {
 			String toMsg = sc.socket().getRemoteSocketAddress() + " said:"
 					+ sb.toString();
 			System.out.println(toMsg);
-			toMsg = sb.toString();
+			System.out.println("len:" + String.valueOf(sb.length()));
+			
+
 			Iterator<SelectionKey> it = key.selector().keys().iterator();
 			while (it.hasNext()) 
 			{
 				SelectionKey skey =  it.next();
 				if (!skey.isValid()) continue;
 				if (skey != key && skey != ssckey) {
-					MyWriter myWriter = new MyWriter(skey, toMsg);
+					//MyWriter myWriter = new MyWriter(skey, ByteBuffer.wrap(b2.array(),0,b2.position()));
+					MyWriter myWriter = new MyWriter(skey, ByteBuffer.wrap(b2.array(),0,sb.length()));
+					
 					exec.execute(myWriter);
 				}
 
@@ -205,11 +218,14 @@ public class TCPServer implements Runnable {
 
 	class MyWriter implements Runnable {
 		SelectionKey key;
-		String msg;
+		ByteBuffer msg;
 
-		public MyWriter(SelectionKey key, String msg) {
+		public MyWriter(SelectionKey key, ByteBuffer msg) {
 			this.key = key;
+			System.out.println("in msg.len"+String.valueOf(msg.position()));
 			this.msg = msg;
+			System.out.println("o msg.len"+String.valueOf(this.msg.position()));
+			
 		}
 
 		public void run() {
@@ -218,7 +234,12 @@ public class TCPServer implements Runnable {
 				SocketChannel client = (SocketChannel) key.channel();
 				System.out.println("send to "+ client.socket().getRemoteSocketAddress().toString());
 				if (key.isValid())
-					client.write(ByteBuffer.wrap(msg.getBytes()));
+				{					
+//					System.out.println("in writer bef wrap:"+ String.valueOf(msg.length));
+//					ByteBuffer bf = ByteBuffer.wrap(msg);
+					client.write(msg);
+					//System.out.println("in writer:"+ String.valueOf(msg.array().length));
+				}
 				else
 				{
 					client.close();

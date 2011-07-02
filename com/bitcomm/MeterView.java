@@ -252,7 +252,8 @@ public class MeterView extends Composite  {
 	}
 	public boolean isConnected()
 	{
-		return meter.strLED==ConstData.strNormal;
+		//return meter.strLED==ConstData.strNormal;
+		return meter.strLED.startsWith(ConstData.strNormal);
 	}
 
 }

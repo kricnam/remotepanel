@@ -61,6 +61,7 @@ public class AlokaPanel {
 	static String homedir;
 	static int nTimeOffset;
 	static String strExtIp;
+	static int nExtIPtryCounter;
 	static void MessageBox(String strTitle,String strMsg)
 	{
 		MessageBox box = new MessageBox(shell);
@@ -201,7 +202,7 @@ public class AlokaPanel {
 		if (!root.exists())
 					root.mkdir();
 		homedir = System.getProperty("user.dir");
-		
+		nExtIPtryCounter = 0;
 		PreferenceStore store = new PreferenceStore("./config.ini");
 		try{
 			store.load();
@@ -327,7 +328,7 @@ public class AlokaPanel {
 					report.getShell().setActive();
 					return;
 				}
-				Shell s = new Shell(shell);
+				Shell s = new Shell(shell,SWT.RESIZE|SWT.DIALOG_TRIM);
 				GC gc = new GC(s);
 				Point pt=gc.stringExtent("888");
 				s.setSize(600,pt.y*54);
@@ -510,7 +511,7 @@ public class AlokaPanel {
 		while (!shell.isDisposed()){
 			if (!d.readAndDispatch()) 
 			{
-				if (strExtIp == null) {
+				if ((nExtIPtryCounter< 3) && (strExtIp == null)) {
 					Cursor cursor = d.getSystemCursor(SWT.CURSOR_WAIT);
 					shell.setCursor(cursor);
 					GetExtIp();
@@ -538,8 +539,9 @@ public class AlokaPanel {
 
 	static void GetExtIp()
 	{
+		if (nExtIPtryCounter>3) return;
 		if (strExtIp == null || strExtIp.isEmpty()) {
-			
+			nExtIPtryCounter++;
 			ExternalIPFetcher fetcher = new ExternalIPFetcher(
 					"http://checkip.dyndns.org/");
 			strExtIp = fetcher.getMyExternalIpAddress();

@@ -129,7 +129,7 @@ public class CommunicationPort {
 				ch = -1;
 				//throw se;
 			}
-			//System.out.println(String.valueOf(pos)+":"+String.valueOf(ch));
+			System.out.println(String.valueOf(pos)+":"+String.valueOf(ch));
 			if (ch < 0 ) break;
 			
 			if (pos >= buffer.length) pos = 0;
@@ -138,6 +138,7 @@ public class CommunicationPort {
 			
 			if (ch == DataPacket.SOH && buffer[0] != DataPacket.SOH) 
 			{
+				System.out.println("catch soh");
 				pos = 0;// buffer.clear();
 				buffer[pos++] = (byte) ch;// buffer.put((byte) ch);
 			} 
@@ -147,6 +148,7 @@ public class CommunicationPort {
 
 				if (pos > 4096 || ch ==DataPacket.EOT) 
 				{
+					if (ch ==DataPacket.EOT) System.out.println("catch EOT");
 					DataPacket packet = new DataPacket(buffer, pos);
 					if (packet.bValid) {
 						pos = 0;// buffer.clear();
